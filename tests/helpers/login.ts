@@ -10,22 +10,19 @@ export interface LoginOptions {
   }
 }
 
-/**
- * Logs the user into the admin panel via the login page.
- */
+/** Logs the user into the writing backend through the product login page. */
 export async function login({
   page,
   serverURL = 'http://127.0.0.1:3100',
   user,
 }: LoginOptions): Promise<void> {
-  await page.goto(`${serverURL}/admin/login`)
+  await page.goto(`${serverURL}/login`)
 
-  await page.fill('#field-email', user.email)
-  await page.fill('#field-password', user.password)
+  await page.fill('#email', user.email)
+  await page.fill('#password', user.password)
   await page.click('button[type="submit"]')
 
-  await page.waitForURL(`${serverURL}/admin`)
+  await page.waitForURL(`${serverURL}/articles`)
 
-  const dashboardArtifact = page.getByRole('heading', { name: '集合' })
-  await expect(dashboardArtifact).toBeVisible()
+  await expect(page.getByRole('navigation', { name: '后台导航' })).toBeVisible()
 }

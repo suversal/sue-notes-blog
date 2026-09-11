@@ -9,7 +9,11 @@ const dirname = path.dirname(__filename)
 const nextConfig: NextConfig = {
   allowedDevOrigins: ['localhost', '127.0.0.1'],
   redirects() {
-    return [{ source: '/', destination: '/blog', permanent: true }]
+    return [
+      { source: '/', destination: '/blog', permanent: true },
+      { source: '/admin', destination: '/articles', permanent: false },
+      { source: '/admin/:path*', destination: '/articles', permanent: false },
+    ]
   },
   images: {
     localPatterns: [

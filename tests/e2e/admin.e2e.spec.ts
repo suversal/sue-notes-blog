@@ -2,7 +2,7 @@ import { test, expect, Page } from '@playwright/test'
 import { login } from '../helpers/login'
 import { seedTestUser, cleanupTestUser, testUser } from '../helpers/seedUser'
 
-test.describe('Admin Panel', () => {
+test.describe('Writing backend', () => {
   let page: Page
 
   test.beforeAll(async ({ browser }) => {
@@ -18,18 +18,16 @@ test.describe('Admin Panel', () => {
     await cleanupTestUser()
   })
 
-  test('can navigate to dashboard', async () => {
+  test('legacy admin entry opens the writing backend', async () => {
     await page.goto('http://127.0.0.1:3100/admin')
-    await expect(page).toHaveURL('http://127.0.0.1:3100/admin')
-    const dashboardArtifact = page.getByRole('heading', { name: '集合' })
-    await expect(dashboardArtifact).toBeVisible()
+    await expect(page).toHaveURL('http://127.0.0.1:3100/articles')
+    await expect(page.getByRole('navigation', { name: '后台导航' })).toBeVisible()
   })
 
-  test('can navigate to list view', async () => {
+  test('legacy nested admin links do not expose Payload UI', async () => {
     await page.goto('http://127.0.0.1:3100/admin/collections/users')
-    await expect(page).toHaveURL(/\/admin\/collections\/users(?:\?.*)?$/)
-    const listViewArtifact = page.locator('h1', { hasText: 'Users' }).first()
-    await expect(listViewArtifact).toBeVisible()
+    await expect(page).toHaveURL('http://127.0.0.1:3100/articles')
+    await expect(page.getByRole('navigation', { name: '后台导航' })).toBeVisible()
   })
 
   test('can open the writing backend', async () => {
