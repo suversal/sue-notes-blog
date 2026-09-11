@@ -1,0 +1,23 @@
+'use client';
+
+import Link from 'next/link';
+import { useActionState, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createTopicFromWeb, deleteTopicFromWeb, renameTopicFromWeb } from '../actions';
+import { Icon } from '../../blog/components/ui-icon';
+import styles from '../admin-v1.module.css';
+
+type Topic = { id: string; name: string; isSystem: boolean; publicCount: number; draftCount: number };
+const initial = { ok: false, message: '' };
+
+export function TopicManager({ topics }: { topics: Topic[] }) {
+  const router = useRouter(); const [query, setQuery] = useState(''); const [dialog, setDialog] = useState<{ kind: 'create' | 'rename' | 'delete'; topic?: Topic } | null>(null); const [createState, createAction, createPending] = useActionState(createTopicFromWeb, initial); const [renameState, renameAction, renamePending] = useActionState(renameTopicFromWeb, initial); const [deleteState, deleteAction, deletePending] = useActionState(deleteTopicFromWeb, initial); const state = dialog?.kind === 'create' ? createState : dialog?.kind === 'rename' ? renameState : deleteState;
+  useEffect(() => {
+    if (!state.ok) return;
+    router.refresh();
+    const timer = window.setTimeout(() => setDialog(null), 0);
+    return () => window.clearTimeout(timer);
+  }, [router, state]);
+  const visible = topics.filter((topic) => topic.name.toLocaleLowerCase('zh-CN').includes(query.trim().toLocaleLowerCase('zh-CN'))); const pending = createPending || renamePending || deletePending;
+  return <><div className={styles.breadcrumb}><span>写作空间 / 主题</span><span>前台与编辑器共用</span></div><header className={styles.pageHead}><div><h1>主题</h1><p>整理文章的归属，让读者顺着兴趣继续读。</p></div><button className={styles.primaryButton} onClick={() => setDialog({ kind: 'create' })}><Icon name="plus" />新增主题</button></header><div className={styles.topicToolbar}><span>{topics.filter((topic) => !topic.isSystem).length} 个自定义主题 · 1 个系统主题</span><label className={styles.searchInput}><Icon name="search" /><span className={styles.srOnly}>搜索主题</span><input placeholder="搜索主题…" value={query} onChange={(event) => setQuery(event.target.value)} /></label></div><div className={styles.topicTable} role="table" aria-label="主题管理列表"><div className={styles.topicHead} role="row"><span>主题名称</span><span>公开文章</span><span>草稿</span><span>操作</span></div>{visible.map((topic) => <div className={styles.topicRow} role="row" key={topic.id}><div><Icon name="tag" /><span><strong>{topic.name}</strong>{topic.isSystem && <small>系统保留 · 接收暂未归类的文章</small>}</span></div><span><small>公开 </small>{topic.publicCount}</span><span><small>草稿 </small>{topic.draftCount}</span><div><Link href={`/articles?topic=${encodeURIComponent(topic.id)}`}>查看文章</Link>{!topic.isSystem ? <><button onClick={() => setDialog({ kind: 'rename', topic })}>编辑</button><button className={styles.dangerText} onClick={() => setDialog({ kind: 'delete', topic })}>删除</button></> : <span>系统主题</span>}</div></div>)}</div><p className={styles.note}>同一篇文章可以同时拥有公开快照和待更新草稿；主题删除时会同时迁移两边的归属，不会删除文章。</p>{dialog && <div className={styles.modalOverlay} onMouseDown={(event) => { if (event.target === event.currentTarget && !pending) setDialog(null); }}><section className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="topic-dialog-title"><header><h2 id="topic-dialog-title">{dialog.kind === 'create' ? '新增主题' : dialog.kind === 'rename' ? '编辑主题' : '删除主题'}</h2><button aria-label="关闭" disabled={pending} onClick={() => setDialog(null)}><Icon name="close" /></button></header><form action={dialog.kind === 'create' ? createAction : dialog.kind === 'rename' ? renameAction : deleteAction}>{dialog.topic && <input type="hidden" name="topicId" value={dialog.topic.id} />}{dialog.kind === 'delete' ? <><p>删除“<strong>{dialog.topic?.name}</strong>”？关联的文章会被保留。</p><label><span>将关联文章迁移到</span><select name="targetId" required defaultValue=""><option value="" disabled>请选择主题</option>{topics.filter((topic) => topic.id !== dialog.topic?.id).map((topic) => <option key={topic.id} value={topic.id}>{topic.name}</option>)}</select></label><small>公开版本和草稿的主题归属会在同一数据库事务中更新。</small></> : <label><span>主题名称</span><input name="name" required minLength={1} maxLength={20} defaultValue={dialog.topic?.name} autoFocus /><small>1–20 个字，名称不能重复。</small></label>}{state.message && !state.ok && <p className={styles.error} role="alert">{state.message}</p>}<div className={styles.modalActions}><button type="button" disabled={pending} onClick={() => setDialog(null)}>取消</button><button className={dialog.kind === 'delete' ? styles.dangerButton : styles.primaryButton} disabled={pending} type="submit">{pending ? '正在保存…' : dialog.kind === 'delete' ? '确认删除并迁移' : '保存主题'}</button></div></form></section></div>}</>;
+}

@@ -1,0 +1,73 @@
+import { getPayloadClient } from './payload';
+import { articleContentPlainText, type ArticleContent } from './article-content-data';
+
+export type SiteProfile = { siteName: string; authorName: string; tagline: string; authorBio: string };
+export type PublicPost = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: ArticleContent;
+  plainText: string;
+  topic: { id: string; name: string };
+  coverStyle: 'none' | 'notes' | 'grid' | 'cache';
+  publishedAt: string;
+  updatedAt: string;
+  publicReferences: { label: string; url: string }[];
+};
+
+export const defaultSiteProfile: SiteProfile = {
+  siteName: '苏码手记',
+  authorName: 'Sue',
+  tagline: '关于工具、创造，以及认真生活的小事。',
+  authorBio: '一个爱折腾工具的独立开发者。把亲手做过的事、慢慢想明白的问题，写在这里。',
+};
+
+export function relationId(value: unknown): string {
+  return value && typeof value === 'object' && 'id' in value ? String((value as { id: unknown }).id) : String(value ?? '');
+}
+
+function topicFrom(revision: any, article: any, topicNames: Map<string, string>): PublicPost['topic'] {
+  const raw = revision.topic ?? article.topic;
+  if (raw && typeof raw === 'object') return { id: String(raw.id), name: String(raw.name || '未分类') };
+  const legacy = revision.tags?.[0]?.value ?? article.tags?.[0]?.value;
+  const id = raw ? String(raw) : 'uncategorized';
+  return { id, name: topicNames.get(id) || legacy || '未分类' };
+}
+
+export async function getSiteProfile(owner?: string): Promise<SiteProfile> {
+  const payload = await getPayloadClient();
+  const result = await payload.find({ collection: 'site-settings', overrideAccess: true, depth: 0, limit: 1, ...(owner ? { where: { owner: { equals: owner } } } : {}) } as any);
+  const item = result.docs[0] as any;
+  return item ? { siteName: item.siteName, authorName: item.authorName, tagline: item.tagline, authorBio: item.authorBio } : defaultSiteProfile;
+}
+
+export async function getPublicPosts(limit = 100): Promise<PublicPost[]> {
+  const payload = await getPayloadClient();
+  const [articles, topics] = await Promise.all([
+    payload.find({ collection: 'articles', overrideAccess: true, depth: 1, limit, sort: '-publishedAt', where: { and: [{ status: { equals: 'published' } }, { visibility: { equals: 'public' } }] } }),
+    payload.find({ collection: 'topics', overrideAccess: true, depth: 0, limit: 100 }),
+  ]);
+  const topicNames = new Map((topics.docs as any[]).map((topic) => [String(topic.id), String(topic.name)]));
+  const rows = await Promise.all((articles.docs as any[]).map(async (article) => {
+    if (!article.publishedRevision) return undefined;
+    const revision = await payload.findByID({
+      collection: 'article-revisions',
+      id: relationId(article.publishedRevision),
+      overrideAccess: true,
+      depth: 1,
+    }) as any;
+    return {
+      id: String(article.id), title: revision.title, slug: revision.slug,
+      excerpt: revision.excerpt || '一篇慢慢写下来的文章。', content: revision.content, plainText: articleContentPlainText(revision.content),
+      topic: topicFrom(revision, article, topicNames), coverStyle: revision.coverStyle || 'none',
+      publishedAt: article.publishedAt || article.updatedAt, updatedAt: article.updatedAt,
+      publicReferences: revision.publicReferences ?? [],
+    } satisfies PublicPost;
+  }));
+  return rows.filter((row): row is PublicPost => Boolean(row));
+}
+
+export async function getPublicPost(slug: string): Promise<PublicPost | undefined> {
+  return (await getPublicPosts(100)).find((post) => post.slug === slug);
+}
