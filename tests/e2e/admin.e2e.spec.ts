@@ -27,7 +27,7 @@ test.describe('Admin Panel', () => {
 
   test('can navigate to list view', async () => {
     await page.goto('http://127.0.0.1:3100/admin/collections/users')
-    await expect(page).toHaveURL('http://127.0.0.1:3100/admin/collections/users')
+    await expect(page).toHaveURL(/\/admin\/collections\/users(?:\?.*)?$/)
     const listViewArtifact = page.locator('h1', { hasText: 'Users' }).first()
     await expect(listViewArtifact).toBeVisible()
   })

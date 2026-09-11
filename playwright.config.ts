@@ -34,7 +34,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev',
+    command:
+      'node --no-deprecation node_modules/next/dist/bin/next dev --hostname 127.0.0.1 --port 3100',
     reuseExistingServer: true,
     url: 'http://127.0.0.1:3100',
   },
