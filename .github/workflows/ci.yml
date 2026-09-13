@@ -29,6 +29,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm check:fast
       - run: pnpm test:unit
+      - name: Migrate test database
+        run: pnpm payload migrate
+        env:
+          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:55433/sue_notes_blog
+          PAYLOAD_SECRET: ci-only-secret-ci-only-secret-ci-only-secret
       - run: pnpm test:int
         env:
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:55433/sue_notes_blog
