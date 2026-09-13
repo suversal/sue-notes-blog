@@ -482,11 +482,11 @@
 }
 @media (hover: hover) and (pointer: fine) {
   .featureTitle:hover h1,
-  .postTitle:hover h3 {
+  .postTitle h3:hover {
     text-decoration-color: color-mix(in srgb, var(--accent) 58%, transparent);
   }
   .featureTitle:hover h1,
-  .postTitle:hover h3,
+  .postTitle h3:hover,
   .sideTopics button:hover {
     color: var(--accent);
   }
@@ -517,7 +517,7 @@
   .postRow:hover {
     background-color: color-mix(in srgb, var(--panel) 45%, transparent);
   }
-  .postTitle:hover svg {
+  .postTitle svg:hover {
     transform: rotate(0) translateX(3px);
     color: var(--accent);
   }
