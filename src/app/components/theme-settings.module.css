@@ -175,8 +175,21 @@
 
 @media (max-width: 420px) {
   .panel {
+    right: 0;
+    left: auto;
     gap: 3px;
     padding: 5px;
+    transform: translate(0, -7px) scale(0.96);
+    transform-origin: top right;
+  }
+  .panelOpen {
+    transform: translate(0, 0) scale(1);
+  }
+  .panel::before,
+  .panel::after {
+    right: 12px;
+    left: auto;
+    transform: none;
   }
   .settings .optionButton {
     width: 36px;

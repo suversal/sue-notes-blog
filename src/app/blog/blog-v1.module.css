@@ -2228,3 +2228,253 @@
   .archiveControl { display: grid; grid-template-columns: auto minmax(0, 1fr); }
   .archiveControl > div { min-width: 0; }
 }
+
+/* Compact mobile rhythm, aligned with the AIRadar reading experience. */
+@media (max-width: 600px) {
+  .publicShell {
+    width: calc(100% - 32px);
+  }
+  .masthead {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    min-height: 56px;
+    padding: 0;
+    gap: 6px;
+    row-gap: 0;
+  }
+  .brand {
+    gap: 7px;
+  }
+  .brand img {
+    width: 28px;
+    height: 28px;
+  }
+  .brand > span {
+    font-size: 18px;
+    letter-spacing: 0.01em;
+  }
+  .brand small {
+    display: none;
+  }
+  .masthead nav {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: center;
+    gap: 0;
+  }
+  .masthead nav a {
+    min-height: 44px;
+    padding: 0 7px;
+    font-size: 13px;
+  }
+  .navTools {
+    grid-column: 3;
+    grid-row: 1;
+    gap: 0;
+  }
+  .navTools > button {
+    width: 36px;
+    height: 44px;
+  }
+  .navTools > button svg {
+    width: 18px;
+    height: 18px;
+  }
+  .navTools .themeToggle {
+    width: 40px;
+    transform: none;
+  }
+  .footer {
+    min-height: auto;
+    margin-top: 24px;
+    padding: 18px 0;
+    gap: 8px;
+    font-size: 11px;
+  }
+  .footerRight,
+  .footerLinks {
+    gap: 12px;
+  }
+  .archiveTitle {
+    padding: 20px 0 16px;
+  }
+  .archiveTitle h1 {
+    margin: 4px 0 2px;
+    font-size: 22px;
+  }
+  .archiveTitle > span {
+    font-size: 12px;
+  }
+  .archiveFilters {
+    padding: 12px 0 8px;
+  }
+  .archiveControls {
+    gap: 8px;
+  }
+  .archiveSearch input,
+  .archiveControls select {
+    min-height: 42px;
+  }
+  .archiveControl {
+    gap: 6px;
+    font-size: 11px;
+  }
+  .archiveTopics {
+    margin-top: 4px;
+  }
+  .archiveTopics button {
+    min-height: 40px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .resultBar {
+    min-height: 44px;
+    font-size: 11px;
+  }
+  .archiveYear > div:first-child {
+    padding: 12px 0 6px;
+  }
+  .archiveYear > div:first-child h2,
+  .archiveYear > div:first-child h2.metricHeading {
+    font-size: 18px;
+    line-height: 1.45;
+  }
+  .archiveYear article {
+    grid-template-columns: 78px minmax(0, 1fr);
+    align-items: start;
+    gap: 4px 10px;
+    min-height: 0;
+    padding: 11px 0;
+  }
+  .archiveYear time,
+  .archiveYear small {
+    padding-top: 4px;
+    font-size: 10px;
+  }
+  .archiveYear h3 {
+    font-size: 17px;
+    line-height: 1.45;
+  }
+  .archiveYear article > span {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    padding: 2px 6px;
+    font-size: 10px;
+  }
+  .archiveYear article small {
+    grid-column: 2;
+    grid-row: 3;
+    justify-self: start;
+    padding-top: 1px;
+  }
+  .archiveRowMeta {
+    gap: 9px;
+  }
+  .archiveMetric svg {
+    width: 13px;
+    height: 13px;
+  }
+  .readerTop {
+    min-height: 52px;
+  }
+  .readerTop > a {
+    font-size: 12px;
+  }
+  .readerTop .readerEdit,
+  .readerTop .readerTool {
+    width: 38px;
+    height: 40px;
+  }
+  .mobileToc {
+    padding: 0;
+    margin-bottom: 12px;
+  }
+  .mobileToc summary {
+    min-height: 40px;
+    font-size: 12px;
+  }
+  .reader {
+    padding: 8px 0 30px;
+  }
+  .reader > h1 {
+    margin: 6px 0 10px;
+    font-size: 24px;
+    line-height: 1.42;
+  }
+  .dek {
+    margin: 12px 0 6px;
+    padding: 8px 0 8px 14px;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+  .dek::before {
+    top: 7px;
+    bottom: 7px;
+  }
+  .byline {
+    gap: 8px;
+    padding: 8px 0 14px;
+    font-size: 11px;
+  }
+  .reader > .plate {
+    margin-bottom: 16px;
+  }
+  .prose {
+    line-height: 1.75;
+  }
+  .prose p {
+    margin: 0 0 1em;
+  }
+  .engagement {
+    padding-top: 24px;
+  }
+  .engagementHeader {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .engagementHeader h2 {
+    font-size: 20px;
+  }
+  .engagementStats > * {
+    min-height: 48px;
+  }
+  .articlePager > a,
+  .articlePager > a + a {
+    padding: 12px 0;
+  }
+  .articlePager h2 {
+    font-size: 15px;
+  }
+  .about > header {
+    padding: 20px 0 16px;
+  }
+  .about > header h1 {
+    margin-top: 4px;
+    font-size: 26px;
+  }
+  .about > header > span {
+    font-size: 12px;
+  }
+  .aboutGrid > div > section {
+    gap: 6px;
+    padding: 18px 0;
+  }
+  .aboutGrid section h2 {
+    font-size: 17px;
+  }
+  .aboutGrid p {
+    margin-bottom: 9px;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+  .aboutGrid aside {
+    padding-top: 18px;
+  }
+  .aboutGrid aside section {
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+  }
+  .aboutGrid aside a {
+    min-height: 52px;
+  }
+}

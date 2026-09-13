@@ -852,3 +852,152 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* AIRadar-inspired density for phone layouts. */
+@media (max-width: 600px) {
+  .intro {
+    padding: 10px 0 12px;
+  }
+  .tagline {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .featureCopy {
+    padding: 18px 16px;
+  }
+  .kicker {
+    font-size: 9px;
+  }
+  .featureTitle h1 {
+    margin: 12px 0 8px;
+    font-size: 22px;
+    line-height: 1.42;
+  }
+  .excerpt {
+    margin-bottom: 14px;
+    font-size: 13px;
+    line-height: 1.7;
+    -webkit-line-clamp: 3;
+  }
+  .featureBottom {
+    gap: 8px;
+  }
+  .readLink {
+    min-height: 40px;
+  }
+  .readingShortcuts {
+    gap: 8px 18px;
+    padding-top: 12px;
+  }
+  .readingShortcuts a {
+    min-height: 40px;
+    font-size: 12px;
+  }
+  .homeGrid {
+    gap: 22px;
+    padding-top: 12px;
+  }
+  .sectionHeading {
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .sectionHeading h2 {
+    font-size: 20px;
+  }
+  .sectionHeading > a {
+    min-height: 40px;
+    font-size: 11px;
+  }
+  .topicScroller {
+    grid-template-columns: 36px minmax(0, 1fr) 36px;
+    padding-bottom: 6px;
+  }
+  .topicArrow {
+    width: 36px;
+    min-height: 40px;
+  }
+  .topicTabs button {
+    min-height: 40px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .postRow,
+  .postRow.withThumbnail {
+    grid-template-columns: 18px minmax(0, 1fr);
+    gap: 8px;
+    padding: 14px 0;
+  }
+  .rowNumber {
+    font-size: 9px;
+  }
+  .postTitle {
+    min-height: 0;
+    gap: 8px;
+  }
+  .postTitle h3,
+  .withThumbnail .postTitle h3 {
+    margin: 4px 0;
+    font-size: 18px;
+    line-height: 1.45;
+  }
+  .postTitle svg {
+    width: 15px;
+    height: 15px;
+  }
+  .postRow p {
+    display: -webkit-box;
+    overflow: hidden;
+    margin-top: 2px;
+    font-size: 13px;
+    line-height: 1.65;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  .postEngagement,
+  .withThumbnail .postEngagement {
+    gap: 7px 13px;
+    margin-top: 8px;
+    font-size: 11px;
+  }
+  .postEngagement .postTopic {
+    padding: 2px 6px;
+  }
+  .postEngagement svg {
+    width: 14px;
+    height: 14px;
+  }
+  .listBottom {
+    min-height: 54px;
+  }
+  .homeAside {
+    padding-top: 20px;
+  }
+  .popularHeading h2 {
+    font-size: 18px;
+  }
+  .popularPeriods {
+    margin-top: 4px;
+  }
+  .popularPeriods button {
+    min-height: 40px;
+    font-size: 11px;
+  }
+  .popularList li {
+    padding: 10px 0;
+  }
+  .popularTitle {
+    grid-template-columns: 20px minmax(0, 1fr) 13px;
+    gap: 7px;
+    font-size: 13px;
+  }
+  .popularList .engagement {
+    margin-top: 4px;
+    margin-left: 27px;
+    font-size: 10px;
+  }
+  .allArticles {
+    min-height: 40px;
+    margin-top: 6px;
+    font-size: 11px;
+  }
+}
