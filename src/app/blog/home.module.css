@@ -856,76 +856,81 @@
 /* AIRadar-inspired density for phone layouts. */
 @media (max-width: 600px) {
   .intro {
-    padding: 10px 0 12px;
+    padding: 8px 0 9px;
   }
   .tagline {
     font-size: 13px;
     line-height: 1.6;
   }
   .featureCopy {
-    padding: 18px 16px;
+    padding: 14px;
   }
   .kicker {
     font-size: 9px;
   }
   .featureTitle h1 {
-    margin: 12px 0 8px;
-    font-size: 22px;
-    line-height: 1.42;
+    margin: 9px 0 6px;
+    font-size: 20px;
+    line-height: 1.4;
   }
   .excerpt {
-    margin-bottom: 14px;
-    font-size: 13px;
-    line-height: 1.7;
-    -webkit-line-clamp: 3;
+    margin-bottom: 10px;
+    font-size: 12px;
+    line-height: 1.65;
+    -webkit-line-clamp: 2;
   }
   .featureBottom {
     gap: 8px;
   }
   .readLink {
-    min-height: 40px;
+    min-height: 36px;
+    font-size: 11px;
+  }
+  .readLink > span {
+    width: 32px;
+    height: 32px;
   }
   .readingShortcuts {
-    gap: 8px 18px;
-    padding-top: 12px;
+    gap: 6px 16px;
+    padding-top: 8px;
   }
   .readingShortcuts a {
-    min-height: 40px;
+    min-height: 36px;
     font-size: 12px;
   }
   .homeGrid {
-    gap: 22px;
-    padding-top: 12px;
+    gap: 14px;
+    padding-top: 8px;
   }
   .sectionHeading {
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
   .sectionHeading h2 {
-    font-size: 20px;
+    font-size: 18px;
   }
   .sectionHeading > a {
-    min-height: 40px;
+    min-height: 36px;
     font-size: 11px;
   }
   .topicScroller {
-    grid-template-columns: 36px minmax(0, 1fr) 36px;
-    padding-bottom: 6px;
+    grid-template-columns: 32px minmax(0, 1fr) 32px;
+    padding-bottom: 4px;
   }
   .topicArrow {
-    width: 36px;
-    min-height: 40px;
+    width: 32px;
+    min-height: 36px;
   }
   .topicTabs button {
-    min-height: 40px;
-    padding: 6px 10px;
-    font-size: 12px;
+    min-height: 36px;
+    padding: 5px 9px;
+    font-size: 11px;
   }
   .postRow,
   .postRow.withThumbnail {
     grid-template-columns: 18px minmax(0, 1fr);
     gap: 8px;
-    padding: 14px 0;
+    padding: 10px 0;
   }
   .rowNumber {
     font-size: 9px;
@@ -936,9 +941,9 @@
   }
   .postTitle h3,
   .withThumbnail .postTitle h3 {
-    margin: 4px 0;
-    font-size: 18px;
-    line-height: 1.45;
+    margin: 2px 0;
+    font-size: 16px;
+    line-height: 1.42;
   }
   .postTitle svg {
     width: 15px;
@@ -948,16 +953,16 @@
     display: -webkit-box;
     overflow: hidden;
     margin-top: 2px;
-    font-size: 13px;
-    line-height: 1.65;
+    font-size: 12px;
+    line-height: 1.6;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
   .postEngagement,
   .withThumbnail .postEngagement {
     gap: 7px 13px;
-    margin-top: 8px;
-    font-size: 11px;
+    margin-top: 6px;
+    font-size: 10px;
   }
   .postEngagement .postTopic {
     padding: 2px 6px;
@@ -967,13 +972,13 @@
     height: 14px;
   }
   .listBottom {
-    min-height: 54px;
+    min-height: 42px;
   }
   .homeAside {
-    padding-top: 20px;
+    padding-top: 12px;
   }
   .popularHeading h2 {
-    font-size: 18px;
+    font-size: 17px;
   }
   .popularPeriods {
     margin-top: 4px;
@@ -983,12 +988,13 @@
     font-size: 11px;
   }
   .popularList li {
-    padding: 10px 0;
+    padding: 8px 0;
   }
   .popularTitle {
     grid-template-columns: 20px minmax(0, 1fr) 13px;
     gap: 7px;
-    font-size: 13px;
+    font-size: 12px;
+    line-height: 1.45;
   }
   .popularList .engagement {
     margin-top: 4px;
@@ -999,5 +1005,21 @@
     min-height: 40px;
     margin-top: 6px;
     font-size: 11px;
+  }
+  .popularList {
+    margin-bottom: 8px;
+  }
+  .sideTopics {
+    padding-top: 12px;
+  }
+  .sideTopics h2 {
+    margin-bottom: 4px;
+    padding-bottom: 8px;
+    font-size: 17px;
+  }
+  .sideTopics button {
+    min-height: 40px;
+    padding: 4px 0;
+    font-size: 12px;
   }
 }

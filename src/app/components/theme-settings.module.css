@@ -173,7 +173,7 @@
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 600px) {
   .panel {
     right: 0;
     left: auto;

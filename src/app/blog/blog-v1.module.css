@@ -22,6 +22,7 @@
   --plate-paper: #f8f7f2;
   --plate-secondary: #cbc9bd;
   --plate-highlight: #d8e4da;
+  overflow-x: clip;
 }
 :global(html[data-blog-transition='true']) .publicRoot {
   transition-duration: 360ms;
@@ -2285,27 +2286,41 @@
   }
   .footer {
     min-height: auto;
-    margin-top: 24px;
-    padding: 18px 0;
-    gap: 8px;
+    margin-top: 18px;
+    padding: 14px 0;
+    gap: 6px;
     font-size: 11px;
   }
-  .footerRight,
+  .footerRight {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
   .footerLinks {
-    gap: 12px;
+    gap: 16px;
+  }
+  .footerLinks a,
+  .socialLinks a {
+    min-height: 40px;
+  }
+  .socialLinks a {
+    width: 40px;
+    min-width: 40px;
+    justify-items: start;
   }
   .archiveTitle {
-    padding: 20px 0 16px;
+    padding: 16px 0 12px;
   }
   .archiveTitle h1 {
     margin: 4px 0 2px;
-    font-size: 22px;
+    font-size: 20px;
   }
   .archiveTitle > span {
     font-size: 12px;
   }
   .archiveFilters {
-    padding: 12px 0 8px;
+    padding: 10px 0 6px;
   }
   .archiveControls {
     gap: 8px;
@@ -2327,15 +2342,15 @@
     font-size: 12px;
   }
   .resultBar {
-    min-height: 44px;
+    min-height: 40px;
     font-size: 11px;
   }
   .archiveYear > div:first-child {
-    padding: 12px 0 6px;
+    padding: 9px 0 4px;
   }
   .archiveYear > div:first-child h2,
   .archiveYear > div:first-child h2.metricHeading {
-    font-size: 18px;
+    font-size: 17px;
     line-height: 1.45;
   }
   .archiveYear article {
@@ -2343,7 +2358,7 @@
     align-items: start;
     gap: 4px 10px;
     min-height: 0;
-    padding: 11px 0;
+    padding: 9px 0;
   }
   .archiveYear time,
   .archiveYear small {
@@ -2351,7 +2366,7 @@
     font-size: 10px;
   }
   .archiveYear h3 {
-    font-size: 17px;
+    font-size: 16px;
     line-height: 1.45;
   }
   .archiveYear article > span {
@@ -2375,65 +2390,77 @@
     height: 13px;
   }
   .readerTop {
-    min-height: 52px;
+    min-height: 48px;
+    align-items: center;
   }
   .readerTop > a {
+    min-height: 40px;
+    align-items: center;
     font-size: 12px;
+  }
+  .readerTop > div {
+    height: 40px;
+    align-items: center;
   }
   .readerTop .readerEdit,
   .readerTop .readerTool {
     width: 38px;
     height: 40px;
+    align-self: center;
   }
   .mobileToc {
     padding: 0;
     margin-bottom: 12px;
   }
   .mobileToc summary {
+    display: flex;
     min-height: 40px;
+    align-items: center;
     font-size: 12px;
   }
   .reader {
-    padding: 8px 0 30px;
+    padding: 6px 0 24px;
   }
   .reader > h1 {
-    margin: 6px 0 10px;
-    font-size: 24px;
-    line-height: 1.42;
+    margin: 5px 0 8px;
+    font-size: 20px;
+    line-height: 1.38;
   }
   .dek {
-    margin: 12px 0 6px;
-    padding: 8px 0 8px 14px;
-    font-size: 14px;
-    line-height: 1.75;
+    margin: 10px 0 4px;
+    padding: 6px 0 6px 12px;
+    font-size: 13px;
+    line-height: 1.7;
   }
   .dek::before {
     top: 7px;
     bottom: 7px;
   }
   .byline {
+    min-height: 40px;
     gap: 8px;
-    padding: 8px 0 14px;
+    padding: 5px 0 10px;
     font-size: 11px;
   }
   .reader > .plate {
-    margin-bottom: 16px;
+    margin-bottom: 13px;
   }
   .prose {
-    line-height: 1.75;
+    font-size: 15px;
+    line-height: 1.7;
   }
   .prose p {
     margin: 0 0 1em;
   }
   .engagement {
-    padding-top: 24px;
+    padding-top: 18px;
   }
   .engagementHeader {
     gap: 12px;
     margin-bottom: 16px;
   }
   .engagementHeader h2 {
-    font-size: 20px;
+    font-size: 18px;
   }
   .engagementStats > * {
     min-height: 48px;
@@ -2443,24 +2470,24 @@
     padding: 12px 0;
   }
   .articlePager h2 {
-    font-size: 15px;
+    font-size: 14px;
   }
   .about > header {
-    padding: 20px 0 16px;
+    padding: 16px 0 12px;
   }
   .about > header h1 {
     margin-top: 4px;
-    font-size: 26px;
+    font-size: 23px;
   }
   .about > header > span {
     font-size: 12px;
   }
   .aboutGrid > div > section {
     gap: 6px;
-    padding: 18px 0;
+    padding: 15px 0;
   }
   .aboutGrid section h2 {
-    font-size: 17px;
+    font-size: 16px;
   }
   .aboutGrid p {
     margin-bottom: 9px;
@@ -2475,6 +2502,67 @@
     margin-bottom: 14px;
   }
   .aboutGrid aside a {
-    min-height: 52px;
+    min-height: 46px;
+  }
+  .overlay {
+    place-items: start center;
+    padding: 12px;
+  }
+  .searchDialog {
+    width: 100%;
+    max-height: calc(100dvh - 24px);
+    overflow-x: hidden;
+    border-radius: 8px;
+  }
+  .dialogHead {
+    min-height: 48px;
+    padding: 0 12px;
+  }
+  .dialogHead button {
+    width: 40px;
+    height: 40px;
+  }
+  .searchField {
+    gap: 9px;
+    margin: 10px 12px;
+    padding: 0 10px;
+  }
+  .searchField input {
+    min-height: 44px;
+    font-size: 15px;
+  }
+  .searchResults {
+    padding: 0 12px;
+  }
+  .searchResults > p {
+    margin: 10px 0 5px;
+  }
+  .searchResults > a {
+    padding: 10px 0;
+  }
+  .searchResults > a strong {
+    margin: 3px 0;
+    font-size: 16px;
+    line-height: 1.45;
+  }
+  .searchResults > a span {
+    display: -webkit-box;
+    overflow: hidden;
+    line-height: 1.55;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  .dialogFoot {
+    padding: 10px 12px;
+  }
+  .backToTopButton {
+    right: 16px;
+    bottom: 16px;
+    width: 40px;
+    height: 40px;
+  }
+  .backToTopButton svg {
+    width: 18px;
+    height: 18px;
   }
 }
