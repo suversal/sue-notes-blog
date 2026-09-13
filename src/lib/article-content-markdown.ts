@@ -113,6 +113,34 @@ function uploadToMarkdown(node: LexicalNode) {
   return mimeType.startsWith('image/') ? `![${escapeMarkdown(alt)}](${url})` : `[${escapeMarkdown(filename)}](${url})`;
 }
 
+function tableToMarkdown(node: LexicalNode) {
+  const rows = (node.children ?? [])
+    .filter((row) => row.type === 'tablerow')
+    .map((row) => (row.children ?? [])
+      .filter((cell) => cell.type === 'tablecell')
+      .map((cell) => plainNodeText(cell)
+        .replaceAll('\\', '\\\\')
+        .replaceAll('|', '\\|')
+        .replace(/\r?\n/g, '<br>')
+        .trim()));
+  if (!rows.length) return '';
+  const columns = Math.max(1, ...rows.map((row) => row.length));
+  const normalized = rows.map((row) => Array.from({ length: columns }, (_, index) => row[index] ?? ''));
+  const header = normalized[0]!;
+  const divider = Array.from({ length: columns }, () => '---');
+  return [header, divider, ...normalized.slice(1)]
+    .map((row) => `| ${row.join(' | ')} |`)
+    .join('\n');
+}
+
+function fencedCode(codeValue: string, languageValue: unknown) {
+  const code = codeValue.replace(/\n$/, '');
+  const longestRun = Math.max(2, ...[...code.matchAll(/`+/g)].map((match) => match[0].length));
+  const fence = '`'.repeat(longestRun + 1);
+  const language = typeof languageValue === 'string' ? languageValue : '';
+  return `${fence}${language}\n${code}\n${fence}`;
+}
+
 function blockNodeToMarkdown(node: LexicalNode): string {
   switch (node.type) {
     case 'paragraph':
@@ -125,11 +153,10 @@ function blockNodeToMarkdown(node: LexicalNode): string {
       return plainNodeText(node).split('\n').map((line) => `> ${escapeMarkdown(line)}`).join('\n');
     case 'list':
       return listToMarkdown(node);
+    case 'table':
+      return tableToMarkdown(node);
     case 'code': {
-      const code = plainNodeText(node).replace(/\n$/, '');
-      const longestRun = Math.max(2, ...[...code.matchAll(/`+/g)].map((match) => match[0].length));
-      const fence = '`'.repeat(longestRun + 1);
-      return `${fence}${node.language ?? ''}\n${code}\n${fence}`;
+      return fencedCode(plainNodeText(node), node.language);
     }
     case 'horizontalrule':
       return '---';

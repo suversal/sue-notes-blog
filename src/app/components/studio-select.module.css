@@ -1,0 +1,123 @@
+.studioSelect {
+  position: relative;
+  min-width: 0;
+  font: 13px/1.5 var(--sans, sans-serif);
+}
+.studioSelect .selectTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--select-trigger-bg, var(--surface));
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    color 160ms,
+    border-color 160ms,
+    box-shadow 160ms;
+}
+.selectTrigger > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.selectTrigger > svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+  transition: transform 160ms;
+}
+.selectTrigger[aria-expanded='true'] > svg {
+  transform: rotate(180deg);
+}
+.studioSelect .selectTrigger:not(:disabled):hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.studioSelect .selectTrigger:not(:disabled):hover > svg {
+  color: var(--accent);
+}
+.studioSelect .selectTrigger:focus-visible,
+.studioSelect .selectTrigger[aria-expanded='true'] {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+.studioSelect .selectTrigger:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.selectOptions {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 7px);
+  right: 0;
+  width: max-content;
+  min-width: 100%;
+  max-width: min(300px, 85vw);
+  max-height: 280px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--select-options-bg, var(--surface));
+  box-shadow: 0 12px 32px rgb(20 40 30 / 12%);
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-6px) scale(0.985);
+  transform-origin: top right;
+  transition:
+    opacity 180ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 220ms;
+}
+.selectOptions[data-open='true'] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+  transition-delay: 0s;
+}
+.selectOptions > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 42px;
+  padding: 9px 11px;
+  border-radius: 6px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.selectOptions > div[data-active='true']:not([aria-disabled='true']) {
+  background: var(--select-option-hover-bg, var(--panel));
+  color: var(--accent);
+}
+.selectOptions > div[aria-selected='true'] {
+  color: var(--accent);
+  background: var(--accent-wash);
+  font-weight: 600;
+}
+.selectOptions > div[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: wait;
+}
+@media (prefers-reduced-motion: reduce) {
+  .studioSelect .selectTrigger,
+  .selectTrigger > svg,
+  .selectOptions {
+    transition: none;
+  }
+}

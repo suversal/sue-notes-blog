@@ -32,6 +32,18 @@ describe('Lexical Markdown export', () => {
     expect(articleContentToMarkdown(content)).toBe('3. 第一项\n4. 第二项\n\n- [x] 完成\n\n```ts\nconst answer = 42;\n```');
   });
 
+  it('exports tables without losing rows or escaped cell content', () => {
+    const cell = (value: string) => block('tablecell', [block('paragraph', [text(value)])], { headerState: 0 });
+    const content = root([
+      block('table', [
+        block('tablerow', [cell('名称'), cell('说明')]),
+        block('tablerow', [cell('链接'), cell('A | B')]),
+      ]),
+    ]);
+
+    expect(articleContentToMarkdown(content)).toBe('| 名称 | 说明 |\n| --- | --- |\n| 链接 | A \\| B |');
+  });
+
   it('exports populated ImgBed uploads with their accessible description', () => {
     const content = root([{
       type: 'upload',

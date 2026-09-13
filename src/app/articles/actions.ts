@@ -22,7 +22,7 @@ export async function createDraftFromWeb(formData: FormData) {
   const excerpt = String(formData.get('excerpt') ?? '').trim();
   const publicReferenceLabel = String(formData.get('publicReferenceLabel') ?? '').trim();
   const publicReferenceUrl = String(formData.get('publicReferenceUrl') ?? '').trim();
-  if (!title || !bodyMarkdown || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) redirect('/articles?error=draft');
+  if (!title || !bodyMarkdown || (slug && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug))) redirect('/articles?error=draft');
 
   const owner = await currentUser();
   try {
@@ -52,7 +52,7 @@ function hasPayloadFieldError(error: unknown, field: string) {
 export async function createDraftAndEditFromWeb(_state: CreateDraftState, formData: FormData): Promise<CreateDraftState> {
   const title = String(formData.get('title') ?? '').trim(); const slug = String(formData.get('slug') ?? '').trim().toLowerCase(); const excerpt = String(formData.get('excerpt') ?? '').trim(); const topic = String(formData.get('topicId') ?? ''); const coverStyle = String(formData.get('coverStyle') ?? 'none') as 'none' | 'notes' | 'grid' | 'cache';
   if (!title) return { field: 'title', message: '请填写文章标题。' };
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return { field: 'slug', message: '文章链接只能包含小写字母、数字和连字符。' };
+  if (slug && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return { field: 'slug', message: '文章链接只能包含小写字母、数字和连字符。' };
 
   let content;
   try {
@@ -64,7 +64,7 @@ export async function createDraftAndEditFromWeb(_state: CreateDraftState, formDa
   const owner = await currentUser();
   let article;
   try {
-    article = await createDraft(owner, { title, slug, content, ...(excerpt ? { excerpt } : {}), ...(topic ? { topic } : {}), coverStyle });
+    article = await createDraft(owner, { title, slug, content, ...(excerpt ? { excerpt } : {}), ...(topic ? { topic } : {}), coverImage: String(formData.get('coverImage') ?? '').trim(), coverStyle });
   } catch (error) {
     if (error instanceof ArticleSlugUnavailableError || (error as { code?: string }).code === '23505') {
       return { field: 'slug', message: '文章链接已被使用或属于系统保留地址，请换一个。' };
@@ -86,7 +86,7 @@ export async function updateDraftFromWeb(formData: FormData) {
 }
 
 
-export async function saveDraftFromWeb(formData: FormData): Promise<{ ok: boolean; message: string }> {
+export async function saveDraftFromWeb(formData: FormData): Promise<{ ok: boolean; message: string; slug?: string }> {
   const articleId = String(formData.get('articleId') ?? '');
   const title = String(formData.get('title') ?? '').trim();
   const slug = String(formData.get('slug') ?? '').trim().toLowerCase();
@@ -96,12 +96,13 @@ export async function saveDraftFromWeb(formData: FormData): Promise<{ ok: boolea
   const coverStyle = String(formData.get('coverStyle') ?? 'none') as 'none' | 'notes' | 'grid' | 'cache';
   const publicReferenceLabel = String(formData.get('publicReferenceLabel') ?? '').trim();
   const publicReferenceUrl = String(formData.get('publicReferenceUrl') ?? '').trim();
-  if (!articleId || !title || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return { ok: false, message: '请填写标题、公开地址和正文。' };
+  if (!articleId || !title) return { ok: false, message: '请填写文章标题。' };
+  if (slug && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return { ok: false, message: '文章链接只能包含小写字母、数字和连字符，也可以留空。' };
   try {
     const content = parseArticleContent(formData.get('content'));
-    await updateDraft(await currentUser(), articleId, { title, slug, content, ...(excerpt ? { excerpt } : {}), ...(tags.length ? { tags } : {}), ...(topic ? { topic } : {}), coverStyle, ...(publicReferenceLabel && /^https?:\/\//.test(publicReferenceUrl) ? { publicReferences: [{ label: publicReferenceLabel, url: publicReferenceUrl }] } : {}) });
-  } catch { return { ok: false, message: '保存失败，请检查标题、公开地址和正文。' }; }
-  return { ok: true, message: '已保存为新版本。' };
+    const saved = await updateDraft(await currentUser(), articleId, { title, slug, content, ...(excerpt ? { excerpt } : {}), ...(tags.length ? { tags } : {}), ...(topic ? { topic } : {}), coverImage: String(formData.get('coverImage') ?? '').trim(), coverStyle, ...(publicReferenceLabel && /^https?:\/\//.test(publicReferenceUrl) ? { publicReferences: [{ label: publicReferenceLabel, url: publicReferenceUrl }] } : {}) }) as { slug?: string };
+    return { ok: true, message: '已保存为新版本。', slug: saved.slug };
+  } catch { return { ok: false, message: '保存失败，请检查文章链接是否已被使用及正文内容。' }; }
 }
 
 export async function preparePublishFromWeb(formData: FormData) {

@@ -1,4 +1,5 @@
 import {
+  EXPERIMENTAL_TableFeature,
   FixedToolbarFeature,
   convertMarkdownToLexical,
   editorConfigFactory,
@@ -7,14 +8,16 @@ import {
 import type { Payload, RichTextField } from 'payload';
 import type { ArticleContent } from './article-content-data';
 import { PasteImageFeature } from '../lexical/paste-image-feature.server';
+import { EditorUxFeature } from '../lexical/editor-ux-feature.server';
 
 const articleContentEditor = lexicalEditor({
   admin: { placeholder: '开始写正文，输入 / 可插入内容块…' },
   features: ({ defaultFeatures }) => [
-    // Payload 3.88 的 Markdown 转换器会在 horizontalRule 节点上触发 Lexical 类身份冲突。
-    // 先收窄这一项，保证 Markdown 导入路径可靠；普通分隔可继续用段落或标题层级表达。
-    ...defaultFeatures.filter((feature) => feature.key !== 'horizontalRule'),
+    // Relationship 在文章正文中没有可用场景，保留入口只会产生一个无法完成的操作。
+    ...defaultFeatures.filter((feature) => !['relationship', 'toolbarInline'].includes(feature.key)),
+    EXPERIMENTAL_TableFeature(),
     PasteImageFeature(),
+    EditorUxFeature(),
     FixedToolbarFeature(),
   ],
 });

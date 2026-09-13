@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { Articles } from './collections/articles';
 import { ArticleRevisions } from './collections/article-revisions';
+import { ArticleViewDays } from './collections/article-view-days';
 import { PublishApprovals } from './collections/publish-approvals';
 import { SiteSettings } from './collections/site-settings';
 import { Topics } from './collections/topics';
@@ -35,11 +36,12 @@ export default buildConfig({
     pool: { connectionString: env.DATABASE_URL },
     idType: 'uuid',
     migrationDir: path.resolve(dirname, '../migrations'),
-    push: process.env.NODE_ENV !== 'production',
+    // Apply explicit migrations outside requests; interactive schema push can stall rendering.
+    push: false,
   }),
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   sharp,
-  collections: [Users, Media, Topics, SiteSettings, Articles, ArticleRevisions, PublishApprovals],
+  collections: [Users, Media, Topics, SiteSettings, Articles, ArticleRevisions, PublishApprovals, ArticleViewDays],
 });

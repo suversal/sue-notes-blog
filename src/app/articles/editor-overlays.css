@@ -1,0 +1,492 @@
+.toolbar-popup__dropdown-items {
+  display: grid !important;
+  gap: 2px;
+  min-width: 188px;
+  max-height: min(420px, calc(100vh - 32px));
+  overflow-y: auto;
+  padding: 8px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 4px !important;
+  background: var(--paper) !important;
+  box-shadow: 0 12px 32px rgb(27 27 24 / 16%) !important;
+}
+
+.toolbar-popup__dropdown-items .toolbar-popup__dropdown-item {
+  display: flex !important;
+  width: 100%;
+  min-height: 38px;
+  align-items: center;
+  padding: 8px 10px !important;
+  border: 0 !important;
+  border-radius: 3px !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+  font-family: var(--sans) !important;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  text-align: left;
+}
+
+.toolbar-popup__dropdown-items .toolbar-popup__dropdown-item:hover,
+.toolbar-popup__dropdown-items .toolbar-popup__dropdown-item:focus-visible,
+.toolbar-popup__dropdown-items .toolbar-popup__dropdown-item.active {
+  background: var(--panel) !important;
+}
+
+.toolbar-popup__dropdown-items .btn__content {
+  display: flex !important;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-start !important;
+  flex-direction: row !important;
+  gap: 9px;
+}
+
+.toolbar-popup__dropdown-items .btn__icon {
+  order: -1;
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+}
+
+.toolbar-popup__dropdown-items .btn__label {
+  flex: 1;
+  min-width: 0;
+}
+
+.toolbar-popup__dropdown-items .tooltip {
+  display: none !important;
+}
+
+/* Payload renders the table cell menu through a portal outside `.lexicalEditor`.
+   Keep its surface tokens and row sizing available at the document root. */
+.table-action-menu-dropdown {
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 232px !important;
+  max-width: min(320px, calc(100vw - 32px));
+  max-height: min(520px, calc(100vh - 32px));
+  padding: 6px !important;
+  overflow-y: auto;
+  border: 1px solid var(--line) !important;
+  border-radius: 6px !important;
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+  box-shadow: 0 16px 44px rgb(27 27 24 / 22%) !important;
+  font-family: var(--sans) !important;
+}
+
+.table-action-menu-dropdown .item {
+  box-sizing: border-box;
+  display: flex !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 38px;
+  align-items: center;
+  justify-content: flex-start !important;
+  padding: 8px 10px !important;
+  border: 0 !important;
+  border-radius: 3px;
+  background: transparent !important;
+  color: var(--ink) !important;
+  font: 13px/1.4 var(--sans) !important;
+  text-align: left;
+  white-space: normal;
+}
+
+.table-action-menu-dropdown .item:hover,
+.table-action-menu-dropdown .item:focus-visible {
+  background: var(--panel) !important;
+}
+
+.table-action-menu-dropdown .item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.table-action-menu-dropdown hr {
+  height: 1px !important;
+  margin: 5px 4px !important;
+  border: 0 !important;
+  background: var(--line) !important;
+}
+
+/* 自定义写作页没有 Payload 后台的完整表单上下文，禁用原生链接抽屉入口，
+   由轻量链接面板接管；保留 LinkFeature 本身用于节点、校验和内容转换。 */
+[data-button-key='link'],
+.link-editor .link-edit {
+  display: none !important;
+}
+
+.sue-link-control,
+.sue-table-control {
+  display: flex;
+  align-items: center;
+}
+
+.sue-link-popover,
+.sue-table-popover,
+.sue-image-layout-popover {
+  position: fixed;
+  z-index: 140;
+  box-sizing: border-box;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 16px 44px rgb(27 27 24 / 22%);
+  font-family: var(--sans);
+}
+
+.sue-image-layout-popover header,
+.sue-image-layout-popover footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sue-image-layout-popover header {
+  margin-bottom: 16px;
+}
+
+.sue-image-layout-popover header strong {
+  font-size: 14px;
+}
+
+.sue-image-layout-popover header button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.sue-image-layout-popover__fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.sue-image-layout-popover__fields label {
+  display: grid;
+  gap: 7px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.sue-image-layout-popover__scale,
+.sue-image-layout-popover__alignment {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.sue-image-layout-popover__scale legend,
+.sue-image-layout-popover__alignment legend {
+  margin-bottom: 7px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.sue-image-layout-popover__scale > div,
+.sue-image-layout-popover__alignment > div {
+  display: grid;
+  gap: 6px;
+}
+
+.sue-image-layout-popover__scale > div {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.sue-image-layout-popover__alignment {
+  margin-top: 14px;
+}
+
+.sue-image-layout-popover__alignment > div {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sue-image-layout-popover__scale button,
+.sue-image-layout-popover__alignment button {
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.sue-image-layout-popover__scale button:last-child {
+  grid-column: 1 / -1;
+}
+
+.sue-image-layout-popover__scale button[aria-pressed='true'],
+.sue-image-layout-popover__alignment button[aria-pressed='true'] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.sue-image-layout-popover input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+.sue-image-layout-popover input:disabled {
+  background: var(--panel);
+  color: var(--ink-soft);
+  cursor: not-allowed;
+}
+
+.sue-image-layout-popover input:focus-visible,
+.sue-image-layout-popover button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  outline-offset: 2px;
+}
+
+.sue-image-layout-popover > p {
+  margin: 12px 0 16px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.sue-image-layout-popover footer button {
+  min-height: 42px;
+  padding: 8px 14px;
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sue-image-layout-popover__reset {
+  border-color: transparent !important;
+  background: transparent;
+  color: var(--ink-soft);
+}
+
+.sue-image-layout-popover__apply {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+@media (max-width: 420px) {
+  .sue-image-layout-popover__fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sue-link-popover > label:not(.sue-link-popover__checkbox) {
+  display: block;
+  margin: 0 0 7px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sue-link-popover > input,
+.sue-table-popover input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+.sue-link-popover > input + label {
+  margin-top: 12px;
+}
+
+.sue-link-popover > input:focus-visible,
+.sue-table-popover input:focus-visible {
+  border-color: var(--accent);
+  outline: 3px solid color-mix(in srgb, var(--accent) 18%, transparent);
+  outline-offset: 1px;
+}
+
+.sue-table-popover > p:first-child {
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sue-table-popover__fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.sue-table-popover__fields label {
+  display: grid;
+  gap: 7px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.sue-table-popover__hint {
+  margin: 10px 0 14px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sue-table-popover__apply {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+  background: var(--ink);
+  color: var(--paper);
+  font: inherit;
+  cursor: pointer;
+}
+
+.sue-table-popover__apply:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  outline-offset: 2px;
+}
+
+.sue-link-popover__error {
+  margin: 7px 0 0;
+  color: #9f2f22;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sue-link-popover__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.sue-link-popover__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.sue-link-popover__actions button {
+  min-height: 38px;
+  padding: 7px 13px;
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sue-link-popover__remove {
+  border-color: transparent !important;
+  background: transparent;
+  color: #9f2f22;
+}
+
+.sue-link-popover__apply {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.sue-link-popover__actions button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  outline-offset: 2px;
+}
+
+/* 防止残留命令或旧页面状态再次把原生抽屉拉成贯穿整页的黑框。 */
+.lexical-link-edit-drawer.drawer {
+  inset: 0 !important;
+  z-index: 130 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+}
+
+.lexical-link-edit-drawer .drawer__close {
+  border: 0 !important;
+  background: rgb(27 27 24 / 30%) !important;
+}
+
+.lexical-link-edit-drawer .drawer__content {
+  flex: 0 0 min(520px, calc(100vw - 24px));
+  width: min(520px, calc(100vw - 24px)) !important;
+  height: 100dvh;
+  border: 0 !important;
+  border-left: 1px solid var(--line) !important;
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+  box-shadow: -16px 0 44px rgb(27 27 24 / 20%);
+}
+
+.slash-menu-popup {
+  min-width: 220px;
+  max-height: min(420px, calc(100vh - 32px));
+  overflow-y: auto;
+  padding: 6px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 4px !important;
+  background: var(--paper) !important;
+  box-shadow: 0 12px 32px rgb(27 27 24 / 16%) !important;
+}
+
+.slash-menu-popup__item {
+  min-height: 40px;
+  border-radius: 3px !important;
+  color: var(--ink) !important;
+}
+
+.slash-menu-popup__item:hover,
+.slash-menu-popup__item:focus-visible,
+.slash-menu-popup__item.selected {
+  background: var(--panel) !important;
+}
+
+/* 图片只通过正文粘贴导入；节点支持仍由 UploadFeature 提供。 */
+.slash-menu-popup__item-upload,
+.slash-menu-popup__item-relationship,
+.slash-menu-popup__item-table {
+  display: none !important;
+}
+
+/* Payload 的段落拖动手柄原本用页面背景遮住一段左侧基准线。
+   移除不透明底色，交互出现时基准线仍保持连续。 */
+.rich-text-lexical--show-gutter .draggable-block-menu,
+.rich-text-lexical--show-gutter .add-block-menu {
+  background-color: transparent !important;
+}
+
+.rich-text-lexical--show-gutter .draggable-block-menu:hover,
+.rich-text-lexical--show-gutter .add-block-menu:hover,
+.rich-text-lexical--show-gutter .draggable-block-menu:focus-visible,
+.rich-text-lexical--show-gutter .add-block-menu:focus-visible {
+  background-color: var(--panel) !important;
+}
+
+.rich-text-lexical--show-gutter .draggable-block-menu .icon,
+.rich-text-lexical--show-gutter .add-block-menu .icon {
+  opacity: 0.55 !important;
+}

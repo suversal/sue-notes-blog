@@ -11,6 +11,7 @@
 - Lexical 富文本编辑、Markdown/网页图文粘贴和图片上传
 - 草稿、预览批准、发布、更新后二次确认、转为私密
 - Payload 管理后台和 PostgreSQL 持久化
+- Artalk 阅读量、文章点赞、评论与评论管理
 
 ## 本地启动
 
@@ -24,7 +25,15 @@
    pnpm install
    ```
 
-5. 启动应用：
+5. 首次使用空数据库时，先执行迁移：
+
+   ```bash
+   pnpm payload migrate
+   ```
+
+   数据库结构使用显式迁移，开发请求不再触发交互式 schema push。已有通过开发模式建表的数据库需要先核对迁移基线，不要直接重放初始迁移。当前本地库的文章封面增量字段已于 2026-09-13 应用。
+
+6. 启动应用：
 
    ```bash
    pnpm dev
@@ -36,8 +45,17 @@
 - `http://127.0.0.1:3100/blog`：博客前台
 - `http://127.0.0.1:3100/articles`：写作后台
 - `http://127.0.0.1:3100/admin`：Payload 管理后台
+- `http://127.0.0.1:23366/sidebar/`：Artalk 评论管理后台
 
 首次使用可访问 `/setup` 创建所有者账户。仅本机开发时，也可运行 `LOCAL_ADMIN_PASSWORD='admin' pnpm configure:local-admin` 配置测试管理员。
+
+首次管理评论前，需要为 Artalk 创建管理员：
+
+```bash
+docker compose exec artalk artalk admin
+```
+
+Artalk 与博客复用同一个 PostgreSQL 数据库，数据表统一使用 `artalk_` 前缀，与 Payload 表隔离。生产环境通过 `NEXT_PUBLIC_ARTALK_SERVER_URL` 指向公开可访问的 Artalk 服务地址，并把博客域名加入 `ATK_TRUSTED_DOMAINS`。
 
 ## 常用命令
 

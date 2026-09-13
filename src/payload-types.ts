@@ -74,6 +74,7 @@ export interface Config {
     articles: Article;
     'article-revisions': ArticleRevision;
     'publish-approvals': PublishApproval;
+    'article-view-days': ArticleViewDay;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +89,7 @@ export interface Config {
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     'article-revisions': ArticleRevisionsSelect<false> | ArticleRevisionsSelect<true>;
     'publish-approvals': PublishApprovalsSelect<false> | PublishApprovalsSelect<true>;
+    'article-view-days': ArticleViewDaysSelect<false> | ArticleViewDaysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -231,6 +233,7 @@ export interface Article {
     [k: string]: unknown;
   };
   topic?: (string | null) | Topic;
+  coverImage?: (string | null) | Media;
   coverStyle?: ('none' | 'notes' | 'grid' | 'cache') | null;
   tags?:
     | {
@@ -285,6 +288,7 @@ export interface ArticleRevision {
     [k: string]: unknown;
   };
   topic?: (string | null) | Topic;
+  coverImage?: (string | null) | Media;
   coverStyle?: ('none' | 'notes' | 'grid' | 'cache') | null;
   tags?:
     | {
@@ -315,6 +319,16 @@ export interface PublishApproval {
   usedAt?: string | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-view-days".
+ */
+export interface ArticleViewDay {
+  id: string;
+  pageKey: string;
+  dayKey: string;
+  views: number;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -490,6 +504,7 @@ export interface ArticlesSelect<T extends boolean = true> {
   excerpt?: T;
   content?: T;
   topic?: T;
+  coverImage?: T;
   coverStyle?: T;
   tags?:
     | T
@@ -529,6 +544,7 @@ export interface ArticleRevisionsSelect<T extends boolean = true> {
   excerpt?: T;
   content?: T;
   topic?: T;
+  coverImage?: T;
   coverStyle?: T;
   tags?:
     | T
@@ -558,6 +574,15 @@ export interface PublishApprovalsSelect<T extends boolean = true> {
   usedAt?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-view-days_select".
+ */
+export interface ArticleViewDaysSelect<T extends boolean = true> {
+  pageKey?: T;
+  dayKey?: T;
+  views?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -4,8 +4,16 @@ import Link from 'next/link'
 import { useState } from 'react'
 import type { PublicPost } from '../../../lib/blog-data'
 import { readingMinutes } from '../../../lib/blog-shared'
+import { StudioSelect } from '../../components/studio-select'
+import { useArticleStats, type ArticleStats } from '../../../lib/use-article-stats'
 import { Icon } from './ui-icon'
 import styles from '../blog-v1.module.css'
+
+const archiveMetrics = [
+  { key: 'views', label: '阅读', icon: 'eye' },
+  { key: 'likes', label: '点赞', icon: 'heart' },
+  { key: 'comments', label: '评论', icon: 'comment' },
+] as const
 
 export function ArchiveClient({
   posts,
@@ -14,18 +22,15 @@ export function ArchiveClient({
   posts: PublicPost[]
   initialTopic?: string
 }) {
-  const topics = [
-    ...new Map(
-      posts
-        .filter((post) => post.topic.name !== '未分类')
-        .map((post) => [post.topic.id, post.topic]),
-    ).values(),
-  ]
+  const { stats, status } = useArticleStats(posts)
+  const topics = [...new Map(posts.map((post) => [post.topic.id, post.topic])).values()]
   const years = [...new Set(posts.map((post) => post.publishedAt.slice(0, 4)))].sort().reverse()
   const [topic, setTopic] = useState(initialTopic)
   const [year, setYear] = useState('all')
   const [query, setQuery] = useState('')
-  const [order, setOrder] = useState<'newest' | 'oldest'>('newest')
+  const [order, setOrder] = useState<'newest' | 'oldest' | keyof ArticleStats>('newest')
+  const metric = order === 'views' || order === 'likes' || order === 'comments' ? order : null
+  const metricLabel = metric === 'views' ? '阅读最多' : metric === 'likes' ? '点赞最多' : '评论最多'
   const keyword = query.trim().toLocaleLowerCase('zh-CN')
   const rows = posts
     .filter(
@@ -34,17 +39,27 @@ export function ArchiveClient({
         (year === 'all' || post.publishedAt.startsWith(year)) &&
         (!keyword || `${post.title} ${post.excerpt}`.toLocaleLowerCase('zh-CN').includes(keyword)),
     )
-    .sort((a, b) =>
-      order === 'newest'
-        ? b.publishedAt.localeCompare(a.publishedAt)
-        : a.publishedAt.localeCompare(b.publishedAt),
-    )
-  const groups = [...new Set(rows.map((post) => post.publishedAt.slice(0, 4)))]
-  const filtered = topic !== 'all' || year !== 'all' || Boolean(query)
+    .sort((a, b) => {
+      if (metric && status === 'ready') {
+        const difference =
+          (stats[`/blog/${b.slug}`]?.[metric] ?? 0) - (stats[`/blog/${a.slug}`]?.[metric] ?? 0)
+        if (difference) return difference
+      }
+      return order === 'oldest'
+        ? a.publishedAt.localeCompare(b.publishedAt)
+        : b.publishedAt.localeCompare(a.publishedAt)
+    })
+  const groups = metric
+    ? rows.length
+      ? ['metrics']
+      : []
+    : [...new Set(rows.map((post) => post.publishedAt.slice(0, 4)))]
+  const filtered = topic !== 'all' || year !== 'all' || Boolean(query) || order !== 'newest'
   const reset = () => {
     setTopic('all')
     setYear('all')
     setQuery('')
+    setOrder('newest')
   }
   return (
     <>
@@ -70,27 +85,33 @@ export function ArchiveClient({
               </button>
             )}
           </label>
-          <label>
+          <div className={styles.archiveControl}>
             <span>年份</span>
-            <select value={year} onChange={(event) => setYear(event.target.value)}>
-              <option value="all">全部年份</option>
-              {years.map((item) => (
-                <option value={item} key={item}>
-                  {item} 年
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
+            <StudioSelect
+              label="筛选年份"
+              value={year}
+              onChange={setYear}
+              options={[
+                { value: 'all', label: '全部年份' },
+                ...years.map((item) => ({ value: item, label: `${item} 年` })),
+              ]}
+            />
+          </div>
+          <div className={styles.archiveControl}>
             <span>排序</span>
-            <select
+            <StudioSelect
+              label="归档排序"
               value={order}
-              onChange={(event) => setOrder(event.target.value as 'newest' | 'oldest')}
-            >
-              <option value="newest">最新在前</option>
-              <option value="oldest">最早在前</option>
-            </select>
-          </label>
+              onChange={(value) => setOrder(value as typeof order)}
+              options={[
+                { value: 'newest', label: '最新在前' },
+                { value: 'oldest', label: '最早在前' },
+                { value: 'views', label: '阅读量最多', disabled: status !== 'ready' },
+                { value: 'likes', label: '点赞最多', disabled: status !== 'ready' },
+                { value: 'comments', label: '评论最多', disabled: status !== 'ready' },
+              ]}
+            />
+          </div>
         </div>
         <div className={styles.archiveTopics} role="group" aria-label="归档主题">
           <button
@@ -122,26 +143,53 @@ export function ArchiveClient({
           清除筛选
         </button>
       </div>
+      {status !== 'ready' && (
+        <p className={styles.archiveStatsStatus} role="status">
+          {status === 'loading'
+            ? '阅读与互动统计加载中…'
+            : '互动统计暂不可用，暂时无法按阅读、点赞或评论排序。'}
+        </p>
+      )}
       <div className={styles.archiveResults}>
         {groups.map((group) => (
           <section className={styles.archiveYear} key={group}>
             <div>
-              <h2>{group}</h2>
-              <span>{rows.filter((post) => post.publishedAt.startsWith(group)).length} 篇文章</span>
+              <h2 className={metric ? styles.metricHeading : undefined}>
+                {metric ? metricLabel : group}
+              </h2>
+              <span>
+                {rows.filter((post) => metric || post.publishedAt.startsWith(group)).length} 篇文章
+              </span>
             </div>
             <div>
               {rows
-                .filter((post) => post.publishedAt.startsWith(group))
+                .filter((post) => metric || post.publishedAt.startsWith(group))
                 .map((post) => (
                   <article key={post.id}>
                     <time dateTime={post.publishedAt}>
-                      {post.publishedAt.slice(5, 10).replace('-', ' / ')}
+                      {metric
+                        ? post.publishedAt.slice(0, 10).replaceAll('-', '/')
+                        : post.publishedAt.slice(5, 10).replace('-', ' / ')}
                     </time>
                     <h3>
                       <Link href={`/blog/${post.slug}`}>{post.title}</Link>
                     </h3>
                     <span>{post.topic.name}</span>
-                    <small>{readingMinutes(post.plainText)} 分钟</small>
+                    <small className={styles.archiveRowMeta}>
+                      <span>{readingMinutes(post.plainText)} 分钟</span>
+                      {archiveMetrics.map((item) => (
+                        <span
+                          className={`${styles.archiveMetric} ${metric === item.key ? styles.archiveMetricActive : ''}`}
+                          aria-label={`${item.label}：${status === 'ready' ? (stats[`/blog/${post.slug}`]?.[item.key] ?? 0) : '暂无统计'}`}
+                          key={item.key}
+                        >
+                          <Icon name={item.icon} />
+                          {status === 'ready'
+                            ? (stats[`/blog/${post.slug}`]?.[item.key] ?? 0).toLocaleString('zh-CN')
+                            : '—'}
+                        </span>
+                      ))}
+                    </small>
                   </article>
                 ))}
             </div>

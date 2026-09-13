@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getPayloadClient } from '../../lib/payload';
 import { getSiteProfile } from '../../lib/blog-data';
 import { AdminShell } from './components/admin-shell';
+import './editor-overlays.css';
 
 export const dynamic = 'force-dynamic';
 

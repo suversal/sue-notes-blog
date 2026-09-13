@@ -16,6 +16,7 @@ export const ArticleRevisions: CollectionConfig = {
     { name: 'excerpt', type: 'textarea', maxLength: 500 },
     articleContentField,
     { name: 'topic', type: 'relationship', relationTo: 'topics' },
+    { name: 'coverImage', type: 'upload', relationTo: 'media' },
     { name: 'coverStyle', type: 'select', options: ['none', 'notes', 'grid', 'cache'], defaultValue: 'none' },
     { name: 'tags', type: 'array', maxRows: 20, fields: [{ name: 'value', type: 'text', required: true, maxLength: 64 }] },
     { name: 'publicReferences', type: 'array', maxRows: 20, fields: [{ name: 'label', type: 'text', required: true, maxLength: 160 }, { name: 'url', type: 'text', required: true, maxLength: 2_048 }] },

@@ -1,0 +1,23 @@
+{
+  "type": "design",
+  "designSystems": [],
+  "primaryDesignSystem": null,
+  "assets": {
+    "suversal 站点图标探索": {
+      "versions": [
+        {
+          "path": "index.html",
+          "createdAt": "2026-09-13T17:42:00.351Z",
+          "status": "needs-review"
+        },
+        {
+          "path": "index-v2.html",
+          "createdAt": "2026-09-13T17:45:05.860Z",
+          "status": "needs-review"
+        }
+      ]
+    }
+  },
+  "createdAt": "2026-09-13T17:42:00.352Z",
+  "updatedAt": "2026-09-13T17:45:05.860Z"
+}

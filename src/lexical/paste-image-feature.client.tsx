@@ -6,18 +6,24 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $insertNodeToNearestRoot } from '@lexical/utils';
 import { $createUploadNode, createClientFeature, UploadNode } from '@payloadcms/richtext-lexical/client';
 import {
+  $applyNodeReplacement,
   $getRoot,
   $getNodeByKey,
+  $nodesOfType,
   $getSelection,
   $insertNodes,
   $isRangeSelection,
   $setSelection,
   COMMAND_PRIORITY_CRITICAL,
+  DecoratorNode,
   PASTE_COMMAND,
+  type EditorConfig,
   type LexicalEditor,
+  type NodeKey,
   type RangeSelection,
+  type SerializedLexicalNode,
 } from 'lexical';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import styles from '../app/articles/admin-v1.module.css';
 
 const ALLOWED_IMAGE_TYPES = new Set(['image/avif', 'image/gif', 'image/jpeg', 'image/png', 'image/webp']);
@@ -26,6 +32,58 @@ export const EDITOR_IMPORT_STATE_EVENT = 'knowhub:editor-import-state';
 type UploadedImage = { alt: string; id: string; url: null | string | undefined };
 type UploadStatus = { kind: 'error' | 'idle' | 'success' | 'uploading' | 'warning'; message: string };
 type PasteOutcome = Pick<UploadStatus, 'kind' | 'message'>;
+type SerializedPasteImageLoadingNode = SerializedLexicalNode & { label: string; token: string };
+
+class PasteImageLoadingNode extends DecoratorNode<ReactNode> {
+  __label: string;
+  __token: string;
+
+  static getType() {
+    return 'paste-image-loading';
+  }
+
+  static clone(node: PasteImageLoadingNode) {
+    return new PasteImageLoadingNode(node.__label, node.__token, node.__key);
+  }
+
+  static importJSON(node: SerializedPasteImageLoadingNode) {
+    return new PasteImageLoadingNode(node.label, node.token);
+  }
+
+  constructor(label: string, token: string, key?: NodeKey) {
+    super(key);
+    this.__label = label;
+    this.__token = token;
+  }
+
+  createDOM(_config: EditorConfig) {
+    return document.createElement('div');
+  }
+
+  updateDOM() {
+    return false;
+  }
+
+  exportJSON(): SerializedPasteImageLoadingNode {
+    return { ...super.exportJSON(), label: this.__label, token: this.__token, type: 'paste-image-loading', version: 1 };
+  }
+
+  getToken() {
+    return this.getLatest().__token;
+  }
+
+  decorate() {
+    return <div className={styles.pasteImageLoading} role="status" aria-live="polite">
+      <span aria-hidden="true" />
+      <strong>{this.__label}</strong>
+      <small>上传完成后，图片会显示在这里</small>
+    </div>;
+  }
+}
+
+function $createPasteImageLoadingNode(label: string, token: string) {
+  return $applyNodeReplacement(new PasteImageLoadingNode(label, token));
+}
 
 const PAYLOAD_UPLOAD_TRANSFORMER: ElementTransformer = {
   type: 'element',
@@ -116,14 +174,35 @@ function announceBusy(editor: LexicalEditor, busy: boolean) {
   editor.getRootElement()?.dispatchEvent(new CustomEvent(EDITOR_IMPORT_STATE_EVENT, { bubbles: true, detail: { busy } }));
 }
 
-function insertUploadedImages(editor: LexicalEditor, images: UploadedImage[], savedSelection: RangeSelection | null) {
-  if (!images.length) return;
+function insertLoadingPlaceholder(editor: LexicalEditor, savedSelection: RangeSelection | null, imageCount: number) {
+  const token = globalThis.crypto.randomUUID();
   editor.update(() => {
     restoreSelection(savedSelection);
+    const node = $createPasteImageLoadingNode(imageCount > 1 ? `正在上传 ${imageCount} 张图片…` : '正在上传图片…', token);
+    $insertNodeToNearestRoot(node);
+  });
+  return token;
+}
+
+function $loadingPlaceholder(token: string) {
+  return $nodesOfType(PasteImageLoadingNode).find((node) => node.getToken() === token);
+}
+
+function removeLoadingPlaceholder(editor: LexicalEditor, token: string) {
+  editor.update(() => $loadingPlaceholder(token)?.remove());
+}
+
+function insertUploadedImages(editor: LexicalEditor, images: UploadedImage[], savedSelection: RangeSelection | null, placeholderToken: string) {
+  if (!images.length) return;
+  editor.update(() => {
+    const placeholder = $loadingPlaceholder(placeholderToken);
+    if (!placeholder) restoreSelection(savedSelection);
     for (const image of images) {
-      $insertNodeToNearestRoot($createUploadNode({
+      const upload = $createUploadNode({
         data: { fields: {}, id: globalThis.crypto.randomUUID(), relationTo: 'media', value: image.id },
-      }));
+      });
+      if (placeholder) placeholder.insertBefore(upload);
+      else $insertNodeToNearestRoot(upload);
     }
   });
 }
@@ -167,7 +246,7 @@ function partialPasteOutcome(uploadedCount: number, failures: string[], hasText:
   };
 }
 
-function insertMarkdown(editor: LexicalEditor, markdown: string, savedSelection: RangeSelection | null) {
+function insertMarkdown(editor: LexicalEditor, markdown: string, savedSelection: RangeSelection | null, placeholderToken: string) {
   editor.update(() => {
     const root = $getRoot();
     const existingNodes = root.getChildren();
@@ -175,8 +254,12 @@ function insertMarkdown(editor: LexicalEditor, markdown: string, savedSelection:
     const importedNodes = root.getChildren();
     importedNodes.forEach((node) => node.remove());
     root.append(...existingNodes);
-    restoreSelection(savedSelection);
-    $insertNodes(importedNodes);
+    const placeholder = $loadingPlaceholder(placeholderToken);
+    if (placeholder) importedNodes.forEach((node) => placeholder.insertBefore(node));
+    else {
+      restoreSelection(savedSelection);
+      $insertNodes(importedNodes);
+    }
   });
 }
 
@@ -184,6 +267,12 @@ function PasteImagePlugin() {
   const [editor] = useLexicalComposerContext();
   const importing = useRef(false);
   const [status, setStatus] = useState<UploadStatus>({ kind: 'idle', message: '' });
+
+  useEffect(() => {
+    editor.update(() => {
+      $nodesOfType(PasteImageLoadingNode).forEach((node) => node.remove());
+    });
+  }, [editor]);
 
   useEffect(() => editor.registerCommand(PASTE_COMMAND, (event) => {
     if (!(event instanceof ClipboardEvent)) return false;
@@ -207,6 +296,8 @@ function PasteImagePlugin() {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) savedSelection = selection.clone();
     });
+    const expectedImages = Math.max(files.length, (html.match(/<img\b/gi) ?? []).length, hasMarkdownImages ? 1 : 0);
+    const loadingPlaceholderToken = insertLoadingPlaceholder(editor, savedSelection, expectedImages);
     importing.current = true;
     announceBusy(editor, true);
 
@@ -259,10 +350,15 @@ function PasteImagePlugin() {
           throw new Error(failures[0] || '没有读取到可粘贴的图文内容。');
         }
         editor.update(() => {
-          restoreSelection(savedSelection);
-          $insertNodes($generateNodesFromDOM(editor, document));
+          const nodes = $generateNodesFromDOM(editor, document);
+          const placeholder = $loadingPlaceholder(loadingPlaceholderToken);
+          if (placeholder) nodes.forEach((node) => placeholder.insertBefore(node));
+          else {
+            restoreSelection(savedSelection);
+            $insertNodes(nodes);
+          }
         });
-        insertUploadedImages(editor, extraUploads, null);
+        insertUploadedImages(editor, extraUploads, null, loadingPlaceholderToken);
 
         if (failures.length) return partialPasteOutcome(uploadedCount, failures, hasTextContent, failures.length);
         return {
@@ -282,8 +378,8 @@ function PasteImagePlugin() {
             failures.push(error instanceof Error ? error.message : '图片上传失败');
           }
         }
-        if (markdown.trim()) insertMarkdown(editor, markdown, savedSelection);
-        insertUploadedImages(editor, uploaded, markdown.trim() ? null : savedSelection);
+        if (markdown.trim()) insertMarkdown(editor, markdown, savedSelection, loadingPlaceholderToken);
+        insertUploadedImages(editor, uploaded, markdown.trim() ? null : savedSelection, loadingPlaceholderToken);
         if (!markdown.trim() && uploaded.length === 0) throw new Error(failures[0] || '剪贴板图片上传失败。');
         if (failures.length) return partialPasteOutcome(uploaded.length, failures, Boolean(markdown.trim()));
         return {
@@ -302,7 +398,7 @@ function PasteImagePlugin() {
       });
       const result = await response.json().catch(() => ({})) as { markdown?: string; imageCount?: number; message?: string };
       if (!response.ok || !result.markdown) throw new Error(result.message || 'Markdown 导入失败。');
-      insertMarkdown(editor, result.markdown, savedSelection);
+      insertMarkdown(editor, result.markdown, savedSelection, loadingPlaceholderToken);
       return { kind: 'success', message: `Markdown 已插入，${result.imageCount ?? 0} 张图片已归档。` };
     };
 
@@ -313,13 +409,14 @@ function PasteImagePlugin() {
         message: `${detail || '图文粘贴失败。'} 请重新复制图片后再试。`,
       });
     }).finally(() => {
+      removeLoadingPlaceholder(editor, loadingPlaceholderToken);
       importing.current = false;
       announceBusy(editor, false);
     });
     return true;
   }, COMMAND_PRIORITY_CRITICAL), [editor]);
 
-  if (status.kind === 'idle') return null;
+  if (status.kind === 'idle' || status.kind === 'uploading') return null;
   return <p
     className={`${styles.clipboardImageStatus} ${status.kind === 'error' ? styles.clipboardImageError : status.kind === 'warning' ? styles.clipboardImageWarning : ''}`}
     role={status.kind === 'error' ? 'alert' : 'status'}
@@ -328,5 +425,6 @@ function PasteImagePlugin() {
 }
 
 export const PasteImageFeatureClient = createClientFeature({
+  nodes: [PasteImageLoadingNode],
   plugins: [{ Component: PasteImagePlugin, position: 'belowContainer' }],
 });

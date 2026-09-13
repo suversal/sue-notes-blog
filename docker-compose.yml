@@ -18,5 +18,31 @@ services:
       timeout: 5s
       retries: 10
 
+  artalk:
+    image: artalk/artalk-go:2.10.0
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      TZ: Asia/Shanghai
+      ATK_TIMEZONE: Asia/Shanghai
+      ATK_LOCALE: zh-CN
+      ATK_APP_KEY: ${PAYLOAD_SECRET}
+      ATK_SITE_DEFAULT: 苏码手记
+      ATK_SITE_URL: http://127.0.0.1:3100
+      ATK_TRUSTED_DOMAINS: http://127.0.0.1:3100 http://localhost:3100
+      ATK_DB_TYPE: pgsql
+      ATK_DB_HOST: postgres
+      ATK_DB_PORT: 5432
+      ATK_DB_NAME: sue_notes_blog
+      ATK_DB_USER: postgres
+      ATK_DB_PASSWORD: postgres
+      ATK_DB_TABLE_PREFIX: artalk_
+      ATK_FRONTEND_VOTE: 'true'
+      ATK_FRONTEND_VOTE_DOWN: 'false'
+    ports:
+      - '23366:23366'
+
 volumes:
   postgres_data:

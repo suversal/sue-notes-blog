@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="design_doc_mode" content="canvas">
+  <title>suversal · 站点图标探索</title>
+  <style>
+    :root { --paper:#efeee8; --surface:#f8f7f2; --ink:#202723; --muted:#626861; --line:#cbc9bd; --accent:#147a4a; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#e6e4dd; color:var(--ink); font-family:-apple-system,"SF Pro Text","PingFang SC",sans-serif; }
+    main { width:min(1380px,calc(100% - 56px)); margin:42px auto 64px; }
+    header { display:flex; align-items:end; justify-content:space-between; gap:32px; margin-bottom:32px; }
+    h1 { margin:0 0 8px; font:600 36px/1.2 "Songti SC",serif; letter-spacing:-.02em; }
+    header p { margin:0; color:var(--muted); font-size:14px; }
+    .legend { display:flex; gap:18px; color:var(--muted); font:12px/1.4 ui-monospace,SFMono-Regular,monospace; }
+    .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+    article { overflow:hidden; border:1px solid var(--line); background:var(--surface); }
+    .cardHead { display:flex; align-items:baseline; justify-content:space-between; padding:18px 20px 14px; border-bottom:1px solid var(--line); }
+    h2 { margin:0; font:600 18px/1.3 "Songti SC",serif; }
+    .code { color:var(--accent); font:600 12px/1 ui-monospace,SFMono-Regular,monospace; }
+    .stage { display:grid; grid-template-columns:1fr 1fr; min-height:178px; }
+    .mode { display:grid; place-items:center; padding:22px; }
+    .mode.dark { background:#171b19; }
+    .primary { width:88px; height:88px; }
+    .mini { width:20px; height:20px; position:absolute; transform:translate(58px,52px); box-shadow:0 0 0 4px color-mix(in srgb,var(--surface) 75%,transparent); border-radius:5px; }
+    .dark .mini { box-shadow:0 0 0 4px #171b19; }
+    .iconPair { position:relative; display:grid; place-items:center; }
+    .lockup { display:flex; align-items:center; gap:10px; padding:15px 20px; border-top:1px solid var(--line); }
+    .lockup img { width:32px; height:32px; }
+    .lockup strong { display:block; font:600 20px/1.05 "Songti SC",serif; }
+    .lockup small { display:block; margin-top:4px; color:var(--muted); font:7px/1 ui-monospace,SFMono-Regular,monospace; letter-spacing:.16em; }
+    .note { min-height:64px; margin:0; padding:14px 20px 18px; color:var(--muted); font-size:13px; line-height:1.65; }
+    .recommended { border-color:color-mix(in srgb,var(--accent) 65%,var(--line)); box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 15%,transparent); }
+    .recommended .cardHead::after { content:"推荐"; padding:4px 7px; background:#e0ebe2; color:var(--accent); font-size:10px; }
+    @media(max-width:960px){ .grid{grid-template-columns:1fr 1fr} }
+    @media(max-width:640px){ main{width:calc(100% - 28px);margin-top:24px}.grid{grid-template-columns:1fr}header{align-items:start;flex-direction:column}.legend{display:none} }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div><h1>suversal · 图标方向</h1><p>从名字出发，分别探索字母、轨道、印章与手记四种品牌语言。</p></div>
+      <div class="legend"><span>88px ICON</span><span>20px FAVICON</span><span>LIGHT / DARK</span></div>
+    </header>
+    <section class="grid">
+      <article class="recommended">
+        <div class="cardHead"><h2>S 轨迹</h2><span class="code">A</span></div>
+        <div class="stage"><div class="mode"><div class="iconPair"><img class="primary" src="icon-a.svg" alt="A"><img class="mini" src="icon-a.svg" alt=""></div></div><div class="mode dark"><div class="iconPair"><img class="primary" src="icon-a.svg" alt=""><img class="mini" src="icon-a.svg" alt=""></div></div></div>
+        <div class="lockup"><img src="icon-a.svg" alt=""><span><strong>苏码手记</strong><small>SUVERSAL · INDEPENDENT JOURNAL</small></span></div>
+        <p class="note">用一条连续轨迹构成 S，右上绿点像尚未写完的句号。最直接、最容易形成 suversal 记忆。</p>
+      </article>
+      <article>
+        <div class="cardHead"><h2>SV 切角</h2><span class="code">B</span></div>
+        <div class="stage"><div class="mode"><div class="iconPair"><img class="primary" src="icon-b.svg" alt="B"><img class="mini" src="icon-b.svg" alt=""></div></div><div class="mode dark"><div class="iconPair"><img class="primary" src="icon-b.svg" alt=""><img class="mini" src="icon-b.svg" alt=""></div></div></div>
+        <div class="lockup"><img src="icon-b.svg" alt=""><span><strong>苏码手记</strong><small>SUVERSAL · INDEPENDENT JOURNAL</small></span></div>
+        <p class="note">把 S 的末笔和 V 叠合，偏理性、偏产品化，更像独立开发者品牌。</p>
+      </article>
+      <article>
+        <div class="cardHead"><h2>环行 S</h2><span class="code">C</span></div>
+        <div class="stage"><div class="mode"><div class="iconPair"><img class="primary" src="icon-c.svg" alt="C"><img class="mini" src="icon-c.svg" alt=""></div></div><div class="mode dark"><div class="iconPair"><img class="primary" src="icon-c.svg" alt=""><img class="mini" src="icon-c.svg" alt=""></div></div></div>
+        <div class="lockup"><img src="icon-c.svg" alt=""><span><strong>苏码手记</strong><small>SUVERSAL · INDEPENDENT JOURNAL</small></span></div>
+        <p class="note">用轨道包住 S，回应 suversal 里“universal”的联想，科技感更强。</p>
+      </article>
+      <article>
+        <div class="cardHead"><h2>绿色印章</h2><span class="code">D</span></div>
+        <div class="stage"><div class="mode"><div class="iconPair"><img class="primary" src="icon-d.svg" alt="D"><img class="mini" src="icon-d.svg" alt=""></div></div><div class="mode dark"><div class="iconPair"><img class="primary" src="icon-d.svg" alt=""><img class="mini" src="icon-d.svg" alt=""></div></div></div>
+        <div class="lockup"><img src="icon-d.svg" alt=""><span><strong>苏码手记</strong><small>SUVERSAL · INDEPENDENT JOURNAL</small></span></div>
+        <p class="note">像作者落款章，辨识度最强，也最贴合个人网站，但性格会更鲜明。</p>
+      </article>
+      <article>
+        <div class="cardHead"><h2>双向轨道</h2><span class="code">E</span></div>
+        <div class="stage"><div class="mode"><div class="iconPair"><img class="primary" src="icon-e.svg" alt="E"><img class="mini" src="icon-e.svg" alt=""></div></div><div class="mode dark"><div class="iconPair"><img class="primary" src="icon-e.svg" alt=""><img class="mini" src="icon-e.svg" alt=""></div></div></div>
+        <div class="lockup"><img src="icon-e.svg" alt=""><span><strong>苏码手记</strong><small>SUVERSAL · INDEPENDENT JOURNAL</small></span></div>
+        <p class="note">圆形更适合社交头像和 favicon，轨迹围绕 S 循环，气质柔和一些。</p>
+      </article>
+      <article>
+        <div class="cardHead"><h2>纸页 S</h2><span class="code">F</span></div>
+        <div class="stage"><div class="mode"><div class="iconPair"><img class="primary" src="icon-f.svg" alt="F"><img class="mini" src="icon-f.svg" alt=""></div></div><div class="mode dark"><div class="iconPair"><img class="primary" src="icon-f.svg" alt=""><img class="mini" src="icon-f.svg" alt=""></div></div></div>
+        <div class="lockup"><img src="icon-f.svg" alt=""><span><strong>苏码手记</strong><small>SUVERSAL · INDEPENDENT JOURNAL</small></span></div>
+        <p class="note">保留文章纸页，只把正文线条变成 S。含义最完整，但 favicon 细节最多。</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

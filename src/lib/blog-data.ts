@@ -10,11 +10,18 @@ export type PublicPost = {
   content: ArticleContent;
   plainText: string;
   topic: { id: string; name: string };
+  coverImage?: { id: string; url: string; alt: string };
   coverStyle: 'none' | 'notes' | 'grid' | 'cache';
   publishedAt: string;
   updatedAt: string;
   publicReferences: { label: string; url: string }[];
 };
+
+export function publicCoverImage(value: unknown): PublicPost['coverImage'] {
+  if (!value || typeof value !== 'object' || !('url' in value) || typeof value.url !== 'string' || !/^https?:\/\//.test(value.url)) return undefined;
+  const media = value as { id: string; url: string; alt?: string };
+  return { id: String(media.id), url: media.url, alt: media.alt || '文章封面' };
+}
 
 export const defaultSiteProfile: SiteProfile = {
   siteName: '苏码手记',
@@ -59,13 +66,13 @@ export async function getPublicPosts(limit = 100): Promise<PublicPost[]> {
     }) as any;
     return {
       id: String(article.id), title: revision.title, slug: revision.slug,
-      excerpt: revision.excerpt || '一篇慢慢写下来的文章。', content: revision.content, plainText: articleContentPlainText(revision.content),
-      topic: topicFrom(revision, article, topicNames), coverStyle: revision.coverStyle || 'none',
+      excerpt: revision.excerpt?.trim() || '', content: revision.content, plainText: articleContentPlainText(revision.content),
+      topic: topicFrom(revision, article, topicNames), coverStyle: revision.coverStyle || 'none', coverImage: publicCoverImage(revision.coverImage),
       publishedAt: article.publishedAt || article.updatedAt, updatedAt: article.updatedAt,
       publicReferences: revision.publicReferences ?? [],
     } satisfies PublicPost;
   }));
-  return rows.filter((row): row is PublicPost => Boolean(row));
+  return rows.filter((row) => row !== undefined);
 }
 
 export async function getPublicPost(slug: string): Promise<PublicPost | undefined> {

@@ -4,8 +4,15 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { PublicPost, SiteProfile } from '../../../lib/blog-data'
+import { ThemeSettings } from '../../components/theme-settings'
 import { Icon } from './ui-icon'
 import styles from '../blog-v1.module.css'
+
+const socialAccounts = [
+  { href: 'https://github.com/suversal', icon: 'github' as const, label: 'GitHub：suversal' },
+  { href: 'https://x.com/suversal', icon: 'x' as const, label: 'X：suversal' },
+  { href: 'https://t.me/suversal', icon: 'telegram' as const, label: 'Telegram：suversal' },
+]
 
 function Brand({ site }: { site: SiteProfile }) {
   return (
@@ -31,17 +38,7 @@ export function PublicShell({
   const pathname = usePathname()
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const dialog = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      const saved = localStorage.getItem('sue-notes-theme')
-      const next = saved === 'dark' ? 'dark' : 'light'
-      setTheme(next)
-      document.documentElement.dataset.blogTheme = next
-    })
-    return () => cancelAnimationFrame(frame)
-  }, [])
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
@@ -86,12 +83,6 @@ export function PublicShell({
       before?.focus()
     }
   }, [searchOpen])
-  const toggleTheme = () => {
-    const next = theme === 'light' ? 'dark' : 'light'
-    setTheme(next)
-    localStorage.setItem('sue-notes-theme', next)
-    document.documentElement.dataset.blogTheme = next
-  }
   const keyword = query.trim().toLocaleLowerCase('zh-CN')
   const found = searchPosts
     .filter(
@@ -125,13 +116,20 @@ export function PublicShell({
             <button aria-label="搜索文章" onClick={() => setSearchOpen(true)}>
               <Icon name="search" />
             </button>
-            <button
-              className={styles.themeToggle}
-              aria-label={`切换到${theme === 'light' ? '深色' : '浅色'}主题`}
-              onClick={toggleTheme}
-            >
-              <Icon name="sun" />
-            </button>
+            <ThemeSettings className={styles.themeToggle} />
+            {socialAccounts.map((account) => (
+              <a
+                className={styles.socialTool}
+                href={account.href}
+                target="_blank"
+                rel="me noopener noreferrer"
+                aria-label={account.label}
+                title={account.label.replace('：', ' · @')}
+                key={account.href}
+              >
+                <Icon name={account.icon} />
+              </a>
+            ))}
           </div>
         </header>
         {children}
@@ -139,9 +137,25 @@ export function PublicShell({
           <span>
             © {new Date().getFullYear()} {site.siteName} · 写下来，慢慢来。
           </span>
-          <div>
-            <Link href="/blog/about">关于作者</Link>
-            <Link href="/blog/archive">全部文章</Link>
+          <div className={styles.footerRight}>
+            <nav className={styles.socialLinks} aria-label="社交账号">
+              {socialAccounts.map((account) => (
+                <a
+                  href={account.href}
+                  target="_blank"
+                  rel="me noopener noreferrer"
+                  aria-label={account.label}
+                  title={account.label.replace('：', ' · @')}
+                  key={account.href}
+                >
+                  <Icon name={account.icon} />
+                </a>
+              ))}
+            </nav>
+            <div className={styles.footerLinks}>
+              <Link href="/blog/about">关于作者</Link>
+              <Link href="/blog/archive">全部文章</Link>
+            </div>
           </div>
         </footer>
       </div>
