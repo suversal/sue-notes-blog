@@ -672,8 +672,7 @@
 }
 .archiveTitle h1 {
   margin: 9px 0 4px;
-  font-family: var(--serif);
-  font-size: 38px;
+  font: 600 23px/1.4 var(--serif);
 }
 .archiveTitle > span {
   color: var(--muted);
@@ -745,7 +744,7 @@
   opacity: 0.35;
 }
 .archiveResults {
-  border-bottom: 1px solid var(--ink);
+  border-bottom: 0;
 }
 .archiveYear {
   display: grid;
@@ -1929,7 +1928,6 @@
   .thumbnail {
     display: none;
   }
-  .archiveTitle h1,
   .about > header h1 {
     font-size: 34px;
   }
@@ -1983,7 +1981,6 @@
 .empty h3 {
   font-weight: 600;
 }
-.archiveTitle h1,
 .about > header h1 {
   font-size: 34px;
   font-weight: 600;
@@ -2041,7 +2038,6 @@
   .brand > span {
     font-size: 23px;
   }
-  .archiveTitle h1,
   .about > header h1 {
     font-size: 30px;
   }
