@@ -771,6 +771,9 @@
   min-height: 68px;
   border-top: 1px solid var(--line);
 }
+.archiveYear:last-child article:last-child {
+  border-bottom: 1px solid var(--line);
+}
 .archiveYear time,
 .archiveYear small {
   color: var(--muted);
@@ -2213,6 +2216,25 @@
 .archiveSearch:focus-within { background: var(--panel); border-color: var(--accent); box-shadow: none; }
 .archiveSearch input { appearance: none; }
 .archiveSearch input::-webkit-search-cancel-button { display: none; }
+.archiveTopics button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  transition: color 280ms ease, background-color 280ms ease;
+}
+.archiveTopics button[aria-pressed='true'],
+.archiveTopics button:hover {
+  background: var(--accent-wash);
+  color: var(--accent);
+}
+.archiveTopics button[aria-pressed='true'] {
+  font-weight: 600;
+}
+.archiveTopics button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 .archiveYear .metricHeading { font-size: 20px; line-height: 1.5; }
 .archiveMetric { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
 .archiveMetric svg { width: 14px; height: 14px; flex: none; }

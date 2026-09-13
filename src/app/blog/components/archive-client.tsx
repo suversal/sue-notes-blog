@@ -135,7 +135,7 @@ export function ArchiveClient({
       </section>
       <div className={styles.resultBar}>
         <span role="status">
-          {filtered ? '找到' : '共'} <strong>{rows.length}</strong> 篇文章
+          共 <strong>{rows.length}</strong> 篇文章
           {topic !== 'all' && ` · ${topics.find((item) => item.id === topic)?.name ?? ''}`}
           {year !== 'all' && ` · ${year} 年`}
         </span>
