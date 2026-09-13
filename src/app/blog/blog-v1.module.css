@@ -2218,7 +2218,11 @@
 .archiveSearch:focus-within { background: var(--panel); border-color: var(--accent); box-shadow: none; }
 .archiveSearch input { appearance: none; }
 .archiveSearch input::-webkit-search-cancel-button { display: none; }
-.archiveYear .metricHeading { font-size: 20px; line-height: 1.5; }
+.archiveYear > div:first-child h2.metricHeading {
+  font-size: 20px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
 .archiveMetric { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
 .archiveMetric svg { width: 14px; height: 14px; flex: none; }
 .archiveRowMeta { display: flex; align-items: center; justify-content: flex-end; gap: 12px; white-space: nowrap; }
