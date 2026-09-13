@@ -157,9 +157,6 @@ export function ArchiveClient({
               <h2 className={metric ? styles.metricHeading : undefined}>
                 {metric ? metricLabel : group}
               </h2>
-              <span>
-                {rows.filter((post) => metric || post.publishedAt.startsWith(group)).length} 篇文章
-              </span>
             </div>
             <div>
               {rows

@@ -759,10 +759,6 @@
   font-size: 20px;
   font-weight: 500;
 }
-.archiveYear > div:first-child span {
-  color: var(--muted);
-  font-size: 11px;
-}
 .archiveYear article {
   display: grid;
   grid-template-columns: 70px minmax(0, 1fr) 90px minmax(210px, auto);
