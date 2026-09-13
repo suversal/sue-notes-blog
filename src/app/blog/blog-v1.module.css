@@ -756,7 +756,7 @@
 .archiveYear > div:first-child h2 {
   margin: 0;
   font-family: var(--serif);
-  font-size: 32px;
+  font-size: 20px;
   font-weight: 500;
 }
 .archiveYear > div:first-child span {
