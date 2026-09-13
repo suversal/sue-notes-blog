@@ -164,9 +164,7 @@ export function ArchiveClient({
                 .map((post) => (
                   <article key={post.id}>
                     <time dateTime={post.publishedAt}>
-                      {metric
-                        ? post.publishedAt.slice(0, 10).replaceAll('-', '/')
-                        : post.publishedAt.slice(5, 10).replace('-', ' / ')}
+                      {post.publishedAt.slice(0, 10).replaceAll('-', '/')}
                     </time>
                     <h3>
                       <Link href={`/blog/${post.slug}`}>{post.title}</Link>
