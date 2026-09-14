@@ -685,9 +685,9 @@
 }
 .archiveControls {
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) auto auto;
+  grid-template-columns: minmax(280px, 1fr) minmax(140px, 156px) minmax(140px, 156px);
   align-items: center;
-  gap: 24px;
+  gap: 10px;
 }
 .archiveControls > label:not(.archiveSearch) {
   display: flex;
@@ -706,11 +706,14 @@
 }
 .archiveSearch {
   display: flex;
+  min-height: 46px;
   align-items: center;
   gap: 10px;
   max-width: 440px;
-  padding: 0 0 0 12px;
+  padding: 0 6px 0 13px;
   border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 72%, var(--panel));
 }
 .archiveSearch input {
   min-width: 0;
@@ -722,8 +725,50 @@
   color: inherit;
   font-size: 16px;
 }
+.archiveSearch button {
+  display: grid;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--muted);
+}
+.archiveSearch button:hover {
+  background: var(--accent-wash);
+  color: var(--accent);
+}
+.archiveSearch button svg {
+  width: 16px;
+  height: 16px;
+}
 .archiveTopics {
-  margin: 6px 0 0;
+  margin: 0;
+  padding-right: 34px;
+  scroll-padding-inline: 4px 34px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+.archiveTopics::-webkit-scrollbar {
+  display: none;
+}
+.archiveTopics button {
+  scroll-snap-align: start;
+}
+.archiveTopicsScroller {
+  position: relative;
+  min-width: 0;
+  margin-top: 6px;
+}
+.archiveTopicsScroller::after {
+  position: absolute;
+  top: 4px;
+  right: 0;
+  bottom: 12px;
+  width: 38px;
+  pointer-events: none;
+  content: '';
+  background: linear-gradient(90deg, transparent, var(--bg) 78%);
 }
 .resultBar {
   display: flex;
@@ -734,15 +779,20 @@
   font-size: 12px;
 }
 .resultBar button {
+  display: inline-flex;
   min-height: 44px;
-  color: var(--muted);
-  transition: color 160ms ease;
-}
-.resultBar button:not(:disabled):hover {
+  align-items: center;
+  gap: 5px;
   color: var(--accent);
+  font-weight: 600;
+  transition: color 160ms ease, opacity 160ms ease;
 }
-.resultBar button:disabled {
-  opacity: 0.35;
+.resultBar button:hover {
+  opacity: 0.72;
+}
+.resultBar button svg {
+  width: 14px;
+  height: 14px;
 }
 .archiveResults {
   border-bottom: 0;
@@ -801,76 +851,97 @@
   color: var(--accent);
   font-size: 11px;
 }
-.about > header {
-  padding: 30px 0 24px;
+.about {
+  width: min(100%, 1060px);
+  margin: 0 auto;
+}
+.aboutHero {
+  padding: clamp(48px, 7vw, 84px) 0 clamp(40px, 5vw, 60px);
   border-bottom: 1px solid var(--line);
 }
-.about > header h1 {
-  margin: 9px 0 2px;
-  font-family: var(--serif);
-  font-size: 38px;
-}
-.about > header > span {
-  color: var(--muted);
-  font-size: 14px;
-}
-.aboutGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 290px;
-  gap: 42px;
-}
-.aboutGrid > div > section {
-  display: grid;
-  grid-template-columns: 150px 1fr;
+.aboutKicker {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
   gap: 24px;
-  padding: 28px 0;
+}
+.aboutKicker > span {
+  color: var(--muted);
+  font: 10px/1.4 var(--sans);
+  letter-spacing: 0.14em;
+}
+.aboutHero h1 {
+  max-width: 820px;
+  margin: 22px 0 20px;
+  font-family: var(--serif);
+  font-size: clamp(48px, 6vw, 76px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+.aboutHero h1 em {
+  color: var(--accent);
+  font-style: normal;
+}
+.aboutLead {
+  max-width: 620px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.8;
+}
+.aboutContent {
+  display: grid;
+}
+.aboutSection {
+  display: grid;
+  grid-template-columns: 52px minmax(180px, 220px) minmax(0, 1fr);
+  gap: 28px;
+  padding: clamp(34px, 4vw, 48px) 0;
   border-bottom: 1px solid var(--line);
 }
-.aboutGrid section h2 {
+.aboutSectionNumber {
+  padding-top: 6px;
+  color: var(--accent);
+  font: 11px/1.4 monospace;
+  letter-spacing: 0.08em;
+}
+.aboutSection h2 {
   margin: 0;
   font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+.aboutSectionBody {
+  max-width: 660px;
+  font-size: 16px;
+  line-height: 1.95;
+}
+.aboutSectionBody p {
+  margin: 0 0 16px;
+}
+.aboutSectionBody p:last-of-type {
+  margin-bottom: 0;
+}
+.aboutSectionBody a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 42%, transparent);
+  text-underline-offset: 4px;
+  transition: color 180ms ease, text-decoration-color 180ms ease;
+}
+.aboutSectionBody a:hover {
+  text-decoration-color: var(--accent);
+}
+.aboutSectionBody strong {
+  display: block;
+  margin-top: 26px;
+  color: var(--accent);
+  font: italic 32px/1 var(--serif);
+}
+.aboutSection:first-child .aboutSectionBody p:first-child {
   font-size: 18px;
-}
-.aboutGrid p {
-  margin: 0 0 12px;
-  line-height: 1.9;
-}
-.aboutGrid strong {
-  color: var(--accent);
-  font: italic 27px var(--serif);
-}
-.aboutGrid aside {
-  padding-top: 28px;
-}
-.aboutGrid aside section {
-  padding-bottom: 20px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--line);
-}
-.aboutGrid aside h2 {
-  margin-bottom: 10px;
-  color: var(--muted);
-  font: 12px var(--sans);
-}
-.aboutGrid aside a {
-  display: flex;
-  min-height: 60px;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--line);
-  transition: color 180ms ease;
-}
-.aboutGrid aside a:hover,
-.aboutGrid > div a:hover {
-  color: var(--accent);
-}
-.aboutGrid aside a span {
-  display: flex;
-  flex-direction: column;
-}
-.aboutGrid aside small {
-  color: var(--muted);
-  font-size: 11px;
 }
 .progress {
   position: fixed;
@@ -1716,9 +1787,6 @@
     grid-template-columns: 140px minmax(0, 680px);
     gap: 24px;
   }
-  .aboutGrid {
-    grid-template-columns: minmax(0, 1fr) 250px;
-  }
 }
 @media (max-width: 760px) {
   .publicShell {
@@ -1839,15 +1907,35 @@
     grid-row: 2;
     justify-self: end;
   }
-  .aboutGrid {
-    grid-template-columns: 1fr;
+  .aboutHero {
+    padding: 40px 0 34px;
   }
-  .aboutGrid > div > section {
-    grid-template-columns: 1fr;
-    gap: 8px;
+  .aboutHero h1 {
+    margin: 18px 0 16px;
+    font-size: clamp(42px, 11vw, 58px);
   }
-  .aboutGrid aside {
-    padding-top: 0;
+  .aboutLead {
+    font-size: 16px;
+  }
+  .aboutSection {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 10px 14px;
+    padding: 32px 0;
+  }
+  .aboutSectionNumber {
+    grid-row: 1 / span 2;
+    padding-top: 5px;
+  }
+  .aboutSection h2,
+  .aboutSectionBody {
+    grid-column: 2;
+  }
+  .aboutSection h2 {
+    font-size: 22px;
+  }
+  .aboutSectionBody,
+  .aboutSection:first-child .aboutSectionBody p:first-child {
+    font-size: 16px;
   }
   .readerGrid {
     grid-template-columns: 1fr;
@@ -2209,12 +2297,13 @@
 .photoCover { position: relative; }
 .photoCover > img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .reader > .photoCover { height: auto; max-height: none; aspect-ratio: 5 / 2; border-radius: 8px; }
-.archiveControl { --select-trigger-bg: var(--panel); --select-options-bg: var(--panel); --select-option-hover-bg: var(--accent-wash); display: flex; align-items: center; gap: 10px; min-width: 0; color: var(--muted); font-size: 12px; }
-.archiveControl > div { min-width: 128px; }
-.archiveSearch { border-radius: 9px; background: var(--panel); border-color: transparent; transition: border-color 160ms, background 160ms; }
-.archiveSearch:focus-within { background: var(--panel); border-color: var(--accent); box-shadow: none; }
+.archiveControl { min-width: 0; }
+.archiveControl > div { min-width: 0; }
+.archiveSearch { transition: border-color 160ms, background 160ms, box-shadow 160ms; }
+.archiveSearch:focus-within { background: var(--surface); border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent); }
 .archiveSearch input { appearance: none; }
 .archiveSearch input::-webkit-search-cancel-button { display: none; }
+.archiveOverlayRoot { position: relative; z-index: 120; }
 .archiveYear > div:first-child h2.metricHeading {
   font-size: 20px;
   line-height: 1.5;
@@ -2226,7 +2315,6 @@
 .archiveMetricActive { color: var(--accent); font-weight: 600; }
 .archiveStatsStatus { color: var(--muted); font-size: 12px; }
 @media (max-width: 760px) {
-  .archiveControl { display: grid; grid-template-columns: auto minmax(0, 1fr); }
   .archiveControl > div { min-width: 0; }
 }
 
@@ -2285,29 +2373,69 @@
     transform: none;
   }
   .footer {
-    min-height: auto;
+    flex-direction: row;
+    min-height: 40px;
     margin-top: 18px;
-    padding: 14px 0;
-    gap: 6px;
-    font-size: 11px;
+    padding: 0 0 env(safe-area-inset-bottom);
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+  }
+  .footerCopyright {
+    display: block;
+    width: auto;
+    line-height: 1;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .footerTagline {
+    display: none;
   }
   .footerRight {
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
+    width: auto;
+    min-width: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
     gap: 0;
   }
   .footerLinks {
-    gap: 16px;
+    display: none;
   }
   .footerLinks a,
   .socialLinks a {
-    min-height: 40px;
+    touch-action: manipulation;
+  }
+  .footerLinks a {
+    min-height: 24px;
+    padding: 0 4px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .socialLinks {
+    flex: none;
+    justify-content: flex-end;
+    gap: 6px;
   }
   .socialLinks a {
-    width: 40px;
-    min-width: 40px;
-    justify-items: start;
+    width: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    justify-items: center;
+    border: 0;
+    background: transparent;
+  }
+  .socialLinks svg {
+    width: 12px;
+    height: 12px;
+  }
+  .footerLinks a:active,
+  .socialLinks a:active {
+    background: var(--accent-wash);
+    color: var(--accent);
   }
   .archiveTitle {
     padding: 16px 0 12px;
@@ -2325,19 +2453,25 @@
   .archiveControls {
     gap: 8px;
   }
-  .archiveSearch input,
-  .archiveControls select {
+  .archiveSearch {
+    min-height: 44px;
+    padding-left: 12px;
+  }
+  .archiveSearch input {
     min-height: 42px;
+    font-size: 15px;
   }
   .archiveControl {
-    gap: 6px;
-    font-size: 11px;
+    min-width: 0;
   }
   .archiveTopics {
+    padding-right: 32px;
+  }
+  .archiveTopicsScroller {
     margin-top: 4px;
   }
   .archiveTopics button {
-    min-height: 40px;
+    min-height: 44px;
     padding: 6px 10px;
     font-size: 12px;
   }
@@ -2556,13 +2690,13 @@
     padding: 10px 12px;
   }
   .backToTopButton {
-    right: 16px;
-    bottom: 16px;
-    width: 40px;
-    height: 40px;
+    right: 12px;
+    bottom: 12px;
+    width: 36px;
+    height: 36px;
   }
   .backToTopButton svg {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
   }
 }

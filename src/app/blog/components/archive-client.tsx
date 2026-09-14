@@ -1,11 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { PublicPost } from '../../../lib/blog-data'
 import { readingMinutes } from '../../../lib/blog-shared'
-import { StudioSelect } from '../../components/studio-select'
 import { useArticleStats, type ArticleStats } from '../../../lib/use-article-stats'
+import { ArchiveSelect } from './archive-select'
 import { Icon } from './ui-icon'
 import styles from '../blog-v1.module.css'
 
@@ -22,6 +22,7 @@ export function ArchiveClient({
   posts: PublicPost[]
   initialTopic?: string
 }) {
+  const overlayRoot = useRef<HTMLDivElement>(null)
   const { stats, status } = useArticleStats(posts)
   const topics = [...new Map(posts.map((post) => [post.topic.id, post.topic])).values()]
   const years = [...new Set(posts.map((post) => post.publishedAt.slice(0, 4)))].sort().reverse()
@@ -86,11 +87,12 @@ export function ArchiveClient({
             )}
           </label>
           <div className={styles.archiveControl}>
-            <span>年份</span>
-            <StudioSelect
-              label="筛选年份"
+            <ArchiveSelect
+              label="选择年份"
               value={year}
               onChange={setYear}
+              portalContainer={overlayRoot}
+              active={year !== 'all'}
               options={[
                 { value: 'all', label: '全部年份' },
                 ...years.map((item) => ({ value: item, label: `${item} 年` })),
@@ -98,11 +100,12 @@ export function ArchiveClient({
             />
           </div>
           <div className={styles.archiveControl}>
-            <span>排序</span>
-            <StudioSelect
-              label="归档排序"
+            <ArchiveSelect
+              label="选择排序方式"
               value={order}
               onChange={(value) => setOrder(value as typeof order)}
+              portalContainer={overlayRoot}
+              active={order !== 'newest'}
               options={[
                 { value: 'newest', label: '最新在前' },
                 { value: 'oldest', label: '最早在前' },
@@ -113,24 +116,26 @@ export function ArchiveClient({
             />
           </div>
         </div>
-        <div className={styles.archiveTopics} role="group" aria-label="归档主题">
-          <button
-            className={topic === 'all' ? styles.selected : ''}
-            aria-pressed={topic === 'all'}
-            onClick={() => setTopic('all')}
-          >
-            全部
-          </button>
-          {topics.map((item) => (
+        <div className={styles.archiveTopicsScroller}>
+          <div className={styles.archiveTopics} role="group" aria-label="归档主题">
             <button
-              className={topic === item.id ? styles.selected : ''}
-              aria-pressed={topic === item.id}
-              onClick={() => setTopic(item.id)}
-              key={item.id}
+              className={topic === 'all' ? styles.selected : ''}
+              aria-pressed={topic === 'all'}
+              onClick={() => setTopic('all')}
             >
-              {item.name}
+              全部
             </button>
-          ))}
+            {topics.map((item) => (
+              <button
+                className={topic === item.id ? styles.selected : ''}
+                aria-pressed={topic === item.id}
+                onClick={() => setTopic(item.id)}
+                key={item.id}
+              >
+                {item.name}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
       <div className={styles.resultBar}>
@@ -139,9 +144,12 @@ export function ArchiveClient({
           {topic !== 'all' && ` · ${topics.find((item) => item.id === topic)?.name ?? ''}`}
           {year !== 'all' && ` · ${year} 年`}
         </span>
-        <button disabled={!filtered} onClick={reset}>
-          清除筛选
-        </button>
+        {filtered && (
+          <button onClick={reset}>
+            <Icon name="close" />
+            清除筛选
+          </button>
+        )}
       </div>
       {status !== 'ready' && (
         <p className={styles.archiveStatsStatus} role="status">
@@ -202,6 +210,7 @@ export function ArchiveClient({
           </div>
         )}
       </div>
+      <div ref={overlayRoot} className={styles.archiveOverlayRoot} />
     </>
   )
 }

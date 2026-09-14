@@ -134,8 +134,9 @@ export function PublicShell({
         </header>
         {children}
         <footer className={styles.footer}>
-          <span>
-            © {new Date().getFullYear()} {site.siteName} · 写下来，慢慢来。
+          <span className={styles.footerCopyright}>
+            © {new Date().getFullYear()} {site.siteName}
+            <span className={styles.footerTagline}> · 写下来，慢慢来。</span>
           </span>
           <div className={styles.footerRight}>
             <nav className={styles.socialLinks} aria-label="社交账号">

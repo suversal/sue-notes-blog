@@ -1,0 +1,340 @@
+.root {
+  min-width: 0;
+  font: 13px/1.4 var(--sans, sans-serif);
+}
+
+.desktopOnly,
+.mobileOnly {
+  min-width: 0;
+}
+
+.mobileOnly {
+  display: none;
+}
+
+.root .trigger {
+  display: flex;
+  width: 100%;
+  min-height: 46px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 0 13px;
+  border: 1px solid color-mix(in srgb, var(--line) 88%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 72%, var(--panel));
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.root[data-filter-active] .trigger {
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--line));
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  color: var(--accent);
+}
+
+.trigger:hover {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.trigger[data-popup-open] {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.triggerValue {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.triggerIcon,
+.trigger > svg {
+  display: grid;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  color: var(--muted);
+  transition: transform 180ms ease, color 160ms ease;
+}
+
+.root .triggerIcon > svg,
+.root .trigger > svg {
+  width: 18px;
+  height: 18px;
+}
+
+.trigger[data-popup-open] .triggerIcon {
+  color: var(--accent);
+  transform: rotate(180deg);
+}
+
+.positioner {
+  z-index: 120;
+  width: var(--anchor-width);
+  min-width: 172px;
+  outline: none;
+}
+
+.popup {
+  width: 100%;
+  max-height: min(320px, var(--available-height));
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--line) 92%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 96%, var(--panel));
+  color: var(--ink);
+  box-shadow:
+    0 18px 44px rgb(20 32 25 / 13%),
+    0 2px 8px rgb(20 32 25 / 7%);
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity 150ms ease,
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.popup[data-starting-style],
+.popup[data-ending-style] {
+  opacity: 0;
+  transform: translateY(-4px) scale(0.985);
+}
+
+.optionList {
+  max-height: inherit;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.option {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.option[data-highlighted] {
+  background: color-mix(in srgb, var(--panel) 72%, transparent);
+}
+
+.option[data-selected] {
+  background: color-mix(in srgb, var(--accent) 9%, var(--surface));
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.option[data-disabled] {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.optionIndicator {
+  display: grid;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+}
+
+.optionIndicator svg {
+  width: 18px;
+  height: 18px;
+}
+
+.drawerBackdrop {
+  position: fixed;
+  z-index: 130;
+  inset: 0;
+  background: rgb(16 19 17 / 24%);
+  opacity: calc(1 - var(--drawer-swipe-progress, 0));
+  backdrop-filter: blur(2px);
+  transition: opacity 180ms ease;
+}
+
+.drawerBackdrop[data-starting-style],
+.drawerBackdrop[data-ending-style] {
+  opacity: 0;
+}
+
+.drawerViewport {
+  position: fixed;
+  z-index: 131;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.drawerPopup {
+  width: min(100%, 560px);
+  max-height: calc(100dvh - 48px);
+  padding: 9px 12px max(12px, env(safe-area-inset-bottom));
+  border: 1px solid color-mix(in srgb, var(--line) 92%, transparent);
+  border-bottom: 0;
+  border-radius: 18px 18px 0 0;
+  background: var(--surface);
+  box-shadow: 0 -18px 50px rgb(15 24 18 / 16%);
+  color: var(--ink);
+  pointer-events: auto;
+  transform: translateY(var(--drawer-swipe-movement-y, 0));
+  transition: transform calc(260ms * var(--drawer-swipe-strength, 1)) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.drawerPopup[data-starting-style],
+.drawerPopup[data-ending-style] {
+  transform: translateY(100%);
+}
+
+.drawerHandle {
+  width: 34px;
+  height: 4px;
+  margin: 0 auto 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--muted) 36%, transparent);
+}
+
+.drawerContent {
+  min-height: 0;
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 7px 6px 11px;
+  border-bottom: 1px solid var(--line);
+}
+
+.drawerHeader h2 {
+  margin: 0;
+  font: 600 18px/1.45 var(--serif);
+}
+
+.drawerHeader p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.drawerHeader .drawerClose {
+  display: grid;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: -4px -6px -4px 0;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.drawerHeader .drawerClose:hover {
+  background: var(--accent-wash);
+  color: var(--accent);
+}
+
+.drawerHeader .drawerClose:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.drawerHeader .drawerClose svg {
+  width: 20px;
+  height: 20px;
+}
+
+.drawerOptions {
+  max-height: min(62dvh, 420px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px 0 0;
+}
+
+.drawerPopup .drawerOption {
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+  background: transparent;
+  color: var(--ink);
+  font: 14px/1.4 var(--sans);
+  text-align: left;
+  cursor: pointer;
+}
+
+.drawerPopup .drawerOption:last-child {
+  border-bottom: 0;
+}
+
+.drawerPopup .drawerOption[aria-pressed='true'] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.drawerPopup .drawerOption:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.drawerPopup .drawerOption svg {
+  flex: none;
+  width: 19px;
+  height: 19px;
+}
+
+@media (max-width: 600px) {
+  .desktopOnly {
+    display: none;
+  }
+
+  .mobileOnly {
+    display: block;
+  }
+
+  .root .trigger {
+    min-height: 44px;
+    padding: 0 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root .trigger,
+  .triggerIcon,
+  .trigger > svg,
+  .popup,
+  .drawerBackdrop,
+  .drawerPopup {
+    transition: none;
+  }
+}
