@@ -93,6 +93,7 @@ export function PublicShell({
           .includes(keyword),
     )
     .slice(0, 8)
+  const listingFooter = pathname === '/blog/archive' || pathname === '/blog/explore'
   return (
     <div className={styles.publicRoot}>
       <div className={styles.publicShell}>
@@ -108,6 +109,12 @@ export function PublicShell({
             >
               归档
             </Link>
+            <Link
+              className={pathname === '/blog/explore' ? styles.active : ''}
+              href="/blog/explore"
+            >
+              探索
+            </Link>
             <Link className={pathname === '/blog/about' ? styles.active : ''} href="/blog/about">
               关于
             </Link>
@@ -117,23 +124,12 @@ export function PublicShell({
               <Icon name="search" />
             </button>
             <ThemeSettings className={styles.themeToggle} />
-            {socialAccounts.map((account) => (
-              <a
-                className={styles.socialTool}
-                href={account.href}
-                target="_blank"
-                rel="me noopener noreferrer"
-                aria-label={account.label}
-                title={account.label.replace('：', ' · @')}
-                key={account.href}
-              >
-                <Icon name={account.icon} />
-              </a>
-            ))}
           </div>
         </header>
         {children}
-        <footer className={styles.footer}>
+        <footer
+          className={`${styles.footer} ${pathname === '/blog' ? styles.homeFooter : ''} ${listingFooter ? styles.listingFooter : ''}`}
+        >
           <span className={styles.footerCopyright}>
             © {new Date().getFullYear()} {site.siteName}
             <span className={styles.footerTagline}> · 写下来，慢慢来。</span>
@@ -155,7 +151,6 @@ export function PublicShell({
             </nav>
             <div className={styles.footerLinks}>
               <Link href="/blog/about">关于作者</Link>
-              <Link href="/blog/archive">全部文章</Link>
             </div>
           </div>
         </footer>

@@ -96,6 +96,7 @@ export default async function PreviewPage({
     topic,
     coverStyle: revision.coverStyle || 'none',
     coverImage: publicCoverImage(revision.coverImage),
+    pinPriority: Number(article.pinPriority) || 0,
     publishedAt: article.publishedAt || new Date().toISOString(),
     updatedAt: article.updatedAt,
     publicReferences: revision.publicReferences ?? [],

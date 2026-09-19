@@ -1,7 +1,7 @@
-import { createHash, randomUUID } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import { commitTransaction, createLocalReq, initTransaction, killTransaction } from 'payload';
 import { markdownToArticleContent } from './article-content';
-import { articleContentHasMeaningfulContent, type ArticleContent } from './article-content-data';
+import { articleContentHasMeaningfulContent, linkifyArticleContentUrls, type ArticleContent } from './article-content-data';
 import { getPayloadClient } from './payload';
 
 export const revisionHash = (value: object) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
@@ -25,6 +25,12 @@ export type DraftInput = DraftMeta & (
 type ResolvedDraftInput = DraftMeta & { content: ArticleContent };
 
 const reservedSlugs = new Set(['about', 'api', 'articles', 'library', 'login', 'setup', 'admin', '_next']);
+const autoSlugAlphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
+
+export function generateArticleSlug() {
+  const bytes = randomBytes(10);
+  return Array.from(bytes, (byte) => autoSlugAlphabet[byte % autoSlugAlphabet.length]).join('');
+}
 
 export class ArticleSlugUnavailableError extends Error {
   readonly code = 'ARTICLE_SLUG_UNAVAILABLE';
@@ -33,6 +39,14 @@ export class ArticleSlugUnavailableError extends Error {
     super('文章链接已被使用或不可用。');
     this.name = 'ArticleSlugUnavailableError';
   }
+}
+
+export function parseArticlePinPriority(value: unknown) {
+  const raw = String(value ?? '').trim();
+  if (!/^\d{1,3}$/.test(raw)) throw new Error('置顶优先级必须是 0–999 的整数。');
+  const priority = Number(raw);
+  if (!Number.isSafeInteger(priority) || priority < 0 || priority > 999) throw new Error('置顶优先级必须是 0–999 的整数。');
+  return priority;
 }
 
 function relationId(value: unknown): string { return value && typeof value === 'object' && 'id' in value ? String((value as { id: unknown }).id) : String(value); }
@@ -61,7 +75,7 @@ async function resolveDraftInput(payload: any, input: DraftInput, owner: string)
     const media = await payload.findByID({ collection: 'media', id: input.coverImage, overrideAccess: true, depth: 0 });
     if (relationId(media.owner) !== owner || !media.mimeType?.startsWith('image/')) throw new Error('封面图片不可用。');
   }
-  const content = input.content ?? markdownToArticleContent(payload, input.bodyMarkdown);
+  const content = linkifyArticleContentUrls(input.content ?? markdownToArticleContent(payload, input.bodyMarkdown));
   if (!articleContentHasMeaningfulContent(content)) throw new Error('正文不能为空。');
   const { bodyMarkdown: _, ...rest } = input;
   return { ...rest, content };
@@ -92,7 +106,7 @@ async function ownedArticle(payload: any, owner: string, articleId: string) {
 }
 
 export async function createDraft(owner: string, input: DraftInput) {
-  input = { ...input, slug: input.slug.trim().toLowerCase() || `post-${randomUUID()}` };
+  input = { ...input, slug: input.slug.trim().toLowerCase() || generateArticleSlug() };
   assertSlug(input.slug); const payload = await getPayloadClient(); await assertSlugAvailable(payload, owner, input.slug); const resolved = await resolveDraftInput(payload, input, owner); const data = revisionData(resolved);
   const req = await createLocalReq({}, payload);
   await initTransaction(req);
@@ -111,7 +125,7 @@ export async function createDraft(owner: string, input: DraftInput) {
 /** 新版本只更新私有工作副本；已公开版本继续由 publishedRevision 提供。 */
 export async function updateDraft(owner: string, articleId: string, input: DraftInput) {
   const payload = await getPayloadClient(); const article = await ownedArticle(payload, owner, articleId);
-  input = { ...input, slug: input.slug.trim().toLowerCase() || article.slug || `post-${randomUUID()}` };
+  input = { ...input, slug: input.slug.trim().toLowerCase() || article.slug || generateArticleSlug() };
   assertSlug(input.slug); await assertSlugAvailable(payload, owner, input.slug, articleId);
   const { revision, data } = await appendRevision(payload, owner, article, input);
   return payload.update({ collection: 'articles', id: articleId, overrideAccess: true, data: { title: data.title, slug: data.slug, content: data.content, excerpt: data.excerpt, tags: data.tags, topic: data.topic, coverStyle: data.coverStyle, coverImage: data.coverImage, publicReferences: data.publicReferences, revisionHash: data.revisionHash, currentRevision: revision.id } } as any);
@@ -139,6 +153,12 @@ export async function makePrivate(owner: string, articleId: string) {
   const payload = await getPayloadClient(); const article = await ownedArticle(payload, owner, articleId);
   if (article.status !== 'published') throw new Error('公开文章不存在。');
   return payload.update({ collection: 'articles', id: articleId, overrideAccess: true, data: { status: 'draft', visibility: 'private', privateAt: new Date().toISOString() } });
+}
+
+export async function setArticlePinPriority(owner: string, articleId: string, pinPriority: number) {
+  const payload = await getPayloadClient(); const article = await ownedArticle(payload, owner, articleId);
+  if (article.status !== 'published' && pinPriority > 0) throw new Error('只有已发布文章可以置顶。');
+  return payload.update({ collection: 'articles', id: articleId, overrideAccess: true, data: { pinPriority: pinPriority || null } });
 }
 
 export async function archiveArticle(owner: string, articleId: string) {

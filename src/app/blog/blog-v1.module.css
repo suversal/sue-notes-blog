@@ -166,7 +166,6 @@
   gap: 8px;
 }
 .navTools > button,
-.navTools > a,
 .dialogHead button,
 .archiveSearch button,
 .readerTop button {
@@ -181,28 +180,11 @@
   color: var(--muted);
 }
 .navTools > button:hover,
-.navTools > a:hover,
 .dialogHead button:hover,
 .archiveSearch button:hover,
 .readerTop button:hover {
   background: var(--accent-wash);
   color: var(--accent);
-}
-.navTools > a {
-  display: grid;
-  width: 44px;
-  height: 44px;
-  place-items: center;
-  border-radius: 3px;
-  color: var(--muted);
-}
-.navTools > a:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-.navTools > a svg {
-  width: 19px;
-  height: 19px;
 }
 .strap {
   display: flex;
@@ -528,11 +510,12 @@
   color: var(--accent);
 }
 .socialLinks {
-  gap: 2px;
+  gap: 4px;
 }
 .socialLinks a {
-  width: 44px;
-  min-width: 44px;
+  width: 32px;
+  min-width: 32px;
+  min-height: 32px;
   border-radius: 50%;
   color: var(--muted);
   transition: background-color 150ms ease, color 150ms ease;
@@ -546,8 +529,8 @@
   outline-offset: 2px;
 }
 .socialLinks svg {
-  width: 19px;
-  height: 19px;
+  width: 14px;
+  height: 14px;
 }
 .emptyHero {
   min-height: 310px;
@@ -755,10 +738,17 @@
 .archiveTopics button {
   scroll-snap-align: start;
 }
+.archiveTopicLine {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 16px;
+  margin-top: 6px;
+}
 .archiveTopicsScroller {
   position: relative;
+  flex: 1;
   min-width: 0;
-  margin-top: 6px;
 }
 .archiveTopicsScroller::after {
   position: absolute;
@@ -770,45 +760,18 @@
   content: '';
   background: linear-gradient(90deg, transparent, var(--bg) 78%);
 }
-.resultBar {
-  display: flex;
-  min-height: 55px;
-  align-items: center;
-  justify-content: space-between;
+.archiveCount {
+  flex: none;
   color: var(--muted);
   font-size: 12px;
-}
-.resultBar button {
-  display: inline-flex;
-  min-height: 44px;
-  align-items: center;
-  gap: 5px;
-  color: var(--accent);
-  font-weight: 600;
-  transition: color 160ms ease, opacity 160ms ease;
-}
-.resultBar button:hover {
-  opacity: 0.72;
-}
-.resultBar button svg {
-  width: 14px;
-  height: 14px;
+  text-align: right;
+  white-space: nowrap;
 }
 .archiveResults {
   border-bottom: 0;
 }
 .archiveYear {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-}
-.archiveYear > div:first-child {
-  padding: 10px 0;
-}
-.archiveYear > div:first-child h2 {
-  margin: 0;
-  font-family: var(--serif);
-  font-size: 20px;
-  font-weight: 500;
+  display: block;
 }
 .archiveYear article {
   display: grid;
@@ -818,8 +781,8 @@
   min-height: 68px;
   border-top: 1px solid var(--line);
 }
-.archiveYear:last-child article:last-child {
-  border-bottom: 1px solid var(--line);
+.archiveYear article:first-child {
+  border-top: 0;
 }
 .archiveYear time,
 .archiveYear small {
@@ -1807,9 +1770,6 @@
     grid-row: 1;
   }
   .navTools .themeToggle { transform: scale(0.92); transform-origin: right center; }
-  .navTools .socialTool {
-    display: none;
-  }
   .brand {
     font-size: 22px;
   }
@@ -1883,14 +1843,6 @@
   }
   .archiveControls select {
     width: 100%;
-  }
-  .archiveYear {
-    grid-template-columns: 1fr;
-  }
-  .archiveYear > div:first-child {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
   }
   .archiveYear article {
     grid-template-columns: 58px minmax(0, 1fr);
@@ -2183,16 +2135,14 @@
   transform-origin: left;
   transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.navTools > button,
-.navTools > a {
+.navTools > button {
   border-radius: 50%;
   transition:
     background-color 280ms ease,
     color 280ms ease,
     transform 280ms ease;
 }
-.navTools > button:active,
-.navTools > a:active {
+.navTools > button:active {
   transform: scale(0.92);
 }
 .themeIcon {
@@ -2205,6 +2155,15 @@
   margin-top: 32px;
   min-height: 100px;
   padding: 24px 0;
+}
+.homeFooter {
+  min-height: 72px;
+  margin-top: 0;
+  padding: 12px 0;
+}
+
+.listingFooter {
+  margin-top: 0;
 }
 .overlay {
   backdrop-filter: blur(5px);
@@ -2304,11 +2263,6 @@
 .archiveSearch input { appearance: none; }
 .archiveSearch input::-webkit-search-cancel-button { display: none; }
 .archiveOverlayRoot { position: relative; z-index: 120; }
-.archiveYear > div:first-child h2.metricHeading {
-  font-size: 20px;
-  line-height: 1.5;
-  white-space: nowrap;
-}
 .archiveMetric { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
 .archiveMetric svg { width: 14px; height: 14px; flex: none; }
 .archiveRowMeta { display: flex; align-items: center; justify-content: flex-end; gap: 12px; white-space: nowrap; }
@@ -2354,6 +2308,9 @@
     min-height: 44px;
     padding: 0 7px;
     font-size: 13px;
+  }
+  .masthead nav a:first-child {
+    display: none;
   }
   .navTools {
     grid-column: 3;
@@ -2468,24 +2425,19 @@
     padding-right: 32px;
   }
   .archiveTopicsScroller {
+    min-width: 0;
+  }
+  .archiveTopicLine {
+    gap: 10px;
     margin-top: 4px;
+  }
+  .archiveCount {
+    font-size: 11px;
   }
   .archiveTopics button {
     min-height: 44px;
     padding: 6px 10px;
     font-size: 12px;
-  }
-  .resultBar {
-    min-height: 40px;
-    font-size: 11px;
-  }
-  .archiveYear > div:first-child {
-    padding: 9px 0 4px;
-  }
-  .archiveYear > div:first-child h2,
-  .archiveYear > div:first-child h2.metricHeading {
-    font-size: 17px;
-    line-height: 1.45;
   }
   .archiveYear article {
     grid-template-columns: 78px minmax(0, 1fr);

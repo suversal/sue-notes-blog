@@ -169,69 +169,76 @@ export function HomeClient({ posts, site }: { posts: PublicPost[]; site: SitePro
         </a>
       </nav>
       <div className={styles.homeGrid}>
-        <section aria-labelledby="recent-title">
-          <Reveal>
-            <div className={styles.sectionHeading}>
-              <div>
-                <h2 id="recent-title" ref={listHeading} tabIndex={-1}>
-                  最近的文字<span>{String(rows.length).padStart(2, '0')}</span>
-                </h2>
+        <section className={styles.articlePanel} aria-labelledby="recent-title">
+          <div className={styles.articleHeader}>
+            <Reveal>
+              <div className={styles.sectionHeading}>
+                <div>
+                  <h2 id="recent-title" ref={listHeading} tabIndex={-1}>
+                    最近的文字<span>{String(rows.length).padStart(2, '0')}</span>
+                  </h2>
+                </div>
+                <Link href="/blog/archive">
+                  查看归档 <Icon name="arrow" />
+                </Link>
               </div>
-              <Link href="/blog/archive">
-                查看归档 <Icon name="arrow" />
-              </Link>
-            </div>
-            <div className={styles.topicScroller}>
-              <button
-                className={styles.topicArrow}
-                type="button"
-                aria-label="向左查看更多分类"
-                disabled={!topicScroll.left}
-                onClick={() => scrollTopics(-1)}
-              >
-                <Icon name="back" />
-              </button>
-              <div ref={topicRail} className={styles.topicTabs} role="group" aria-label="筛选文章主题">
+              <div className={styles.topicScroller}>
                 <button
-                  aria-controls="home-results"
-                  aria-pressed={topic === 'all'}
-                  onClick={(event) => {
-                    chooseTopic('all')
-                    event.currentTarget.scrollIntoView({ block: 'nearest', inline: 'center' })
-                  }}
+                  className={styles.topicArrow}
+                  type="button"
+                  aria-label="向左查看更多分类"
+                  disabled={!topicScroll.left}
+                  onClick={() => scrollTopics(-1)}
                 >
-                  全部
+                  <Icon name="back" />
                 </button>
-                {topics.map((item) => (
+                <div
+                  ref={topicRail}
+                  className={styles.topicTabs}
+                  role="group"
+                  aria-label="筛选文章主题"
+                >
                   <button
                     aria-controls="home-results"
-                    aria-pressed={topic === item.id}
+                    aria-pressed={topic === 'all'}
                     onClick={(event) => {
-                      chooseTopic(item.id)
+                      chooseTopic('all')
                       event.currentTarget.scrollIntoView({ block: 'nearest', inline: 'center' })
                     }}
-                    key={item.id}
                   >
-                    {item.name}
+                    全部
                   </button>
-                ))}
+                  {topics.map((item) => (
+                    <button
+                      aria-controls="home-results"
+                      aria-pressed={topic === item.id}
+                      onClick={(event) => {
+                        chooseTopic(item.id)
+                        event.currentTarget.scrollIntoView({ block: 'nearest', inline: 'center' })
+                      }}
+                      key={item.id}
+                    >
+                      {item.name}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  className={styles.topicArrow}
+                  type="button"
+                  aria-label="向右查看更多分类"
+                  disabled={!topicScroll.right}
+                  onClick={() => scrollTopics(1)}
+                >
+                  <Icon name="arrow" />
+                </button>
               </div>
-              <button
-                className={styles.topicArrow}
-                type="button"
-                aria-label="向右查看更多分类"
-                disabled={!topicScroll.right}
-                onClick={() => scrollTopics(1)}
-              >
-                <Icon name="arrow" />
-              </button>
-            </div>
-          </Reveal>
+            </Reveal>
+          </div>
           <div
             id="home-results"
             role="region"
             aria-label="文章列表"
-            className={styles.homeResults}
+            className={`${styles.homeResults} ${visible >= rows.length ? styles.completeResults : ''}`}
             key={topic}
           >
             {shown.map((post, index) => (
@@ -306,21 +313,19 @@ export function HomeClient({ posts, site }: { posts: PublicPost[]; site: SitePro
               </div>
             )}
           </div>
-          <div ref={loadMoreTrigger} className={styles.listBottom}>
-            <span
-              className={`${styles.autoLoadStatus} ${loadingMore ? styles.loading : ''}`}
-              role="status"
-              aria-live="polite"
-            >
-              {loadingMore
-                ? '正在加载下一页…'
-                : rows.length
-                ? visible < rows.length
-                  ? `已显示 ${shown.length} / ${rows.length} 篇，向下滚动继续阅读`
-                  : `已显示全部 ${rows.length} 篇文章`
-                : '暂无更多文章'}
-            </span>
-          </div>
+          {visible < rows.length && (
+            <div ref={loadMoreTrigger} className={styles.listBottom}>
+              <span
+                className={`${styles.autoLoadStatus} ${loadingMore ? styles.loading : ''}`}
+                role="status"
+                aria-live="polite"
+              >
+                {loadingMore
+                  ? '正在加载下一页…'
+                  : `已显示 ${shown.length} / ${rows.length} 篇，向下滚动继续阅读`}
+              </span>
+            </div>
+          )}
         </section>
 
         <aside className={styles.homeAside}>

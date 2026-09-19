@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>苏码手记 · 关于与探索设计实验室</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-concept="one" data-view="about">
+    <header class="lab-toolbar" aria-label="设计方案控制栏">
+      <div class="lab-brand">
+        <span>SU NOTES</span>
+        <small>ABOUT × EXPLORE LAB</small>
+      </div>
+      <div class="lab-groups">
+        <div class="segmented" aria-label="选择设计方案">
+          <button type="button" data-concept-button="one" aria-pressed="true">01 静奢展厅</button>
+          <button type="button" data-concept-button="two" aria-pressed="false">02 动态索引</button>
+          <button type="button" data-concept-button="three" aria-pressed="false">03 空间档案</button>
+        </div>
+        <div class="segmented view-switch" aria-label="切换页面">
+          <button type="button" data-view-button="about" aria-pressed="true">关于</button>
+          <button type="button" data-view-button="explore" aria-pressed="false">探索</button>
+        </div>
+      </div>
+      <span class="lab-note">内容为视觉示意</span>
+    </header>
+
+    <main class="prototype" id="prototype">
+      <section class="concept concept-one" data-concept-panel="one" data-screen-label="方案 01 · 静奢展厅">
+        <nav class="one-nav" aria-label="方案一站点导航">
+          <button class="one-brand" type="button" data-view-target="about">
+            <img src="icon.svg" alt="" width="34" height="34" />
+            <span>苏码手记<small>SUE NOTES</small></span>
+          </button>
+          <div>
+            <button type="button">文章</button>
+            <button type="button">归档</button>
+            <button type="button" data-view-target="explore">探索</button>
+            <button type="button" data-view-target="about">关于</button>
+          </div>
+          <span>CN / EN</span>
+        </nav>
+
+        <div class="screen one-about" data-screen="about">
+          <header class="one-about-hero">
+            <div class="one-issue"><span>ABOUT / 2026</span><i></i><span>SHANGHAI</span></div>
+            <h1 class="reveal">把复杂的事，<br />想清楚，<br /><em>再做出来。</em></h1>
+            <p class="reveal">你好，我是 Sue。一个爱折腾工具的独立开发者，也是在这里长期写字的人。</p>
+            <div class="one-seal" aria-hidden="true"><img src="icon.svg" alt="" /></div>
+            <span class="one-scroll">SCROLL TO READ <i></i></span>
+          </header>
+          <section class="one-manifesto reveal">
+            <span>01 / WHO I AM</span>
+            <p>我关心技术如何变成普通人真正用得上的东西，也关心一个判断是如何形成、被验证，再被留下来的。</p>
+          </section>
+          <section class="one-method">
+            <header class="reveal"><span>02 / HOW I WORK</span><h2>不急着证明自己，<br />先把问题解决。</h2></header>
+            <div class="one-method-grid reveal">
+              <article><span>01</span><h3>亲手试过</h3><p>不把转述包装成经验，重要的判断来自真实使用。</p></article>
+              <article><span>02</span><h3>做成产品</h3><p>让想法落地，接受现实世界而不是想象中的检验。</p></article>
+              <article><span>03</span><h3>长期记录</h3><p>写下过程与变化，让今天的经验能在未来继续生长。</p></article>
+            </div>
+          </section>
+          <section class="one-writing reveal">
+            <span>03 / WHY I WRITE</span>
+            <div><h2>这里不是成果陈列柜。</h2><p>它更像一份持续更新的工作底稿：产品背后的判断、工程里的弯路，以及仍在变化中的想法。</p></div>
+          </section>
+          <footer class="one-about-footer reveal">
+            <div><span>NEXT / EXPLORE</span><h2>看看我在做什么，<br />也看看什么影响了我。</h2></div>
+            <button type="button" data-view-target="explore"><span>进入探索</span><span>↗</span></button>
+            <strong>Sue.</strong>
+          </footer>
+        </div>
+
+        <div class="screen one-explore" data-screen="explore" hidden>
+          <header class="one-explore-hero">
+            <span>AN INDEX OF THINGS I MAKE &amp; KEEP</span>
+            <h1 class="reveal">探索<span>。</span></h1>
+            <p class="reveal">我做的产品、我维护的网站，以及值得一再回访的互联网角落。</p>
+          </header>
+          <div class="filter-bar" data-filter-bar>
+            <span>FILTER</span>
+            <button type="button" data-filter="all" aria-pressed="true">全部</button>
+            <button type="button" data-filter="project" aria-pressed="false">开源项目</button>
+            <button type="button" data-filter="site" aria-pressed="false">我的站点</button>
+            <button type="button" data-filter="saved" aria-pressed="false">网站收藏</button>
+          </div>
+          <section class="one-grid" aria-live="polite">
+            <article class="one-card card-wide" data-kind="project">
+              <div class="mock mock-radar"><span>AI RADAR</span><i></i><i></i><i></i><b>01</b></div>
+              <footer><span>OPEN SOURCE / 01</span><h2>AIRadar</h2><p>让值得关注的 AI 变化浮出水面。</p></footer>
+            </article>
+            <article class="one-card card-tall" data-kind="project">
+              <div class="mock mock-apple"><span>果到雷达</span><div><i></i><i></i><i></i><i></i><i></i><i></i></div><small>AVAILABLE NEARBY</small></div>
+              <footer><span>OPEN SOURCE / 02</span><h2>果到雷达</h2><p>Apple 到店库存监控工具。</p></footer>
+            </article>
+            <article class="one-card" data-kind="site">
+              <div class="mock mock-browser"><div><i></i><i></i><i></i></div><strong>radar.<br />suversal.com</strong></div>
+              <footer><span>MY SITE / 01</span><h2>AIRadar Web</h2><p>正在运行的产品站点。</p></footer>
+            </article>
+            <article class="one-card" data-kind="saved">
+              <div class="mock mock-type"><span>REFERENCE / DEMO</span><strong>Are.na</strong><small>CHANNELS FOR CURIOUS MINDS</small></div>
+              <footer><span>SAVED / 示例</span><h2>Are.na</h2><p>收藏、连接与重新发现。</p></footer>
+            </article>
+            <article class="one-card card-wide" data-kind="saved">
+              <div class="mock mock-lines"><strong>A quiet corner<br />of the web.</strong><i></i><i></i><i></i></div>
+              <footer><span>SAVED / 示例</span><h2>Personal Web</h2><p>那些仍然保留个人气质的网站。</p></footer>
+            </article>
+          </section>
+        </div>
+      </section>
+
+      <section class="concept concept-two" data-concept-panel="two" data-screen-label="方案 02 · 动态索引" hidden>
+        <nav class="two-nav" aria-label="方案二站点导航">
+          <button type="button" class="two-logo" data-view-target="about">S/</button>
+          <div><button type="button">ARTICLES</button><button type="button">ARCHIVE</button><button type="button" data-view-target="explore">EXPLORE</button><button type="button" data-view-target="about">ABOUT</button></div>
+          <span>SU NOTES® 2026</span>
+        </nav>
+
+        <div class="screen two-about" data-screen="about">
+          <header class="two-hero">
+            <p>独立开发者 / 写作者</p>
+            <h1><span>MAKE</span><span>THINK</span><span>WRITE</span></h1>
+            <div class="two-hero-copy"><strong>你好，我是 Sue。</strong><p>我把复杂的问题做成可以使用的工具，也把那些值得留下的判断写在这里。</p></div>
+            <div class="two-cross" aria-hidden="true"><i></i><i></i></div>
+          </header>
+          <div class="two-marquee" aria-hidden="true"><span>BUILD WHAT MATTERS · WRITE WHAT LASTS · BUILD WHAT MATTERS · WRITE WHAT LASTS · </span></div>
+          <section class="two-belief reveal">
+            <div><span>001</span><small>BELIEF</small></div>
+            <p>好的技术不应该制造距离感。它应该安静地工作，让人更快抵达自己真正想做的事。</p>
+          </section>
+          <section class="two-columns reveal">
+            <article><span>002 / PRACTICE</span><h2>从真实问题开始。</h2><p>亲手验证、快速做出、持续修正。不用宏大叙事掩盖一个产品是否真的有用。</p></article>
+            <article><span>003 / NOTES</span><h2>把过程公开。</h2><p>这里记录的不只是答案，也包括走错的路、改变的判断和仍未解决的问题。</p></article>
+          </section>
+          <footer class="two-footer reveal">
+            <h2>ABOUT ENDS.<br /><em>EXPLORATION BEGINS.</em></h2>
+            <button type="button" data-view-target="explore">OPEN THE INDEX <span>→</span></button>
+          </footer>
+        </div>
+
+        <div class="screen two-explore" data-screen="explore" hidden>
+          <header class="two-index-head">
+            <span>THE OPEN INDEX / 2026</span>
+            <h1>EXPL<span>O</span>RE</h1>
+            <p>Projects, websites and references — selected by Sue.</p>
+          </header>
+          <div class="two-filter" data-filter-bar>
+            <button type="button" data-filter="all" aria-pressed="true">ALL</button>
+            <button type="button" data-filter="project" aria-pressed="false">PROJECTS</button>
+            <button type="button" data-filter="site" aria-pressed="false">MY SITES</button>
+            <button type="button" data-filter="saved" aria-pressed="false">SAVED WEB</button>
+          </div>
+          <section class="two-index">
+            <article class="two-row" data-kind="project"><span>01</span><h2>AIRadar</h2><p>AI INTELLIGENCE</p><div class="two-preview preview-a"><b>AI/R</b><i></i><i></i><i></i></div><small>OPEN SOURCE ↗</small></article>
+            <article class="two-row" data-kind="project"><span>02</span><h2>果到雷达</h2><p>APPLE INVENTORY</p><div class="two-preview preview-b"><b>果</b><div><i></i><i></i><i></i></div></div><small>OPEN SOURCE ↗</small></article>
+            <article class="two-row" data-kind="site"><span>03</span><h2>radar.suversal.com</h2><p>MY SITE</p><div class="two-preview preview-c"><b>RADAR</b><em>LIVE / WEB</em></div><small>VISIT ↗</small></article>
+            <article class="two-row" data-kind="saved"><span>04</span><h2>Are.na</h2><p>SAVED / DEMO</p><div class="two-preview preview-d"><b>ARE.NA</b><em>REFERENCE</em></div><small>VISIT ↗</small></article>
+            <article class="two-row" data-kind="saved"><span>05</span><h2>Personal Web</h2><p>SAVED / DEMO</p><div class="two-preview preview-e"><b>WWW</b><i></i></div><small>VISIT ↗</small></article>
+          </section>
+          <footer class="two-index-footer"><span>05 OBJECTS IN VIEW</span><strong>CURATED, NOT COLLECTED.</strong></footer>
+        </div>
+      </section>
+
+      <section class="concept concept-three" data-concept-panel="three" data-screen-label="方案 03 · 空间档案" hidden>
+        <nav class="three-nav" aria-label="方案三站点导航">
+          <button class="three-brand" type="button" data-view-target="about"><span>S</span><strong>苏码手记</strong></button>
+          <div><button type="button">文章</button><button type="button">归档</button><button type="button" data-view-target="explore">探索</button><button type="button" data-view-target="about">关于</button></div>
+          <span>STAY CURIOUS</span>
+        </nav>
+
+        <div class="screen three-about" data-screen="about">
+          <header class="three-hero">
+            <div class="blob blob-a" aria-hidden="true"></div><div class="blob blob-b" aria-hidden="true"></div><div class="blob blob-c" aria-hidden="true"></div>
+            <span class="three-kicker">ABOUT SUE / 独立开发者与写作者</span>
+            <h1 class="reveal">我喜欢把<br /><em>“能不能更好？”</em><br />做成答案。</h1>
+            <p class="reveal">从一个真实问题开始，做工具，写文章，也持续整理自己的数字生活。</p>
+            <div class="three-stamp" aria-hidden="true">SUE<br />NOTES</div>
+          </header>
+          <section class="three-thoughts">
+            <article class="reveal"><span>01</span><h2>保持好奇</h2><p>对习以为常的流程多问一句：为什么必须这样？</p></article>
+            <article class="reveal"><span>02</span><h2>动手验证</h2><p>比起讲一个完美故事，我更相信一个真正能运行的版本。</p></article>
+            <article class="reveal"><span>03</span><h2>留下痕迹</h2><p>把判断写下来，允许它在未来被修正，而不是被遗忘。</p></article>
+          </section>
+          <section class="three-note reveal"><span>WHY THIS BLOG</span><p>这是一个可以慢慢写、反复改、隔很久再回来看的地方。</p><i>写下来，慢慢来。</i></section>
+          <footer class="three-footer reveal"><div><span>KEEP EXPLORING</span><h2>下一站，<br />去看看我的数字档案。</h2></div><button type="button" data-view-target="explore">打开探索 <span>↗</span></button></footer>
+        </div>
+
+        <div class="screen three-explore" data-screen="explore" hidden>
+          <header class="three-explore-head">
+            <span>MY DIGITAL FIELD / 2026</span>
+            <h1>探索不是收集，<br /><em>是建立连接。</em></h1>
+            <p>这里放着我做的、我拥有的，以及我愿意推荐给别人的互联网角落。</p>
+          </header>
+          <div class="three-filter" data-filter-bar>
+            <button type="button" data-filter="all" aria-pressed="true">全部</button>
+            <button type="button" data-filter="project" aria-pressed="false">开源项目</button>
+            <button type="button" data-filter="site" aria-pressed="false">我的站点</button>
+            <button type="button" data-filter="saved" aria-pressed="false">网站收藏</button>
+          </div>
+          <section class="three-field">
+            <article class="field-card field-main" data-kind="project"><span>OPEN SOURCE / 01</span><div class="field-visual radar-field"><b>AIR</b><i></i><i></i><i></i></div><h2>AIRadar</h2><p>AI 信息雷达</p></article>
+            <article class="field-card field-apple" data-kind="project"><span>OPEN SOURCE / 02</span><div class="field-visual apple-field"><b>果</b><div><i></i><i></i><i></i><i></i></div></div><h2>果到雷达</h2><p>Apple 到店库存工具</p></article>
+            <article class="field-card field-site" data-kind="site"><span>MY SITE / 01</span><div class="field-visual site-field"><i></i><i></i><i></i><b>radar.<br />suversal.com</b></div><h2>AIRadar Web</h2><p>产品站点</p></article>
+            <article class="field-card field-saved" data-kind="saved"><span>SAVED / 示例</span><div class="field-visual saved-field"><b>A</b><em>ARE.NA</em></div><h2>Are.na</h2><p>Ideas in relation</p></article>
+            <article class="field-card field-web" data-kind="saved"><span>SAVED / 示例</span><div class="field-visual web-field"><b>WWW</b><i></i></div><h2>Personal Web</h2><p>独立、真诚、有个人气质</p></article>
+          </section>
+          <footer class="three-explore-footer"><strong>SUE'S FIELD NOTES</strong><span>MORE OBJECTS WILL GROW HERE.</span></footer>
+        </div>
+      </section>
+    </main>
+
+    <div class="cursor" aria-hidden="true"></div>
+    <script src="app.js"></script>
+  </body>
+</html>

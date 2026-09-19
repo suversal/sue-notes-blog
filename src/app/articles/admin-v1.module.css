@@ -108,16 +108,6 @@
   --accent-wash: #2b2b31;
 }
 
-.adminThemeSettings {
-  --theme-panel-right: auto;
-  --theme-panel-left: 0;
-  --theme-panel-translate-x: 0;
-  margin: auto auto 0;
-}
-.adminThemeSettings + .owner {
-  margin-top: 14px;
-}
-
 .filterControl { --select-trigger-bg: var(--panel); --select-options-bg: var(--panel); --select-option-hover-bg: var(--accent-wash); display: flex; align-items: center; gap: 10px; flex-shrink: 0; color: var(--muted); font-size: 12px; }
 .filterControl > div { min-width: 134px; }
 .queryControls .articleSearch { max-width: 420px; min-height: 46px; border-radius: 9px; background: var(--panel); border-color: transparent; }
@@ -255,6 +245,8 @@
   font-size: 11px;
 }
 .adminMain {
+  --admin-main-block-start: 24px;
+  --admin-main-inline-size: 40px;
   width: min(1320px, 100%);
   min-width: 0;
   padding: 24px 40px 50px;
@@ -422,7 +414,7 @@
 .listLabels,
 .manageRow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 100px 100px 44px;
+  grid-template-columns: minmax(0, 1fr) 100px 168px 44px;
   align-items: center;
   gap: 18px;
 }
@@ -461,8 +453,22 @@
   text-decoration: none;
 }
 .manageTitle small {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
   color: var(--muted);
   font-size: 11px;
+}
+.pinBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 5px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+  border-radius: 3px;
+  color: var(--accent);
+  font-size: 10px;
+  line-height: 1.5;
 }
 .status {
   display: inline-flex;
@@ -489,9 +495,12 @@
 .changed {
   color: var(--accent);
 }
-.manageRow time {
+.manageRow time,
+.unpublishedTime {
   color: var(--muted);
   font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .rowMenu {
   position: relative;
@@ -518,14 +527,26 @@
   background: var(--paper);
   box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
 }
-.rowMenu a {
+.manageRow:nth-last-child(-n + 3) .rowMenu > div {
+  top: auto;
+  bottom: 42px;
+}
+.rowMenu a,
+.rowMenu .menuAction {
   display: flex;
+  width: 100%;
   min-height: 40px;
   align-items: center;
   padding: 6px 9px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-size: 12px;
+  text-align: left;
   text-decoration: none;
 }
-.rowMenu a:hover {
+.rowMenu a:hover,
+.rowMenu .menuAction:hover {
   background: var(--panel);
 }
 .listBottom {
@@ -692,6 +713,15 @@
   color: var(--muted);
   font-size: 10px;
 }
+.modalDescription {
+  padding: 10px 12px;
+  margin: -6px 0 18px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
 .modalActions {
   display: flex;
   justify-content: flex-end;
@@ -748,13 +778,31 @@
   background: #e7ede7;
   color: #315137;
 }
+.editorForm {
+  --editor-header-height: 57px;
+}
 .editorHeader {
+  position: sticky;
+  top: var(--admin-main-block-start);
+  z-index: 20;
   display: flex;
   min-height: 52px;
   align-items: center;
   gap: 12px;
+  padding-inline: var(--admin-main-inline-size);
   padding-bottom: 12px;
+  margin-inline: calc(-1 * var(--admin-main-inline-size));
   border-bottom: 1px solid var(--line);
+  background: var(--paper);
+}
+.editorHeader::before {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: var(--admin-main-block-start);
+  background: var(--paper);
+  content: '';
 }
 .editorHeader > a {
   display: flex;
@@ -1062,7 +1110,8 @@
     grid-template-columns: minmax(0, 1fr) 90px 44px;
   }
   .listLabels span:nth-child(3),
-  .manageRow time {
+  .manageRow time,
+  .manageRow .unpublishedTime {
     display: none;
   }
   .topicHead,
@@ -1343,13 +1392,12 @@
   overflow-x: auto;
   overflow-y: hidden;
   position: sticky;
-  top: 0;
-  z-index: 6;
+  top: calc(var(--admin-main-block-start) + var(--editor-header-height));
+  z-index: 19;
   min-height: 52px;
   padding: 6px 8px;
   border-bottom: 1px solid var(--line);
-  background: color-mix(in srgb, var(--paper) 94%, transparent);
-  backdrop-filter: blur(8px);
+  background: var(--paper);
 }
 .lexicalEditor :global(.fixed-toolbar__group-add) {
   display: none;
@@ -1809,6 +1857,7 @@
   min-height: 44px;
 }
 .adminMain {
+  --admin-main-inline-size: 36px;
   padding: 24px 36px 48px;
   max-width: 1260px;
 }
@@ -2006,6 +2055,7 @@
   box-shadow: 0 8px 24px rgb(20 30 24 / 9%);
 }
 .rowMenu a,
+.rowMenu .menuAction,
 .rowMenu form button {
   min-height: 44px;
   font-size: 13px;
@@ -2143,6 +2193,157 @@
   min-height: 140px;
   line-height: 1.8;
 }
+.exploreSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 0 16px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.exploreSummary a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.exploreSummary a:hover {
+  color: var(--accent);
+}
+.exploreSummary a svg {
+  width: 16px;
+  height: 16px;
+}
+.exploreTable {
+  border-bottom: 1px solid var(--line);
+}
+.exploreHead,
+.exploreRow {
+  display: grid;
+  grid-template-columns: 58px minmax(220px, 1fr) 100px minmax(100px, 140px) 84px 112px;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+}
+.exploreHead {
+  border-radius: 5px 5px 0 0;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 11px;
+}
+.exploreRow {
+  min-height: 82px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  transition: background 140ms;
+}
+.exploreRow:hover {
+  background: var(--surface);
+}
+.exploreRow > div:nth-child(2) {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+.exploreRow strong {
+  overflow-wrap: anywhere;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+.exploreRow small {
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.exploreOrder {
+  color: var(--accent);
+  font-family: monospace;
+}
+.exploreActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.exploreActions button {
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--ink);
+  font-size: 12px;
+}
+.exploreActions button:hover {
+  background: var(--panel);
+  color: var(--accent);
+}
+.exploreDialog {
+  width: min(720px, 100%);
+}
+.exploreDialog header > div p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.exploreForm > label,
+.exploreFieldGrid > label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 16px;
+  font-size: 12px;
+}
+.exploreFieldGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+}
+.exploreForm input,
+.exploreForm select,
+.exploreForm textarea {
+  min-height: 44px;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 15px;
+}
+.exploreForm textarea {
+  min-height: 92px;
+  resize: vertical;
+  line-height: 1.7;
+}
+.exploreForm small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.exploreChecks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  padding: 2px 0 6px;
+}
+.exploreChecks label {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+}
+.exploreChecks input {
+  width: 18px;
+  height: 18px;
+  min-height: 0;
+  padding: 0;
+  accent-color: var(--accent);
+}
 .editorLayout {
   margin-inline: -36px;
 }
@@ -2180,6 +2381,7 @@
     grid-template-columns: 192px minmax(0, 1fr);
   }
   .adminMain {
+    --admin-main-inline-size: 24px;
     padding-inline: 24px;
   }
   .sidebar {
@@ -2197,6 +2399,15 @@
   }
   .topicRow > div:last-child {
     gap: 2px;
+  }
+  .exploreHead,
+  .exploreRow {
+    grid-template-columns: 48px minmax(180px, 1fr) 92px 76px 104px;
+    gap: 10px;
+  }
+  .exploreHead > span:nth-child(4),
+  .exploreRow > span:nth-child(4) {
+    display: none;
   }
   .queryControls {
     gap: 10px;
@@ -2254,6 +2465,8 @@
     display: none;
   }
   .adminMain {
+    --admin-main-block-start: 18px;
+    --admin-main-inline-size: 20px;
     padding: 18px 20px 32px;
   }
   .pageHead {
@@ -2277,7 +2490,8 @@
     padding-inline: 8px;
   }
   .listLabels > span:nth-child(3),
-  .manageRow > time {
+  .manageRow > time,
+  .manageRow > .unpublishedTime {
     display: none;
   }
   .topicToolbar .searchInput {
@@ -2297,6 +2511,39 @@
   }
   .settingsForm section {
     padding: 20px 16px;
+  }
+  .exploreSummary {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .exploreHead {
+    display: none;
+  }
+  .exploreRow {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    gap: 8px 10px;
+    padding: 14px 8px;
+  }
+  .exploreRow > span:nth-child(3),
+  .exploreRow > span:nth-child(4) {
+    display: none;
+  }
+  .exploreRow > span:nth-child(5) {
+    grid-column: 2;
+  }
+  .exploreActions {
+    grid-column: 2 / -1;
+    justify-content: flex-start;
+  }
+  .exploreFieldGrid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .exploreForm input,
+  .exploreForm select,
+  .exploreForm textarea {
+    font-size: 16px;
   }
   .editorLayout {
     margin-inline: -20px;

@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#efeee8" />
+    <title>苏码手记 · 关于与探索（原风格精修）</title>
+    <link rel="stylesheet" href="original-refined.css" />
+  </head>
+  <body data-view="about">
+    <!--
+      Design context: the current Sue Notes production shell and About page.
+      Direction: preserve its warm paper palette, serif hierarchy, fine rules,
+      compact editorial rhythm and green accent. No typewriter, kinetic type,
+      oversized project artwork or speculative visual language.
+    -->
+    <header class="review-bar" aria-label="设计预览控制栏">
+      <div>
+        <strong>原风格精修版</strong>
+        <span>关于不放项目 · 探索使用紧凑目录</span>
+      </div>
+      <nav aria-label="切换预览页面">
+        <button type="button" data-view-button="about" aria-pressed="true">关于</button>
+        <button type="button" data-view-button="explore" aria-pressed="false">探索</button>
+      </nav>
+      <small>DESIGN REVIEW · V2</small>
+    </header>
+
+    <div class="site-shell">
+      <header class="masthead">
+        <button class="brand" type="button" data-view-target="about">
+          <img src="icon.svg" alt="" width="36" height="36" />
+          <span>苏码手记<small>SUE NOTES · AN INDEPENDENT JOURNAL</small></span>
+        </button>
+        <nav aria-label="博客导航">
+          <button type="button">文章</button>
+          <button type="button">归档</button>
+          <button type="button" data-view-target="explore">探索</button>
+          <button type="button" data-view-target="about">关于</button>
+        </nav>
+        <div class="mast-tools" aria-label="站点工具">
+          <button type="button" aria-label="搜索文章">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+          </button>
+          <button type="button" aria-label="切换主题">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"></path></svg>
+          </button>
+        </div>
+      </header>
+
+      <main id="main-content">
+        <article class="about-view page-view" data-screen="about" data-screen-label="原风格精修 · 关于">
+          <header class="about-hero">
+            <div class="about-kicker">
+              <p>A NOTE ABOUT ME</p>
+              <span>INDEPENDENT MAKER · WRITER</span>
+            </div>
+            <div class="about-intro">
+              <h1>你好，<br />我是 <em>Sue</em>。</h1>
+              <div>
+                <p>折腾一些小工具，也认真记录生活里的小发现。</p>
+                <small>写下来，慢慢来。</small>
+              </div>
+            </div>
+          </header>
+
+          <div class="about-content">
+            <section class="about-section reveal">
+              <span class="section-number">01</span>
+              <h2>在这里写字的人</h2>
+              <div class="section-body">
+                <p class="lead-copy">一个爱折腾工具的独立开发者，也是在这里长期写字的人。</p>
+                <p>这个博客放的是比较完整的文字：做一个产品时踩过的坑，某个终于弄懂的概念，以及一些还在变化中的想法。</p>
+              </div>
+            </section>
+            <section class="about-section reveal">
+              <span class="section-number">02</span>
+              <h2>这里会写些什么</h2>
+              <div class="section-body">
+                <p>数字工具、独立开发、工程实践，偶尔也聊聊阅读和日常。</p>
+                <p>我更愿意写亲手试过的东西，交代清楚过程，也留下一点当时的判断。</p>
+              </div>
+            </section>
+            <section class="about-section reveal">
+              <span class="section-number">03</span>
+              <h2>为什么写博客</h2>
+              <div class="section-body">
+                <p>因为我想有一个自己的地方。文字可以长一点，可以修改，可以隔很久再回来读。</p>
+                <p>更新没有固定频率，有值得写的东西就写。如果你也是这样，欢迎从一篇旧文章开始。</p>
+                <strong>Sue.</strong>
+              </div>
+            </section>
+          </div>
+
+          <aside class="next-page reveal" aria-label="前往探索页">
+            <div>
+              <span>NEXT</span>
+              <h2>项目、站点与收藏，<br />另外放在探索页。</h2>
+            </div>
+            <button type="button" data-view-target="explore">去探索 <span>↗</span></button>
+          </aside>
+        </article>
+
+        <article class="explore-view page-view" data-screen="explore" data-screen-label="原风格精修 · 探索" hidden>
+          <header class="explore-hero">
+            <div class="about-kicker">
+              <p>EXPLORE THE INDEX</p>
+              <span>PROJECTS · SITES · BOOKMARKS</span>
+            </div>
+            <div class="explore-intro">
+              <h1>探索</h1>
+              <p>我做的项目、维护的网站，以及愿意反复回访的互联网角落。少一点陈列，多一点真实的使用痕迹。</p>
+            </div>
+          </header>
+
+          <div class="explore-toolbar">
+            <div class="filters" data-filter-bar aria-label="筛选探索内容">
+              <button type="button" data-filter="all" aria-pressed="true">全部 <span>05</span></button>
+              <button type="button" data-filter="project" aria-pressed="false">开源项目 <span>02</span></button>
+              <button type="button" data-filter="site" aria-pressed="false">我的站点 <span>01</span></button>
+              <button type="button" data-filter="saved" aria-pressed="false">网站收藏 <span>02</span></button>
+            </div>
+            <span>按最近更新</span>
+          </div>
+
+          <section class="index-list" aria-live="polite">
+            <article class="index-row" data-kind="project" tabindex="0">
+              <span class="row-index">01</span>
+              <div class="row-main"><span>OPEN SOURCE</span><h2>AIRadar</h2></div>
+              <p>让值得关注的 AI 变化浮出水面。</p>
+              <div class="row-meta"><span>AI / 信息工具</span><small>持续维护</small></div>
+              <span class="row-arrow" aria-hidden="true">↗</span>
+            </article>
+            <article class="index-row" data-kind="project" tabindex="0">
+              <span class="row-index">02</span>
+              <div class="row-main"><span>OPEN SOURCE</span><h2>果到雷达</h2></div>
+              <p>Apple 到店库存监控工具。</p>
+              <div class="row-meta"><span>macOS / 工具</span><small>持续维护</small></div>
+              <span class="row-arrow" aria-hidden="true">↗</span>
+            </article>
+            <article class="index-row" data-kind="site" tabindex="0">
+              <span class="row-index">03</span>
+              <div class="row-main"><span>MY SITE</span><h2>AIRadar Web</h2></div>
+              <p>AI 信息雷达的公开阅读站点。</p>
+              <div class="row-meta"><span>radar.suversal.com</span><small class="live"><i></i>运行中</small></div>
+              <span class="row-arrow" aria-hidden="true">↗</span>
+            </article>
+            <article class="index-row demo" data-kind="saved" tabindex="0">
+              <span class="row-index">04</span>
+              <div class="row-main"><span>SAVED · 示例</span><h2>Are.na</h2></div>
+              <p>用于收藏、连接与重新发现灵感。</p>
+              <div class="row-meta"><span>知识整理</span><small>示例内容</small></div>
+              <span class="row-arrow" aria-hidden="true">↗</span>
+            </article>
+            <article class="index-row demo" data-kind="saved" tabindex="0">
+              <span class="row-index">05</span>
+              <div class="row-main"><span>SAVED · 示例</span><h2>Personal Web</h2></div>
+              <p>那些仍然保留个人气质的网站。</p>
+              <div class="row-meta"><span>独立网站</span><small>示例内容</small></div>
+              <span class="row-arrow" aria-hidden="true">↗</span>
+            </article>
+          </section>
+
+          <footer class="index-foot">
+            <p>收藏网站目前使用示例内容，确定结构后再替换成你的真实清单。</p>
+            <span><b data-visible-count>05</b> ITEMS IN VIEW</span>
+          </footer>
+        </article>
+      </main>
+
+      <footer class="site-footer">
+        <span>© 2026 苏码手记 <i>· 写下来，慢慢来。</i></span>
+        <div><button type="button" data-view-target="about">关于作者</button><button type="button">全部文章</button></div>
+      </footer>
+    </div>
+
+    <script src="original-refined.js"></script>
+  </body>
+</html>

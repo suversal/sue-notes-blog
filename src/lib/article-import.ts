@@ -1,5 +1,7 @@
 import { fromMarkdown } from 'mdast-util-from-markdown';
+import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm';
 import { toMarkdown } from 'mdast-util-to-markdown';
+import { gfm } from 'micromark-extension-gfm';
 
 type MarkdownNode = {
   alt?: null | string;
@@ -22,12 +24,36 @@ function normalizedIdentifier(value: string | undefined) {
   return value?.trim().replace(/\s+/g, ' ').toLowerCase() ?? '';
 }
 
+function parseMarkdown(markdown: string) {
+  return fromMarkdown(markdown, {
+    extensions: [gfm()],
+    mdastExtensions: [gfmFromMarkdown()],
+  }) as unknown as MarkdownNode;
+}
+
+export function findMarkdownImageSources(markdown: string) {
+  const tree = parseMarkdown(markdown);
+  const definitions = new Map<string, string>();
+  visit(tree, (node) => {
+    if (node.type === 'definition' && node.identifier && node.url) definitions.set(normalizedIdentifier(node.identifier), node.url);
+  });
+  const sources: string[] = [];
+  visit(tree, (node) => {
+    if (node.type === 'image' && node.url) sources.push(node.url);
+    if (node.type === 'imageReference' && node.identifier) {
+      const source = definitions.get(normalizedIdentifier(node.identifier));
+      if (source) sources.push(source);
+    }
+  });
+  return [...new Set(sources)];
+}
+
 /**
  * Payload's upload transformer intentionally imports only ![relation:id]() placeholders.
  * This pass resolves normal CommonMark images, archives each source, and emits that official format.
  */
 export async function rewriteMarkdownImages(markdown: string, importImage: ImportImage) {
-  const tree = fromMarkdown(markdown) as unknown as MarkdownNode;
+  const tree = parseMarkdown(markdown);
   const definitions = new Map<string, MarkdownNode>();
   visit(tree, (node) => {
     if (node.type === 'definition' && node.identifier && node.url) definitions.set(normalizedIdentifier(node.identifier), node);
@@ -67,5 +93,5 @@ export async function rewriteMarkdownImages(markdown: string, importImage: Impor
     tree.children = tree.children.filter((node) => node.type !== 'definition' || referencedDefinitions.has(normalizedIdentifier(node.identifier)));
   }
 
-  return { markdown: toMarkdown(tree as never), imageCount: jobs.length };
+  return { markdown: toMarkdown(tree as never, { extensions: [gfmToMarkdown()] }), imageCount: jobs.length };
 }

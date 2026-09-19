@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { articleContentPlainText, type ArticleContent } from '../../../lib/article-content-data';
 import { Icon } from '../../blog/components/ui-icon';
@@ -44,6 +44,7 @@ function formDataFrom(form: HTMLFormElement) {
 export function EditorForm({ articleId, status: articleStatus, initial, topics, save, preparePreview }: EditorFormProps) {
   const router = useRouter();
   const form = useRef<HTMLFormElement>(null);
+  const header = useRef<HTMLElement>(null);
   const saving = useRef(false);
   const dirtyRef = useRef(false);
   const contentRef = useRef(initial.content);
@@ -56,6 +57,20 @@ export function EditorForm({ articleId, status: articleStatus, initial, topics, 
   const [cover, setCover] = useState<CoverValue>({ style: initial.coverStyle, image: initial.coverImage });
   const [coverUploading, setCoverUploading] = useState(false);
   const [topicId, setTopicId] = useState(initial.topicId);
+
+  useLayoutEffect(() => {
+    const formElement = form.current;
+    const headerElement = header.current;
+    if (!formElement || !headerElement) return;
+
+    const syncHeaderHeight = () => {
+      formElement.style.setProperty('--editor-header-height', `${Math.ceil(headerElement.getBoundingClientRect().height)}px`);
+    };
+    syncHeaderHeight();
+    const observer = new ResizeObserver(syncHeaderHeight);
+    observer.observe(headerElement);
+    return () => observer.disconnect();
+  }, []);
 
   const change = useCallback(() => {
     dirtyRef.current = true;
@@ -116,9 +131,9 @@ export function EditorForm({ articleId, status: articleStatus, initial, topics, 
     change();
   };
 
-  return <form ref={form} onInput={change} onSubmit={(event) => { event.preventDefault(); void persist(); }}>
+  return <form ref={form} className={styles.editorForm} onInput={change} onSubmit={(event) => { event.preventDefault(); void persist(); }}>
     <input type="hidden" name="articleId" value={articleId} />
-    <header className={styles.editorHeader}>
+    <header ref={header} className={styles.editorHeader}>
       <Link href="/articles"><Icon name="back" />文章</Link>
       <span className={`${styles.status} ${articleStatus === 'published' ? styles.published : styles.draft}`}>{articleStatus === 'published' ? dirty ? '有未发布修改' : '已发布' : '草稿'}</span>
       <span className={styles.saveState} role="status">{message}</span>

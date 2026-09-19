@@ -61,15 +61,30 @@ export function CoverCropper({
   const [error, setError] = useState('')
 
   useEffect(() => {
+    let cancelled = false
     const url = URL.createObjectURL(file)
     const image = new Image()
+    imageRef.current = null
+    setReady(false)
+    setError('')
     image.onload = () => {
+      if (cancelled) return
       imageRef.current = image
+      setError('')
       setReady(true)
     }
-    image.onerror = () => setError('无法读取这张图片，请换一张后重试。')
+    image.onerror = () => {
+      if (cancelled) return
+      setReady(false)
+      setError('无法读取这张图片，请换一张后重试。')
+    }
     image.src = url
-    return () => URL.revokeObjectURL(url)
+    return () => {
+      cancelled = true
+      image.onload = null
+      image.onerror = null
+      URL.revokeObjectURL(url)
+    }
   }, [file])
 
   useEffect(() => {

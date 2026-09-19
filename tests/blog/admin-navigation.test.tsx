@@ -31,6 +31,8 @@ describe('后台导航选中状态', () => {
     ['/articles/42/preview', '/articles'],
     ['/articles/topics', '/articles/topics'],
     ['/articles/topics/', '/articles/topics'],
+    ['/articles/explore', '/articles/explore'],
+    ['/articles/explore/', '/articles/explore'],
     ['/articles/settings', '/articles/settings'],
     ['/articles/settings/', '/articles/settings'],
   ])('%s 只有对应入口处于选中状态', (pathname, expected) => {
@@ -50,6 +52,7 @@ describe('后台导航选中状态', () => {
     const { rerender } = render(shell())
     for (const pathname of [
       '/articles/topics',
+      '/articles/explore',
       '/articles/settings',
       '/articles/42/preview',
       '/articles',
@@ -65,6 +68,7 @@ describe('后台导航选中状态', () => {
         '/articles',
         '/articles/topics',
         '/blog',
+        '/articles/explore',
         '/articles/settings',
         'http://127.0.0.1:23366/sidebar/',
       ])

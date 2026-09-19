@@ -1,0 +1,39 @@
+{
+  "type": "design",
+  "designSystems": [],
+  "primaryDesignSystem": null,
+  "assets": {
+    "关于 × 探索 · 三案设计实验室": {
+      "versions": [
+        {
+          "path": "index.html",
+          "createdAt": "2026-09-14T12:30:28.533Z",
+          "status": "changes-requested",
+          "subtitle": "关于只讲人，探索承载项目、站点与收藏",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "section": "UI Prototypes"
+        }
+      ]
+    },
+    "关于 × 探索 · 原风格精修": {
+      "versions": [
+        {
+          "path": "original-refined.html",
+          "createdAt": "2026-09-14T12:44:04.122Z",
+          "status": "needs-review",
+          "subtitle": "沿用现有博客气质，关于保持纯粹，探索改为紧凑目录",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "section": "UI Prototypes"
+        }
+      ]
+    }
+  },
+  "createdAt": "2026-09-14T12:30:28.534Z",
+  "updatedAt": "2026-09-14T12:45:03.201Z"
+}

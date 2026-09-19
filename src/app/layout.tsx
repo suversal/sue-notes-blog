@@ -2,6 +2,7 @@ import { handleServerFunctions, RootLayout as PayloadRootLayout } from '@payload
 import type { Metadata } from 'next';
 import type { ServerFunctionClient } from 'payload';
 import config from '../payload.config';
+import { ThemeSync } from './components/theme-sync';
 import { importMap } from './importMap';
 import './globals.css';
 
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return PayloadRootLayout({
     children: (
       <>
+        <ThemeSync />
         <a className="skipLink" href="#main-content">跳到主要内容</a>
         {children}
       </>

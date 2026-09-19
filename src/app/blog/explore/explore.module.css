@@ -1,0 +1,155 @@
+section.filters {
+  padding-block: 20px;
+}
+
+.filters .filterLine {
+  margin-top: 0;
+}
+
+.filters .topics {
+  margin-bottom: 0;
+}
+
+.list {
+  border-bottom: 0;
+}
+
+.row {
+  display: grid;
+  min-height: 72px;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(260px, 1.2fr) minmax(180px, auto) minmax(160px, 0.65fr);
+  align-items: center;
+  gap: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.row:first-child {
+  border-top: 0;
+}
+
+.row h3 {
+  min-width: 0;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.row h3 a {
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.34em;
+  transition: color 180ms ease, text-decoration-color 180ms ease;
+}
+
+.row h3 a:hover,
+.row h3 a:focus-visible {
+  color: var(--accent);
+  text-decoration-color: color-mix(in srgb, var(--accent) 58%, transparent);
+}
+
+.row > p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.labels {
+  display: flex;
+  justify-self: start;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.kind,
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--accent-wash);
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.kind {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.status.live {
+  color: var(--accent);
+}
+
+.status i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.meta {
+  justify-self: end;
+  color: var(--muted);
+  font: 11px/1.5 monospace;
+  text-align: right;
+}
+
+@media (max-width: 760px) {
+  section.filters {
+    padding-block: 12px;
+  }
+
+  .row {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 5px 10px;
+    padding: 10px 0;
+  }
+
+  .row h3 {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    font-size: 16px;
+    line-height: 1.45;
+  }
+
+  .row > p {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: 12px;
+  }
+
+  .labels {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    justify-self: start;
+  }
+
+  .kind,
+  .status {
+    padding: 2px 6px;
+    font-size: 10px;
+  }
+
+  .meta {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    justify-self: start;
+    font-size: 10px;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row h3 a {
+    transition: none;
+  }
+}

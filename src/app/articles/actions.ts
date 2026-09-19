@@ -3,10 +3,11 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { ArticleSlugUnavailableError, archiveArticle, createDraft, updateDraft, previewDraft, publishDraft, makePrivate } from '../../lib/article-service';
+import { ArticleSlugUnavailableError, archiveArticle, createDraft, updateDraft, previewDraft, publishDraft, makePrivate, parseArticlePinPriority, setArticlePinPriority } from '../../lib/article-service';
 import { createTopic, deleteTopic, renameTopic, saveSiteProfile } from '../../lib/blog-admin-service';
 import { getPayloadClient } from '../../lib/payload';
 import { parseArticleContent } from '../../lib/article-content-data';
+import { createExploreItem, deleteExploreItem, parseExploreItemInput, updateExploreItem } from '../../lib/explore-service';
 
 async function currentUser() {
   const payload = await getPayloadClient();
@@ -162,6 +163,49 @@ export async function saveSiteSettingsFromWeb(_state: { ok: boolean; message: st
   catch (error) { return { ok: false, message: error instanceof Error ? error.message : '站点设置保存失败。' }; }
 }
 
+export type ExploreActionState = { ok: boolean; message: string };
+
+function exploreInput(formData: FormData) {
+  return parseExploreItemInput({
+    kind: formData.get('kind'),
+    title: formData.get('title'),
+    description: formData.get('description'),
+    meta: formData.get('meta'),
+    status: formData.get('status'),
+    href: formData.get('href'),
+    sortOrder: formData.get('sortOrder'),
+    highlightStatus: formData.get('highlightStatus') === 'on',
+    isVisible: formData.get('isVisible') === 'on',
+  });
+}
+
+export async function saveExploreItemFromWeb(_state: ExploreActionState, formData: FormData): Promise<ExploreActionState> {
+  const owner = await currentUser();
+  const id = String(formData.get('itemId') ?? '');
+  try {
+    const input = exploreInput(formData);
+    if (id) await updateExploreItem(owner, id, input);
+    else await createExploreItem(owner, input);
+    revalidatePath('/articles/explore');
+    revalidatePath('/blog/explore');
+    return { ok: true, message: id ? '探索条目已更新。' : '探索条目已创建。' };
+  } catch (error) {
+    return { ok: false, message: error instanceof Error ? error.message : '探索条目保存失败。' };
+  }
+}
+
+export async function deleteExploreItemFromWeb(_state: ExploreActionState, formData: FormData): Promise<ExploreActionState> {
+  const owner = await currentUser();
+  try {
+    await deleteExploreItem(owner, String(formData.get('itemId') ?? ''));
+    revalidatePath('/articles/explore');
+    revalidatePath('/blog/explore');
+    return { ok: true, message: '探索条目已删除。' };
+  } catch (error) {
+    return { ok: false, message: error instanceof Error ? error.message : '探索条目删除失败。' };
+  }
+}
+
 export async function makePrivateFromWeb(formData: FormData) {
   const articleId = String(formData.get('articleId') ?? '');
   if (!articleId) redirect('/articles?error=private');
@@ -172,6 +216,20 @@ export async function makePrivateFromWeb(formData: FormData) {
     redirect('/articles?error=private');
   }
   redirect('/articles?notice=private');
+}
+
+export async function setArticlePinPriorityFromWeb(formData: FormData) {
+  const articleId = String(formData.get('articleId') ?? '');
+  if (!articleId) redirect('/articles?error=pin');
+  try {
+    const pinPriority = parseArticlePinPriority(formData.get('pinPriority'));
+    await setArticlePinPriority(await currentUser(), articleId, pinPriority);
+    revalidatePath('/articles');
+    revalidatePath('/blog');
+  } catch {
+    redirect('/articles?error=pin');
+  }
+  redirect('/articles?notice=pin-updated');
 }
 
 export async function archiveFromWeb(formData: FormData) {

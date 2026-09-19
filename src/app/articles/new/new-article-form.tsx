@@ -49,7 +49,7 @@ export function NewArticleForm({ topics }: { topics: { id: string; name: string 
       <h2>文章设置</h2>
       {fieldError('form') && <p className={styles.formError} role="alert">{fieldError('form')}</p>}
       <div className={styles.settingField}><span>主题</span><input type="hidden" name="topicId" value={topicId} /><StudioSelect label="文章主题" value={topicId} onChange={setTopicId} options={topics.map((topic) => ({ value: topic.id, label: topic.name }))} /></div>
-      <label><span>文章链接（选填）</span><input name="slug" pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="留空自动生成" value={slug} onChange={(event) => setSlug(event.target.value.toLowerCase())} aria-invalid={Boolean(fieldError('slug'))} aria-describedby="slug-help slug-error" /><small id="slug-help">留空时自动生成；自定义链接使用小写字母、数字和连字符。</small>{fieldError('slug') && <small className={styles.fieldError} id="slug-error" role="alert">{fieldError('slug')}</small>}</label>
+      <label><span>文章链接（选填）</span><input name="slug" pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="留空自动生成" value={slug} onChange={(event) => setSlug(event.target.value.toLowerCase())} aria-invalid={Boolean(fieldError('slug'))} aria-describedby="slug-help slug-error" /><small id="slug-help">留空时自动生成 10 位短链接；自定义链接使用小写字母、数字和连字符。</small>{fieldError('slug') && <small className={styles.fieldError} id="slug-error" role="alert">{fieldError('slug')}</small>}</label>
       <CoverPicker value={cover} onChange={setCover} onBusyChange={setCoverUploading} />
       <p>草稿只对自己可见。保存后进入编辑器，再预览读者看到的样子。</p>
       <button className={styles.primaryButton} type="submit" disabled={pending || importing || coverUploading}>{pending ? '正在创建草稿…' : '保存并继续编辑'}</button>

@@ -1,9 +1,19 @@
 import { describe, expect, it, vi } from 'vitest';
-import { rewriteMarkdownImages } from '../../src/lib/article-import';
+import { findMarkdownImageSources, rewriteMarkdownImages } from '../../src/lib/article-import';
 import { isEditorImageFile } from '../../src/lib/editor-image-file';
 import { detectImageMimeType, isForbiddenRemoteAddress, parseDataImage } from '../../src/lib/remote-image';
 
 describe('article image import', () => {
+  it('finds unique inline and referenced image sources before folder upload', () => {
+    expect(findMarkdownImageSources([
+      '![](assets/one.png)',
+      '![](assets/one.png)',
+      '![第二张][two]',
+      '',
+      '[two]: assets/two.png',
+    ].join('\n'))).toEqual(['assets/one.png', 'assets/two.png']);
+  });
+
   it('rewrites inline and reference Markdown images to Payload media placeholders', async () => {
     const upload = vi.fn(async ({ alt, source }: { alt: string; source: string }) => ({
       id: source.includes('first') ? 'media-first' : 'media-second',
@@ -50,6 +60,19 @@ describe('article image import', () => {
     expect(result.imageCount).toBe(0);
     expect(result.markdown).toBe('## 标题\n\n正文\n');
     expect(upload).not.toHaveBeenCalled();
+  });
+
+  it('preserves GFM tables and task lists while rewriting images', async () => {
+    const result = await rewriteMarkdownImages([
+      '| 名称 | 状态 |',
+      '| --- | --- |',
+      '| 导入 | 完成 |',
+      '',
+      '- [x] 保留任务',
+    ].join('\n'), vi.fn());
+
+    expect(result.markdown).toContain('| 名称 | 状态 |');
+    expect(result.markdown).toMatch(/[*-] \[x] 保留任务/);
   });
 });
 

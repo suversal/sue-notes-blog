@@ -22,13 +22,69 @@ export const emptyArticleContent: ArticleContent = {
   },
 };
 
-type RichNode = {
+type RichNode = Record<string, unknown> & {
   children?: RichNode[];
+  fields?: Record<string, unknown>;
+  format?: number | string;
   tag?: string;
   text?: string;
   type?: string;
   value?: unknown;
 };
+
+const bareUrlPattern = /https?:\/\/[^\s<>"']+/giu;
+const trailingUrlPunctuationPattern = /[.,!?;:，。！？；：、）》】}]+$/u;
+
+function textNodeWithValue(node: RichNode, text: string): RichNode {
+  return { ...node, text };
+}
+
+function linkifyTextNode(node: RichNode): RichNode[] {
+  const text = node.text;
+  if (!text || typeof node.format === 'number' && (node.format & 16) !== 0) return [node];
+
+  const nodes: RichNode[] = [];
+  let cursor = 0;
+  let linked = false;
+  for (const match of text.matchAll(bareUrlPattern)) {
+    const start = match.index;
+    const matched = match[0];
+    const trailing = matched.match(trailingUrlPunctuationPattern)?.[0] ?? '';
+    const url = trailing ? matched.slice(0, -trailing.length) : matched;
+    if (!url) continue;
+
+    if (start > cursor) nodes.push(textNodeWithValue(node, text.slice(cursor, start)));
+    nodes.push({
+      type: 'autolink',
+      children: [textNodeWithValue(node, url)],
+      direction: null,
+      fields: { doc: null, linkType: 'custom', newTab: false, url },
+      format: '',
+      indent: 0,
+      version: 2,
+    });
+    if (trailing) nodes.push(textNodeWithValue(node, trailing));
+    cursor = start + matched.length;
+    linked = true;
+  }
+  if (!linked) return [node];
+  if (cursor < text.length) nodes.push(textNodeWithValue(node, text.slice(cursor)));
+  return nodes;
+}
+
+export function linkifyArticleContentUrls(content: ArticleContent): ArticleContent {
+  const next = structuredClone(content) as ArticleContent;
+  const visit = (node: RichNode) => {
+    if (!Array.isArray(node.children) || node.type === 'link' || node.type === 'autolink' || node.type === 'code') return;
+    node.children = node.children.flatMap<RichNode>((child) => {
+      if (child.type === 'text') return linkifyTextNode(child);
+      visit(child);
+      return [child];
+    });
+  };
+  visit(next.root as RichNode);
+  return next;
+}
 
 export function isArticleContent(value: unknown): value is ArticleContent {
   if (!value || typeof value !== 'object' || Array.isArray(value) || !('root' in value)) return false;

@@ -31,7 +31,6 @@ export function ArchiveClient({
   const [query, setQuery] = useState('')
   const [order, setOrder] = useState<'newest' | 'oldest' | keyof ArticleStats>('newest')
   const metric = order === 'views' || order === 'likes' || order === 'comments' ? order : null
-  const metricLabel = metric === 'views' ? '阅读最多' : metric === 'likes' ? '点赞最多' : '评论最多'
   const keyword = query.trim().toLocaleLowerCase('zh-CN')
   const rows = posts
     .filter(
@@ -50,11 +49,6 @@ export function ArchiveClient({
         ? a.publishedAt.localeCompare(b.publishedAt)
         : b.publishedAt.localeCompare(a.publishedAt)
     })
-  const groups = metric
-    ? rows.length
-      ? ['metrics']
-      : []
-    : [...new Set(rows.map((post) => post.publishedAt.slice(0, 4)))]
   const filtered = topic !== 'all' || year !== 'all' || Boolean(query) || order !== 'newest'
   const reset = () => {
     setTopic('all')
@@ -116,41 +110,31 @@ export function ArchiveClient({
             />
           </div>
         </div>
-        <div className={styles.archiveTopicsScroller}>
-          <div className={styles.archiveTopics} role="group" aria-label="归档主题">
-            <button
-              className={topic === 'all' ? styles.selected : ''}
-              aria-pressed={topic === 'all'}
-              onClick={() => setTopic('all')}
-            >
-              全部
-            </button>
-            {topics.map((item) => (
+        <div className={styles.archiveTopicLine}>
+          <div className={styles.archiveTopicsScroller}>
+            <div className={styles.archiveTopics} role="group" aria-label="归档主题">
               <button
-                className={topic === item.id ? styles.selected : ''}
-                aria-pressed={topic === item.id}
-                onClick={() => setTopic(item.id)}
-                key={item.id}
+                className={topic === 'all' ? styles.selected : ''}
+                aria-pressed={topic === 'all'}
+                onClick={() => setTopic('all')}
               >
-                {item.name}
+                全部
               </button>
-            ))}
+              {topics.map((item) => (
+                <button
+                  className={topic === item.id ? styles.selected : ''}
+                  aria-pressed={topic === item.id}
+                  onClick={() => setTopic(item.id)}
+                  key={item.id}
+                >
+                  {item.name}
+                </button>
+              ))}
+            </div>
           </div>
+          <span className={styles.archiveCount} role="status">共 <strong>{rows.length}</strong> 篇文章</span>
         </div>
       </section>
-      <div className={styles.resultBar}>
-        <span role="status">
-          共 <strong>{rows.length}</strong> 篇文章
-          {topic !== 'all' && ` · ${topics.find((item) => item.id === topic)?.name ?? ''}`}
-          {year !== 'all' && ` · ${year} 年`}
-        </span>
-        {filtered && (
-          <button onClick={reset}>
-            <Icon name="close" />
-            清除筛选
-          </button>
-        )}
-      </div>
       {status !== 'ready' && (
         <p className={styles.archiveStatsStatus} role="status">
           {status === 'loading'
@@ -159,45 +143,34 @@ export function ArchiveClient({
         </p>
       )}
       <div className={styles.archiveResults}>
-        {groups.map((group) => (
-          <section className={styles.archiveYear} key={group}>
-            <div>
-              <h2 className={metric ? styles.metricHeading : undefined}>
-                {metric ? metricLabel : group}
-              </h2>
-            </div>
-            <div>
-              {rows
-                .filter((post) => metric || post.publishedAt.startsWith(group))
-                .map((post) => (
-                  <article key={post.id}>
-                    <time dateTime={post.publishedAt}>
-                      {post.publishedAt.slice(0, 10).replaceAll('-', '/')}
-                    </time>
-                    <h3>
-                      <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-                    </h3>
-                    <span>{post.topic.name}</span>
-                    <small className={styles.archiveRowMeta}>
-                      <span>{readingMinutes(post.plainText)} 分钟</span>
-                      {archiveMetrics.map((item) => (
-                        <span
-                          className={`${styles.archiveMetric} ${metric === item.key ? styles.archiveMetricActive : ''}`}
-                          aria-label={`${item.label}：${status === 'ready' ? (stats[`/blog/${post.slug}`]?.[item.key] ?? 0) : '暂无统计'}`}
-                          key={item.key}
-                        >
-                          <Icon name={item.icon} />
-                          {status === 'ready'
-                            ? (stats[`/blog/${post.slug}`]?.[item.key] ?? 0).toLocaleString('zh-CN')
-                            : '—'}
-                        </span>
-                      ))}
-                    </small>
-                  </article>
+        <div className={styles.archiveYear}>
+          {rows.map((post) => (
+            <article key={post.id}>
+              <time dateTime={post.publishedAt}>
+                {post.publishedAt.slice(0, 10).replaceAll('-', '/')}
+              </time>
+              <h3>
+                <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+              </h3>
+              <span>{post.topic.name}</span>
+              <small className={styles.archiveRowMeta}>
+                <span>{readingMinutes(post.plainText)} 分钟</span>
+                {archiveMetrics.map((item) => (
+                  <span
+                    className={`${styles.archiveMetric} ${metric === item.key ? styles.archiveMetricActive : ''}`}
+                    aria-label={`${item.label}：${status === 'ready' ? (stats[`/blog/${post.slug}`]?.[item.key] ?? 0) : '暂无统计'}`}
+                    key={item.key}
+                  >
+                    <Icon name={item.icon} />
+                    {status === 'ready'
+                      ? (stats[`/blog/${post.slug}`]?.[item.key] ?? 0).toLocaleString('zh-CN')
+                      : '—'}
+                  </span>
                 ))}
-            </div>
-          </section>
-        ))}
+              </small>
+            </article>
+          ))}
+        </div>
         {rows.length === 0 && (
           <div className={styles.empty}>
             <h2>{posts.length ? '没有找到符合条件的文章' : '还没有公开的文章'}</h2>

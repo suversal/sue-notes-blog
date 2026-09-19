@@ -12,10 +12,21 @@ export type PublicPost = {
   topic: { id: string; name: string };
   coverImage?: { id: string; url: string; alt: string };
   coverStyle: 'none' | 'notes' | 'grid' | 'cache';
+  pinPriority: number;
   publishedAt: string;
   updatedAt: string;
   publicReferences: { label: string; url: string }[];
 };
+
+export function comparePublicPostPriority(
+  a: Pick<PublicPost, 'pinPriority' | 'publishedAt'>,
+  b: Pick<PublicPost, 'pinPriority' | 'publishedAt'>,
+) {
+  const aPinned = a.pinPriority > 0;
+  const bPinned = b.pinPriority > 0;
+  if (aPinned !== bPinned) return aPinned ? -1 : 1;
+  return (aPinned ? a.pinPriority - b.pinPriority : 0) || b.publishedAt.localeCompare(a.publishedAt);
+}
 
 export function publicCoverImage(value: unknown): PublicPost['coverImage'] {
   if (!value || typeof value !== 'object' || !('url' in value) || typeof value.url !== 'string' || !/^https?:\/\//.test(value.url)) return undefined;
@@ -49,10 +60,10 @@ export async function getSiteProfile(owner?: string): Promise<SiteProfile> {
   return item ? { siteName: item.siteName, authorName: item.authorName, tagline: item.tagline, authorBio: item.authorBio } : defaultSiteProfile;
 }
 
-export async function getPublicPosts(limit = 100): Promise<PublicPost[]> {
+export async function getPublicPosts(limit = 100, order: 'latest' | 'pinned' = 'latest'): Promise<PublicPost[]> {
   const payload = await getPayloadClient();
   const [articles, topics] = await Promise.all([
-    payload.find({ collection: 'articles', overrideAccess: true, depth: 1, limit, sort: '-publishedAt', where: { and: [{ status: { equals: 'published' } }, { visibility: { equals: 'public' } }] } }),
+    payload.find({ collection: 'articles', overrideAccess: true, depth: 1, limit, sort: order === 'pinned' ? ['pinPriority', '-publishedAt'] : '-publishedAt', where: { and: [{ status: { equals: 'published' } }, { visibility: { equals: 'public' } }] } }),
     payload.find({ collection: 'topics', overrideAccess: true, depth: 0, limit: 100 }),
   ]);
   const topicNames = new Map((topics.docs as any[]).map((topic) => [String(topic.id), String(topic.name)]));
@@ -68,11 +79,13 @@ export async function getPublicPosts(limit = 100): Promise<PublicPost[]> {
       id: String(article.id), title: revision.title, slug: revision.slug,
       excerpt: revision.excerpt?.trim() || '', content: revision.content, plainText: articleContentPlainText(revision.content),
       topic: topicFrom(revision, article, topicNames), coverStyle: revision.coverStyle || 'none', coverImage: publicCoverImage(revision.coverImage),
+      pinPriority: Number(article.pinPriority) || 0,
       publishedAt: article.publishedAt || article.updatedAt, updatedAt: article.updatedAt,
       publicReferences: revision.publicReferences ?? [],
     } satisfies PublicPost;
   }));
-  return rows.filter((row) => row !== undefined);
+  const posts = rows.filter((row) => row !== undefined);
+  return order === 'pinned' ? posts.sort(comparePublicPostPriority) : posts;
 }
 
 export async function getPublicPost(slug: string): Promise<PublicPost | undefined> {

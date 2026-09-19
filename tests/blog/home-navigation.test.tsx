@@ -25,6 +25,7 @@ const post = (index: number, topic = { id: 'uncategorized', name: '未分类' })
   plainText: '正文',
   topic,
   coverStyle: 'none',
+  pinPriority: 0,
   publishedAt: '2026-09-13T00:00:00.000Z',
   updatedAt: '2026-09-13T00:00:00.000Z',
   publicReferences: [],
@@ -82,6 +83,7 @@ describe('首页阅读入口', () => {
     const results = screen.getByRole('region', { name: '文章列表' })
     expect(within(results).getAllByRole('link')).toHaveLength(6)
     expect(screen.queryByRole('button', { name: /加载更多/ })).toBeNull()
+    expect(screen.queryByText(/已显示全部/)).toBeNull()
     const filters = screen.getByRole('group', { name: '筛选文章主题' })
     fireEvent.click(within(filters).getByRole('button', { name: '数字工具' }))
     const filtered = screen.getByRole('region', { name: '文章列表' })

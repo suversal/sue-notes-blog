@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { articleContentToMarkdown } from '../../src/lib/article-content-markdown';
-import { articleContentHasMeaningfulContent, normalizeArticleContentForEditor, type ArticleContent } from '../../src/lib/article-content-data';
+import { articleContentHasMeaningfulContent, linkifyArticleContentUrls, normalizeArticleContentForEditor, type ArticleContent } from '../../src/lib/article-content-data';
 
 const root = (children: Record<string, unknown>[]) => ({
   root: { type: 'root', children, direction: null, format: '', indent: 0, version: 1 },
@@ -91,5 +91,25 @@ describe('Lexical Markdown export', () => {
     }]);
 
     expect(articleContentHasMeaningfulContent(content)).toBe(true);
+  });
+
+  it('normalizes bare URLs without changing existing link nodes or trailing punctuation', () => {
+    const url = 'https://x.com/suversal/status/2096801185386963316';
+    const existing = { type: 'link', fields: { linkType: 'custom', url: 'https://example.com' }, children: [text('已有链接')], version: 3 };
+    const content = root([
+      block('paragraph', [text(`X链接：${url}。`)]),
+      block('paragraph', [existing]),
+    ]);
+
+    const normalized = linkifyArticleContentUrls(content) as unknown as {
+      root: { children: Array<{ children: Array<{ type: string; fields?: { url?: string }; text?: string }> }> };
+    };
+    const firstLine = normalized.root.children[0]?.children ?? [];
+    const secondLine = normalized.root.children[1]?.children ?? [];
+
+    expect(firstLine.map((node) => node.type)).toEqual(['text', 'autolink', 'text']);
+    expect(firstLine[1]?.fields?.url).toBe(url);
+    expect(firstLine[2]?.text).toBe('。');
+    expect(secondLine).toEqual([existing]);
   });
 });

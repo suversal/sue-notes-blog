@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { signOut } from '../../login/actions'
 import { Icon } from '../../blog/components/ui-icon'
-import { ThemeSettings } from '../../components/theme-settings'
 import styles from '../admin-v1.module.css'
 
 export function AdminShell({
@@ -27,7 +26,7 @@ export function AdminShell({
     if (path !== '/articles') return pathname === path || pathname.startsWith(`${path}/`)
     return (
       (pathname === '/articles' || pathname.startsWith('/articles/')) &&
-      !['topics', 'settings'].includes(section)
+      !['topics', 'explore', 'settings'].includes(section)
     )
   }
   return (
@@ -64,6 +63,14 @@ export function AdminShell({
             查看博客
           </Link>
           <Link
+            aria-current={active('/articles/explore') ? 'page' : undefined}
+            className={active('/articles/explore') ? styles.active : ''}
+            href="/articles/explore"
+          >
+            <Icon name="compass" />
+            探索管理
+          </Link>
+          <Link
             aria-current={active('/articles/settings') ? 'page' : undefined}
             className={active('/articles/settings') ? styles.active : ''}
             href="/articles/settings"
@@ -76,7 +83,6 @@ export function AdminShell({
             评论管理
           </a>
         </nav>
-        <ThemeSettings className={styles.adminThemeSettings} />
         <div className={styles.owner}>
           <p>
             一个人的编辑部。

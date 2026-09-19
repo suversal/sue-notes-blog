@@ -17,6 +17,7 @@ export const Articles: CollectionConfig = {
     { name: 'publicReferences', type: 'array', maxRows: 20, fields: [{ name: 'label', type: 'text', required: true, maxLength: 160 }, { name: 'url', type: 'text', required: true, maxLength: 2_048 }] },
     { name: 'visibility', type: 'select', required: true, options: ['private', 'public'], defaultValue: 'private' },
     { name: 'status', type: 'select', required: true, options: ['draft', 'published', 'archived'], defaultValue: 'draft' },
+    { name: 'pinPriority', type: 'number', min: 1, max: 999, index: true, admin: { description: '留空表示不置顶；数字越小，首页排序越靠前。' } },
     { name: 'revisionHash', type: 'text', required: true },
     { name: 'currentRevision', type: 'relationship', relationTo: 'article-revisions' },
     { name: 'publishedRevision', type: 'relationship', relationTo: 'article-revisions' },

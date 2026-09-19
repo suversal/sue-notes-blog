@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import type { PublicPost } from '../../../lib/blog-data'
 import { articleContentHeadings } from '../../../lib/article-content-data'
-import { readingMinutes } from '../../../lib/blog-shared'
+import { formatBlogDateTime, readingMinutes } from '../../../lib/blog-shared'
 import { ArticleEngagement } from './article-engagement'
 import { BackToTop } from './back-to-top'
 import { Icon } from './ui-icon'
@@ -198,9 +198,7 @@ export function ArticleReader({
           {post.excerpt && <p className={styles.dek}>{post.excerpt}</p>}
           <div className={styles.byline}>
             <time dateTime={post.publishedAt}>
-              {new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' }).format(
-                new Date(post.publishedAt),
-              )}
+              {formatBlogDateTime(post.publishedAt)}
             </time>
             <small>{readingMinutes(post.plainText)} 分钟阅读</small>
           </div>
@@ -222,7 +220,7 @@ export function ArticleReader({
           )}
           <div className={styles.endnote}>
             <span>
-              写于 {new Intl.DateTimeFormat('zh-CN').format(new Date(post.publishedAt))}
+              写于 <time dateTime={post.publishedAt}>{formatBlogDateTime(post.publishedAt)}</time>
               <br />
               谢谢你读到这里。
             </span>

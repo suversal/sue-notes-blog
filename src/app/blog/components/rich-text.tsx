@@ -4,7 +4,7 @@ import type { SerializedUploadNode } from '@payloadcms/richtext-lexical'
 import type { SerializedCodeNode } from '@lexical/code'
 import type { SerializedLexicalNode } from 'lexical'
 import { createElement, type CSSProperties } from 'react'
-import type { ArticleContent } from '../../../lib/article-content-data'
+import { linkifyArticleContentUrls, type ArticleContent } from '../../../lib/article-content-data'
 import styles from '../blog-v1.module.css'
 import { CopyableCodeBlock } from './copyable-code-block'
 
@@ -69,7 +69,7 @@ export function ArticleRichText({ content }: { content: ArticleContent }) {
   return (
     <RichText
       className={styles.prose ?? 'article-richtext'}
-      data={content}
+      data={linkifyArticleContentUrls(content)}
       converters={({ defaultConverters }) => {
         let section = 0
         return {

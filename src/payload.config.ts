@@ -7,6 +7,7 @@ import sharp from 'sharp';
 import { Articles } from './collections/articles';
 import { ArticleRevisions } from './collections/article-revisions';
 import { ArticleViewDays } from './collections/article-view-days';
+import { ExploreItems } from './collections/explore-items';
 import { PublishApprovals } from './collections/publish-approvals';
 import { SiteSettings } from './collections/site-settings';
 import { Topics } from './collections/topics';
@@ -43,5 +44,5 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   sharp,
-  collections: [Users, Media, Topics, SiteSettings, Articles, ArticleRevisions, PublishApprovals, ArticleViewDays],
+  collections: [Users, Media, Topics, SiteSettings, ExploreItems, Articles, ArticleRevisions, PublishApprovals, ArticleViewDays],
 });

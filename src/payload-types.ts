@@ -71,6 +71,7 @@ export interface Config {
     media: Media;
     topics: Topic;
     'site-settings': SiteSetting;
+    'explore-items': ExploreItem;
     articles: Article;
     'article-revisions': ArticleRevision;
     'publish-approvals': PublishApproval;
@@ -86,6 +87,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     topics: TopicsSelect<false> | TopicsSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'explore-items': ExploreItemsSelect<false> | ExploreItemsSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     'article-revisions': ArticleRevisionsSelect<false> | ArticleRevisionsSelect<true>;
     'publish-approvals': PublishApprovalsSelect<false> | PublishApprovalsSelect<true>;
@@ -209,6 +211,26 @@ export interface SiteSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "explore-items".
+ */
+export interface ExploreItem {
+  id: string;
+  owner: string | User;
+  kind: 'project' | 'site' | 'saved';
+  eyebrow: string;
+  title: string;
+  description: string;
+  meta: string;
+  status: string;
+  href: string;
+  highlightStatus: boolean;
+  isVisible: boolean;
+  sortOrder: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "articles".
  */
 export interface Article {
@@ -250,6 +272,10 @@ export interface Article {
     | null;
   visibility: 'private' | 'public';
   status: 'draft' | 'published' | 'archived';
+  /**
+   * 留空表示不置顶；数字越小，首页排序越靠前。
+   */
+  pinPriority?: number | null;
   revisionHash: string;
   currentRevision?: (string | null) | ArticleRevision;
   publishedRevision?: (string | null) | ArticleRevision;
@@ -369,6 +395,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'site-settings';
         value: string | SiteSetting;
+      } | null)
+    | ({
+        relationTo: 'explore-items';
+        value: string | ExploreItem;
       } | null)
     | ({
         relationTo: 'articles';
@@ -495,6 +525,25 @@ export interface SiteSettingsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "explore-items_select".
+ */
+export interface ExploreItemsSelect<T extends boolean = true> {
+  owner?: T;
+  kind?: T;
+  eyebrow?: T;
+  title?: T;
+  description?: T;
+  meta?: T;
+  status?: T;
+  href?: T;
+  highlightStatus?: T;
+  isVisible?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "articles_select".
  */
 export interface ArticlesSelect<T extends boolean = true> {
@@ -521,6 +570,7 @@ export interface ArticlesSelect<T extends boolean = true> {
       };
   visibility?: T;
   status?: T;
+  pinPriority?: T;
   revisionHash?: T;
   currentRevision?: T;
   publishedRevision?: T;

@@ -2,15 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../blog/components/ui-icon'
+import {
+  applyTheme,
+  DEFAULT_PALETTE,
+  DEFAULT_THEME,
+  PALETTE_STORAGE_KEY,
+  readStoredThemeSettings,
+  THEME_STORAGE_KEY,
+  type BlogPalette,
+  type ThemePreference,
+} from './theme-runtime'
 import styles from './theme-settings.module.css'
-
-export type ThemePreference = 'light' | 'system' | 'dark'
-export type BlogPalette = 'journal' | 'paper' | 'mountain' | 'indigo'
-
-const THEME_STORAGE_KEY = 'sue-notes-theme'
-const PALETTE_STORAGE_KEY = 'sue-notes-palette'
-const DEFAULT_THEME: ThemePreference = 'system'
-const DEFAULT_PALETTE: BlogPalette = 'journal'
 
 const modes: ReadonlyArray<{
   value: ThemePreference
@@ -29,36 +31,6 @@ const palettes: ReadonlyArray<{ value: BlogPalette; label: string; swatch: strin
   { value: 'indigo', label: '墨靛紫', swatch: '#514596' },
 ]
 
-function isThemePreference(value: string | null): value is ThemePreference {
-  return value === 'light' || value === 'system' || value === 'dark'
-}
-
-function isPalette(value: string | null): value is BlogPalette {
-  return palettes.some((palette) => palette.value === value)
-}
-
-function systemTheme(): 'light' | 'dark' {
-  if (typeof window.matchMedia !== 'function') return 'light'
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-}
-
-function resolveTheme(preference: ThemePreference): 'light' | 'dark' {
-  return preference === 'system' ? systemTheme() : preference
-}
-
-function applyTheme(preference: ThemePreference, palette: BlogPalette, withTransition = true) {
-  const root = document.documentElement
-  const resolved = resolveTheme(preference)
-  root.dataset.blogTheme = resolved
-  root.dataset.blogThemePreference = preference
-  root.dataset.blogPalette = palette
-  if (withTransition) {
-    root.dataset.blogTransition = 'true'
-    window.setTimeout(() => delete root.dataset.blogTransition, 360)
-  }
-  return resolved
-}
-
 export function ThemeSettings({ className = '' }: { className?: string }) {
   const [preference, setPreference] = useState<ThemePreference>(DEFAULT_THEME)
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light')
@@ -68,10 +40,7 @@ export function ThemeSettings({ className = '' }: { className?: string }) {
 
   useEffect(() => {
     const hydrate = window.setTimeout(() => {
-      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY)
-      const savedPalette = localStorage.getItem(PALETTE_STORAGE_KEY)
-      const nextPreference = isThemePreference(savedTheme) ? savedTheme : DEFAULT_THEME
-      const nextPalette = isPalette(savedPalette) ? savedPalette : DEFAULT_PALETTE
+      const { palette: nextPalette, preference: nextPreference } = readStoredThemeSettings()
       setPreference(nextPreference)
       setPalette(nextPalette)
       setResolvedTheme(applyTheme(nextPreference, nextPalette, false))

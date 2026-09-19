@@ -89,3 +89,28 @@ describe('public article code blocks', () => {
     expect(html.match(/data-code-line/g)).toHaveLength(2)
   })
 })
+
+describe('public article links', () => {
+  it('makes a bare URL after Chinese punctuation clickable', () => {
+    const url = 'https://x.com/suversal/status/2096801185386963316'
+    const content = {
+      root: {
+        type: 'root',
+        children: [{
+          type: 'paragraph',
+          version: 1,
+          children: [{ type: 'text', version: 1, text: `X链接：${url}`, format: 0 }],
+        }],
+        direction: null,
+        format: '',
+        indent: 0,
+        version: 1,
+      },
+    } as unknown as ArticleContent
+
+    const html = renderToStaticMarkup(<ArticleRichText content={content} />)
+
+    expect(html).toContain(`href="${url}"`)
+    expect(html).toContain(`>X链接：<a`)
+  })
+})
