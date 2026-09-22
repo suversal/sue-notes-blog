@@ -1,10 +1,18 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { createInitialOwner } from './actions';
+import { getPayloadClient } from '../../lib/payload';
 import styles from '../login/styles.module.css';
 import { SubmitButton } from '../components/submit-button';
 import { PasswordField } from '../login/password-field';
 
+export const dynamic = 'force-dynamic';
+
 export default async function SetupPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const payload = await getPayloadClient();
+  if ((await payload.count({ collection: 'users', overrideAccess: true })).totalDocs > 0) {
+    redirect('/login?error=already-configured');
+  }
   const error = (await searchParams).error;
   return (
     <main id="main-content" tabIndex={-1} className={styles.shell}><section className={styles.panel} aria-labelledby="setup-title">
