@@ -19,6 +19,7 @@
     "check:fast": "pnpm lint && pnpm typecheck",
     "bootstrap:owner": "tsx scripts/bootstrap-owner.ts",
     "configure:local-admin": "tsx scripts/configure-local-admin.ts",
+    "change:owner-password": "tsx scripts/change-owner-password.ts",
     "seed:demo": "cross-env NODE_ENV=production node --env-file=.env --import=tsx scripts/seed-demo-articles.ts",
     "smoke:blog": "tsx scripts/smoke-blog.ts",
     "test": "pnpm run test:unit && pnpm run test:int && pnpm run test:e2e",
