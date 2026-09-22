@@ -27,10 +27,6 @@
 
 每次后续更新前，先记录当前镜像和迁移版本，再用 `pg_dump -Fc` 生成并在服务器外保存数据库备份。构建新镜像并运行迁移后，验证公开页面与写作后台。代码可以回退到先前镜像；数据库结构变更需要使用部署前备份恢复，不能仅靠镜像回退。
 
-## 登录账户
-
-生产环境的 `OWNER_LOGIN_ALIAS` 是所有者账户 `admin@local.test` 的登录短名称；当前设置为 `Sue`，大小写不敏感。账户邮箱仍可用于登录。修改短名称后需重新创建 `web` 容器。密码不保存在 Compose 环境变量里；所有者准备好改密时，在服务器交互终端运行 `sudo docker compose --env-file deploy/.env.production -f deploy/compose.production.yml run --rm -it --no-deps migrate pnpm change:owner-password`，按提示输入两遍新密码。输入不回显，密码不会进入命令行参数或终端历史。命令成功后，用新密码登录 `/login` 验收。
-
 ## 回源网段维护
 
 `Caddyfile.edge` 中的地址来自 Cloudflare 官方 `ips-v4` / `ips-v6` 列表，记录日期见文件注释。Cloudflare 更新地址时，应核对官方列表并更新配置、验证 Caddyfile、重建 `edge`；否则新网段回源会收到 403。旧的 Tunnel 仍为其他服务运行，知识库根域名不配置 Tunnel 路由。

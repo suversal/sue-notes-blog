@@ -68,7 +68,6 @@ services:
       DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/sue_notes_blog
       PAYLOAD_SECRET: ${PAYLOAD_SECRET:?set PAYLOAD_SECRET}
       PAYLOAD_SERVER_URL: ${PUBLIC_URL:?set PUBLIC_URL}
-      OWNER_LOGIN_ALIAS: ${OWNER_LOGIN_ALIAS:-admin}
       NEXT_PUBLIC_ARTALK_SERVER_URL: /artalk
       IMGBED_API_URL: ${IMGBED_API_URL:-https://img.suversal.com/}
       IMGBED_PUBLIC_BASE_URL: ${IMGBED_PUBLIC_BASE_URL:-https://img.suversal.com/}
