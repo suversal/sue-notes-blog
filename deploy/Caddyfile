@@ -1,9 +1,15 @@
-:8080 {
-  handle_path /artalk/* {
-    reverse_proxy artalk:23366
-  }
+{
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
 
-  handle {
-    reverse_proxy web:3100
-  }
+:8080 {
+	handle_path /artalk/* {
+		reverse_proxy artalk:23366
+	}
+
+	handle {
+		reverse_proxy web:3100
+	}
 }

@@ -86,5 +86,16 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
 
+  edge:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      gateway:
+        condition: service_started
+    volumes:
+      - ./Caddyfile.edge:/etc/caddy/Caddyfile:ro
+      - /etc/sue-notes-blog/tls:/etc/sue-notes-blog/tls:ro
+
 volumes:
   postgres_data:
