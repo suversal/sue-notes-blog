@@ -3,6 +3,9 @@ packages:
 
 confirmModulesPurge: false
 
+overrides:
+  dompurify: 3.4.13
+
 allowBuilds:
   esbuild: true
   sharp: true
