@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import React from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { ExploreClient } from '../../src/app/blog/components/explore-client'
 import type { ExploreItem } from '../../src/lib/explore-service'
 
@@ -24,9 +24,10 @@ describe('探索页配置内容', () => {
   it('根据传入条目计算数量并筛选', () => {
     render(<ExploreClient items={items} />)
     const filters = screen.getByRole('group', { name: '内容类型' })
-    expect(within(filters).getByRole('button', { name: /全部/ }).textContent).toContain('02')
-    expect(within(filters).getByRole('button', { name: /网站收藏/ }).textContent).toContain('00')
-    fireEvent.click(within(filters).getByRole('button', { name: /我的站点/ }))
+    expect(filters.querySelectorAll('button')).toHaveLength(4)
+    expect(screen.getByRole('status').textContent).toContain('2')
+    fireEvent.click(screen.getByRole('button', { name: /我的站点/ }))
+    expect(screen.getByRole('status').textContent).toContain('1')
     expect(screen.getByRole('link', { name: /站点/ }).getAttribute('href')).toBe('/blog')
     expect(screen.queryByRole('link', { name: /项目/ })).toBeNull()
   })
@@ -34,6 +35,7 @@ describe('探索页配置内容', () => {
   it('没有收藏时显示真实空状态', () => {
     render(<ExploreClient items={items} />)
     fireEvent.click(screen.getByRole('button', { name: /网站收藏/ }))
-    expect(screen.getByRole('heading', { name: '收藏清单正在整理。' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '这个分类暂时还没有条目' })).toBeTruthy()
+    expect(screen.getByRole('status').textContent).toContain('0')
   })
 })

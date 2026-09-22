@@ -69,3 +69,5 @@ pnpm build
 ```
 
 文章公开前必须先生成预览批准；批准只对当时的版本有效，编辑后需要重新预览和确认。图片上传使用 ImgBed 服务端 Token，并固定传递渠道名 `Tel_Channel`。
+
+甲骨文机器的生产服务与上线检查见 [deploy/README.md](deploy/README.md)。

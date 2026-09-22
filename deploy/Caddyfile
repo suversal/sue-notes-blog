@@ -1,0 +1,9 @@
+:8080 {
+  handle_path /artalk/* {
+    reverse_proxy artalk:23366
+  }
+
+  handle {
+    reverse_proxy web:3100
+  }
+}

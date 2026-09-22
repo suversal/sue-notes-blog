@@ -1,0 +1,90 @@
+name: sue-notes-blog-production
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sue_notes_blog
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U postgres -d sue_notes_blog']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  artalk:
+    image: artalk/artalk-go:2.10.0
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      TZ: Asia/Shanghai
+      ATK_TIMEZONE: Asia/Shanghai
+      ATK_LOCALE: zh-CN
+      ATK_APP_KEY: ${ARTALK_APP_KEY:?set ARTALK_APP_KEY}
+      ATK_SITE_DEFAULT: 苏码手记
+      ATK_SITE_URL: ${PUBLIC_URL:?set PUBLIC_URL}
+      ATK_TRUSTED_DOMAINS: ${PUBLIC_URL:?set PUBLIC_URL}
+      ATK_DB_TYPE: pgsql
+      ATK_DB_HOST: postgres
+      ATK_DB_PORT: 5432
+      ATK_DB_NAME: sue_notes_blog
+      ATK_DB_USER: postgres
+      ATK_DB_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      ATK_DB_TABLE_PREFIX: artalk_
+      ATK_FRONTEND_VOTE: 'true'
+      ATK_FRONTEND_VOTE_DOWN: 'false'
+
+  migrate:
+    build:
+      context: ..
+      dockerfile: Dockerfile.production
+    image: sue-notes-blog:local
+    restart: 'no'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/sue_notes_blog
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET:?set PAYLOAD_SECRET}
+      PAYLOAD_SERVER_URL: ${PUBLIC_URL:?set PUBLIC_URL}
+    command: [pnpm, payload, migrate]
+
+  web:
+    image: sue-notes-blog:local
+    pull_policy: never
+    restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      artalk:
+        condition: service_started
+    environment:
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/sue_notes_blog
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET:?set PAYLOAD_SECRET}
+      PAYLOAD_SERVER_URL: ${PUBLIC_URL:?set PUBLIC_URL}
+      NEXT_PUBLIC_ARTALK_SERVER_URL: /artalk
+      IMGBED_API_URL: ${IMGBED_API_URL:-https://img.suversal.com/}
+      IMGBED_PUBLIC_BASE_URL: ${IMGBED_PUBLIC_BASE_URL:-https://img.suversal.com/}
+      IMGBED_API_TOKEN: ${IMGBED_API_TOKEN:?set IMGBED_API_TOKEN}
+      IMGBED_UPLOAD_FOLDER: ${IMGBED_UPLOAD_FOLDER:-sue-notes-blog}
+      IMGBED_CHANNEL_NAME: ${IMGBED_CHANNEL_NAME:-Tel_Channel}
+
+  gateway:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_started
+    ports:
+      - 127.0.0.1:${GATEWAY_PORT:-3100}:8080
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+
+volumes:
+  postgres_data:

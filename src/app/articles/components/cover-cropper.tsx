@@ -65,8 +65,6 @@ export function CoverCropper({
     const url = URL.createObjectURL(file)
     const image = new Image()
     imageRef.current = null
-    setReady(false)
-    setError('')
     image.onload = () => {
       if (cancelled) return
       imageRef.current = image
