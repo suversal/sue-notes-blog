@@ -5,6 +5,17 @@ export const THEME_STORAGE_KEY = 'sue-notes-theme'
 export const PALETTE_STORAGE_KEY = 'sue-notes-palette'
 export const DEFAULT_THEME: ThemePreference = 'system'
 export const DEFAULT_PALETTE: BlogPalette = 'journal'
+export const BLOG_THEME_COLOR_META_ID = 'sue-notes-theme-color'
+
+export const BLOG_BACKGROUND_COLORS: Record<
+  BlogPalette,
+  Record<'light' | 'dark', string>
+> = {
+  journal: { light: '#efeee8', dark: '#181b1a' },
+  paper: { light: '#eee9dc', dark: '#181815' },
+  mountain: { light: '#eef0f6', dark: '#171923' },
+  indigo: { light: '#efedf6', dark: '#19191d' },
+}
 
 const paletteValues: readonly BlogPalette[] = ['journal', 'paper', 'mountain', 'indigo']
 
@@ -23,6 +34,27 @@ function systemTheme(): 'light' | 'dark' {
 
 function resolveTheme(preference: ThemePreference): 'light' | 'dark' {
   return preference === 'system' ? systemTheme() : preference
+}
+
+function syncBlogBrowserChrome(theme: 'light' | 'dark', palette: BlogPalette) {
+  if (!window.location.pathname.startsWith('/blog')) return
+
+  const root = document.documentElement
+  const color = BLOG_BACKGROUND_COLORS[palette][theme]
+  const previous = document.getElementById(BLOG_THEME_COLOR_META_ID) as HTMLMetaElement | null
+
+  // iOS Safari may keep the previous toolbar color when only `content` changes.
+  // Replacing the node makes the browser sample the selected palette immediately.
+  const next = document.createElement('meta')
+  next.id = BLOG_THEME_COLOR_META_ID
+  next.name = 'theme-color'
+  next.content = color
+  if (previous?.isConnected) previous.replaceWith(next)
+  else document.head.prepend(next)
+
+  root.style.backgroundColor = color
+  root.style.colorScheme = theme
+  if (document.body) document.body.style.backgroundColor = color
 }
 
 export function readStoredThemeSettings() {
@@ -44,6 +76,7 @@ export function applyTheme(
   root.dataset.blogTheme = resolved
   root.dataset.blogThemePreference = preference
   root.dataset.blogPalette = palette
+  syncBlogBrowserChrome(resolved, palette)
   if (withTransition) {
     root.dataset.blogTransition = 'true'
     window.setTimeout(() => delete root.dataset.blogTransition, 360)

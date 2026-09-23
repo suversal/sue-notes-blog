@@ -2278,13 +2278,15 @@
     width: calc(100% - 32px);
   }
   .masthead {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     min-height: 56px;
     padding: 0;
     gap: 6px;
     row-gap: 0;
   }
   .brand {
+    grid-column: 1;
+    grid-row: 1;
     gap: 7px;
   }
   .brand img {
@@ -2315,6 +2317,7 @@
   .navTools {
     grid-column: 3;
     grid-row: 1;
+    justify-self: end;
     gap: 0;
   }
   .navTools > button {

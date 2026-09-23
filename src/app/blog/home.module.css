@@ -569,6 +569,22 @@
     transform: rotate(0) translateX(2px);
   }
 }
+.featureTitle:active h1,
+.featureTitle:focus-visible h1,
+.postTitle:active h3,
+.postTitle:focus-visible h3,
+.popularTitle:active > span:nth-child(2),
+.popularTitle:focus-visible > span:nth-child(2) {
+  color: var(--accent);
+  text-decoration-color: color-mix(in srgb, var(--accent) 58%, transparent);
+}
+.postTitle:active svg,
+.postTitle:focus-visible svg,
+.popularTitle:active > svg,
+.popularTitle:focus-visible > svg {
+  color: var(--accent);
+  transform: rotate(0) translateX(2px);
+}
 .home a:active,
 .home button:active {
   opacity: 0.72;
@@ -906,6 +922,10 @@
   .featureCopy {
     padding: 14px;
   }
+  .featureArt {
+    display: block;
+    aspect-ratio: 5 / 2;
+  }
   .kicker {
     font-size: 9px;
   }
@@ -972,6 +992,13 @@
     grid-template-columns: 18px minmax(0, 1fr);
     gap: 8px;
     padding: 10px 0;
+  }
+  .thumbnail {
+    display: block;
+    grid-column: 2;
+    width: 100%;
+    margin-top: 3px;
+    border-radius: 4px;
   }
   .rowNumber {
     font-size: 9px;
