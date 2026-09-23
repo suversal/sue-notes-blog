@@ -319,8 +319,8 @@
   text-decoration-thickness: 1px;
   text-underline-offset: 0.34em;
   transition:
-    color 280ms ease,
-    text-decoration-color 280ms ease;
+    color 180ms ease,
+    text-decoration-color 180ms ease;
 }
 .postTitle svg {
   flex: none;
@@ -571,6 +571,7 @@
 }
 .featureTitle:active h1,
 .featureTitle:focus-visible h1,
+.postTitle:hover h3,
 .postTitle:active h3,
 .postTitle:focus-visible h3,
 .popularTitle:active > span:nth-child(2),
@@ -588,6 +589,9 @@
 .home a:active,
 .home button:active {
   opacity: 0.72;
+}
+.home .postTitle:active {
+  opacity: 1;
 }
 @media (max-width: 1000px) {
   .homeGrid {
@@ -1046,6 +1050,7 @@
     flex: none;
     flex-wrap: nowrap;
     gap: 7px 10px;
+    margin-left: auto;
     margin-top: 0;
     font-size: 10px;
   }

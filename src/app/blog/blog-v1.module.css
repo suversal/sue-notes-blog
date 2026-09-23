@@ -805,7 +805,9 @@
   text-underline-offset: 0.34em;
   transition: color 180ms ease, text-decoration-color 180ms ease;
 }
-.archiveYear h3 a:hover {
+.archiveYear h3 a:hover,
+.archiveYear h3 a:active,
+.archiveYear h3 a:focus-visible {
   color: var(--accent);
   text-decoration-color: color-mix(in srgb, var(--accent) 58%, transparent);
 }
@@ -2564,6 +2566,21 @@
   }
   .engagementStats > * {
     min-height: 48px;
+    grid-template-rows: auto;
+  }
+  .engagementStats svg {
+    grid-row: auto;
+  }
+  .engagementStats small {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
   .articlePager > a,
   .articlePager > a + a {
