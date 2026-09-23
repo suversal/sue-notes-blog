@@ -7,6 +7,9 @@
   --accent: #147a4a;
   --olive: #59645f;
   --control-radius: 6px;
+  --floating-control-bg: color-mix(in srgb, var(--surface) 68%, transparent);
+  --floating-control-hover-bg: color-mix(in srgb, var(--surface) 88%, transparent);
+  --floating-control-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 18%, transparent);
   min-height: 100dvh;
   background: var(--bg);
   color: var(--ink);
@@ -926,8 +929,8 @@
   place-items: center;
   border: 1px solid color-mix(in srgb, var(--line) 72%, transparent) !important;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--surface) 68%, transparent) !important;
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 18%, transparent);
+  background: var(--floating-control-bg) !important;
+  box-shadow: var(--floating-control-shadow);
   color: var(--muted) !important;
   opacity: 0;
   pointer-events: none;
@@ -948,7 +951,7 @@
 }
 .backToTopButton:hover {
   border-color: color-mix(in srgb, var(--accent) 50%, var(--line)) !important;
-  background: color-mix(in srgb, var(--surface) 88%, transparent) !important;
+  background: var(--floating-control-hover-bg) !important;
   color: var(--accent) !important;
 }
 .backToTopButton:active {
@@ -1669,12 +1672,20 @@
 
   --surface: #212422;
   --accent-wash: #2a2e2b;
+  --floating-control-bg: var(--surface);
+  --floating-control-hover-bg: var(--panel);
+  --floating-control-shadow: none;
   --plate-bg: #2a2e2b;
   --plate-ink: #b6bab7;
   --plate-line: #5b625d;
   --plate-paper: #e8ece8;
   --plate-secondary: #7d8580;
   --plate-highlight: #234735;
+}
+:global(html[data-blog-theme='dark']) .backToTopButton {
+  border-color: var(--line) !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 :global(html[data-blog-theme='dark'][data-blog-palette='paper']) .publicRoot {
   --bg: #181815;

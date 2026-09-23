@@ -250,7 +250,7 @@ export function HomeClient({ posts, site }: { posts: PublicPost[]; site: SitePro
                 <span className={styles.rowNumber} aria-hidden="true">
                   {String(index + 1).padStart(2, '0')}
                 </span>
-                <div>
+                <div className={styles.postCopy}>
                   <Meta post={post} showTopic={false} />
                   <Link className={styles.postTitle} href={`/blog/${post.slug}`}>
                     <h3>{post.title}</h3>

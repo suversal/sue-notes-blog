@@ -24,6 +24,19 @@ const site: SiteProfile = {
 afterEach(cleanup)
 
 describe('主题设置入口', () => {
+  it('公开博客挂载时关闭全局纸张纹理，卸载后恢复', () => {
+    route.pathname = '/blog'
+    const { unmount } = render(
+      <PublicShell site={site} searchPosts={[]}>
+        <main>博客内容</main>
+      </PublicShell>,
+    )
+
+    expect(document.body.classList.contains('publicBlogBody')).toBe(true)
+    unmount()
+    expect(document.body.classList.contains('publicBlogBody')).toBe(false)
+  })
+
   it('后台管理页面不显示主题设置', () => {
     route.pathname = '/articles'
     render(

@@ -50,6 +50,10 @@ export function PublicShell({
     return () => document.removeEventListener('keydown', key)
   }, [])
   useEffect(() => {
+    document.body.classList.add('publicBlogBody')
+    return () => document.body.classList.remove('publicBlogBody')
+  }, [])
+  useEffect(() => {
     if (!searchOpen) return
     const before = document.activeElement as HTMLElement | null
     const old = document.body.style.overflow
