@@ -1,0 +1,135 @@
+/* 「相关文章」入口：平时只是一个带数量的小图标，悬停、聚焦或点一下时向上弹出标题列表。 */
+.wrap {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  flex: none;
+}
+
+.wrap .trigger {
+  display: inline-flex;
+  min-width: 46px;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.compact .trigger {
+  min-width: 0;
+  min-height: 32px;
+  padding: 0 9px;
+  border-radius: 8px;
+}
+
+.trigger svg {
+  width: 16px;
+  height: 16px;
+}
+
+.wrap:hover .trigger,
+.wrap:focus-within .trigger {
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+  color: var(--accent);
+}
+
+/* 外层留一截透明的底边，鼠标从图标移到列表上时不会中途断开。 */
+.pop {
+  position: absolute;
+  z-index: 6;
+  right: 0;
+  bottom: 100%;
+  width: max-content;
+  max-width: min(320px, 78vw);
+  padding-bottom: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    visibility 180ms;
+  visibility: hidden;
+}
+
+.alignStart .pop {
+  right: auto;
+  left: 0;
+}
+
+/* 铺满模式：列表不再跟着图标靠右，而是和所在的那一行等宽，正好对齐卡片内容的左右边。
+   需要外层那一行自己是定位容器（position: relative）。 */
+.fill {
+  position: static;
+}
+
+.fill .pop {
+  top: calc(100% - 10px);
+  right: 0;
+  bottom: auto;
+  left: 0;
+  width: auto;
+  max-width: none;
+  padding: 18px 0 0;
+  transform: translateY(-4px);
+}
+
+/* 图标在卡片顶部时改为向下弹出。 */
+.below .pop {
+  top: 100%;
+  bottom: auto;
+  padding: 8px 0 0;
+  transform: translateY(-4px);
+}
+
+.wrap:hover .pop,
+.wrap:focus-within .pop {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: 0 12px 30px -14px color-mix(in srgb, var(--ink) 65%, transparent);
+  text-align: left;
+}
+
+.list > strong {
+  padding-bottom: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.list a {
+  padding: 6px 0;
+  color: var(--accent);
+  font-size: 14px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.list a + a {
+  border-top: 1px solid var(--line);
+}
+
+.list a:hover,
+.list a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}

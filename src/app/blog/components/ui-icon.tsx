@@ -1,3 +1,5 @@
+import arrowStyles from './grow-arrow.module.css'
+
 const paths = {
   heart: <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" />,
   comment: <path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8l-6 4v-4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" />,
@@ -33,4 +35,14 @@ const filledIcons = new Set<keyof typeof paths>(['x'])
 export function Icon({ name, className }: { name: keyof typeof paths; className?: string }) {
   const filled = filledIcons.has(name)
   return <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke={filled ? 'none' : 'currentColor'} strokeWidth="1.55" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
+}
+
+/** 站内链接用的箭头：静止时是「›」，悬停时长出横线变成「→」。跳到站外的链接仍用 Icon 的 arrow。 */
+export function GrowArrow({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={`${arrowStyles.arrow} ${className ?? ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.55" strokeLinecap="round" strokeLinejoin="round">
+      <path data-tail d="M4 12h15" />
+      <path d="m13 6 6 6-6 6" />
+    </svg>
+  )
 }

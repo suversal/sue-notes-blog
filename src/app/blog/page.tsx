@@ -3,7 +3,7 @@ import { getPublicPosts, getSiteProfile } from '../../lib/blog-data';
 import { HomeClient } from './components/home-client';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: '苏码手记 · 文章', description: '关于工具、创造，以及认真生活的小事。', robots: { index: true, follow: true } };
+export const metadata: Metadata = { title: '苏码玩家 · 文章', description: '一个程序员的折腾记录：Apple 生态、家庭网络、出海基建，还有 AI。', robots: { index: true, follow: true } };
 
 export default async function BlogIndex() {
   const [site, posts] = await Promise.all([getSiteProfile(), getPublicPosts(100, 'pinned')]);

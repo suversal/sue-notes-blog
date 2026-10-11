@@ -1,7 +1,7 @@
 {
   "name": "sue-notes-blog",
   "version": "0.1.0",
-  "description": "苏码手记博客与写作后台。",
+  "description": "苏码玩家博客与写作后台。",
   "private": true,
   "license": "UNLICENSED",
   "packageManager": "pnpm@11.19.0",

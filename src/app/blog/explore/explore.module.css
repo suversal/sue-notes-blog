@@ -1,42 +1,85 @@
-section.filters {
-  padding-block: 20px;
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding: 8px 0 20px;
 }
 
-.filters .filterLine {
-  margin-top: 0;
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  scroll-margin-top: 24px;
 }
 
-.filters .topics {
-  margin-bottom: 0;
+.groupHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
 }
 
-.list {
-  border-bottom: 0;
+.groupHead h2 {
+  margin: 0;
+  font: 600 26px/1.4 var(--serif);
 }
 
-.row {
+.groupHead span {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.cards {
   display: grid;
-  min-height: 72px;
-  grid-template-columns: minmax(180px, 0.8fr) minmax(260px, 1.2fr) minmax(180px, auto) minmax(160px, 0.65fr);
-  align-items: center;
-  gap: 16px;
-  border-top: 1px solid var(--line);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
 }
 
-.row:first-child {
-  border-top: 0;
+.card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
 }
 
-.row h3 {
+.cardHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cardHead > svg,
+.savedRow > svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  transform: rotate(-45deg);
+}
+
+.card h3,
+.savedRow h3 {
   min-width: 0;
   margin: 0;
   font-family: var(--serif);
-  font-size: 20px;
   font-weight: 600;
-  line-height: 1.5;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
-.row h3 a {
+.card h3 {
+  font-size: 22px;
+}
+
+.card h3 a,
+.savedRow h3 a {
   text-decoration: underline;
   text-decoration-color: transparent;
   text-decoration-thickness: 1px;
@@ -44,43 +87,41 @@ section.filters {
   transition: color 180ms ease, text-decoration-color 180ms ease;
 }
 
-.row h3 a:hover,
-.row h3 a:focus-visible {
+.card h3 a:hover,
+.card h3 a:focus-visible,
+.savedRow h3 a:hover,
+.savedRow h3 a:focus-visible {
   color: var(--accent);
   text-decoration-color: color-mix(in srgb, var(--accent) 58%, transparent);
 }
 
-.row > p {
+.card > p {
+  flex: 1;
   margin: 0;
-  font-size: 13px;
+  color: color-mix(in srgb, var(--ink) 78%, var(--bg));
+  font-size: 16px;
   line-height: 1.65;
   overflow-wrap: anywhere;
 }
 
-.labels {
-  display: flex;
-  justify-self: start;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
+.meta {
+  color: var(--muted);
+  font-size: 14px;
 }
 
-.kind,
+/* 域名一类的补充信息用等宽字体。 */
+.meta[data-mono] {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
 .status {
   display: inline-flex;
+  flex: none;
   align-items: center;
-  gap: 5px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  background: var(--accent-wash);
+  gap: 6px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 14px;
   white-space: nowrap;
-}
-
-.kind {
-  color: var(--accent);
-  font-weight: 600;
 }
 
 .status.live {
@@ -88,68 +129,364 @@ section.filters {
 }
 
 .status i {
-  width: 5px;
-  height: 5px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: currentColor;
 }
 
-.meta {
-  justify-self: end;
-  color: var(--muted);
-  font: 11px/1.5 monospace;
-  text-align: right;
+.savedList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 0 48px;
+  /* 分隔线画在每条的上方：第一行的线和分组标题下面那条重合，最后一行下面不再多一条，直接接页脚的线。 */
+  margin-top: -21px;
+}
+
+.savedRow {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 16px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+
+.savedKind {
+  flex: none;
+  width: 84px;
+  color: var(--accent);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.savedBody {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.savedRow h3 {
+  font-size: 18px;
+}
+
+.savedRow p {
+  margin: 0;
+  color: color-mix(in srgb, var(--ink) 78%, var(--bg));
+  font-size: 15px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 760px) {
-  section.filters {
-    padding-block: 12px;
+  .sections {
+    gap: 32px;
+    padding-top: 4px;
   }
 
-  .row {
-    min-height: 0;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
-    gap: 5px 10px;
-    padding: 10px 0;
+  .group {
+    gap: 14px;
   }
 
-  .row h3 {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    font-size: 16px;
-    line-height: 1.45;
+  .groupHead h2 {
+    font-size: 20px;
   }
 
-  .row > p {
-    grid-column: 1 / -1;
-    grid-row: 2;
+  .groupHead span,
+  .meta,
+  .status {
     font-size: 12px;
   }
 
-  .labels {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    justify-self: start;
+  .cards {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
 
-  .kind,
-  .status {
-    padding: 2px 6px;
-    font-size: 10px;
+  .card {
+    gap: 6px;
+    padding: 16px;
+    border-radius: 10px;
   }
 
-  .meta {
-    grid-column: 1 / -1;
-    grid-row: 4;
-    justify-self: start;
-    font-size: 10px;
-    text-align: left;
+  .card h3 {
+    font-size: 17px;
+  }
+
+  .card > p,
+  .savedRow p {
+    font-size: 13px;
+  }
+
+
+  .savedList {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: -15px;
+  }
+
+  .savedRow {
+    gap: 10px;
+    padding: 12px 0;
+  }
+
+  .savedKind {
+    width: 32px;
+    font-size: 12px;
+  }
+
+  .savedRow h3 {
+    font-size: 16px;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .row h3 a {
-    transition: none;
+/* 进入与悬停动效；系统开启「减少动态效果」时由全局规则关闭。 */
+.enter {
+  animation: explore-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.card,
+.savedRow {
+  animation: explore-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(80ms + var(--i, 0) * 50ms);
+}
+
+.card {
+  transition:
+    transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 400ms ease;
+}
+
+.cardHead > svg,
+.savedRow > svg {
+  transition:
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 240ms ease;
+}
+
+.status.live i {
+  animation: explore-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes explore-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes explore-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 5px transparent;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  /* 和首页封面的悬停一致：整体放大一点，不改边框颜色。 */
+  .card:hover {
+    z-index: 1;
+    box-shadow: 0 0 28px color-mix(in srgb, var(--ink) 16%, transparent);
+    transform: scale(1.04);
+  }
+
+  .card:hover .cardHead > svg,
+  .savedRow:hover > svg {
+    color: var(--accent);
+    transform: rotate(0) translateX(2px);
+  }
+
+  .savedRow:hover h3 a {
+    color: var(--accent);
+  }
+}
+
+/* 整张卡片可点：标题链接的点击区域铺满卡片，相关文章链接叠在上面保持可单独点击。 */
+.card,
+.savedRow {
+  position: relative;
+  cursor: pointer;
+}
+
+.card h3 a::after,
+.savedRow h3 a::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  content: '';
+}
+
+.card h3 a:focus-visible,
+.savedRow h3 a:focus-visible {
+  outline: none;
+}
+
+.card h3 a:focus-visible::after,
+.savedRow h3 a:focus-visible::after {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover h3 a {
+    color: var(--accent);
+  }
+}
+
+/* 标签、语言色点 */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags li {
+  padding: 2px 10px;
+  border-radius: 6px;
+  background: var(--accent-wash);
+  color: color-mix(in srgb, var(--accent) 70%, var(--ink));
+  font-size: 13px;
+}
+
+.language {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.language i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.cardHead h3 {
+  flex: 1;
+}
+
+.logo {
+  flex: none;
+  align-self: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+  object-fit: cover;
+}
+
+/* Star 和 Fork 跟在语言后面。 */
+.counts,
+.counts span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.counts {
+  gap: 14px;
+}
+
+.counts span {
+  gap: 5px;
+}
+
+.counts span:first-child {
+  color: color-mix(in srgb, #c98a16 72%, var(--ink));
+}
+
+.counts svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* 卡片底部一行：语言、Star、Fork 在左，相关文章图标靠右。 */
+.cardFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+  min-height: 32px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.cardFoot > span:has(button) {
+  margin-left: auto;
+}
+
+.savedRow > span:has(button) {
+  align-self: center;
+}
+
+/* 弹出相关文章列表时，这张卡片要压在相邻卡片上面。 */
+.card:hover,
+.card:focus-within,
+.savedRow:hover,
+.savedRow:focus-within {
+  z-index: 3;
+}
+
+/* ── 以下只在站点所有者进入编辑状态时生效 ── */
+.hidden > :not([role='group']) {
+  opacity: 0.45;
+}
+
+/* 编辑时卡片不再整张可点，否则操作按钮和链接会抢点击。 */
+.editable {
+  cursor: default;
+}
+
+.editable h3 a::after {
+  display: none;
+}
+
+/* 编辑时不放大，按钮位置保持不动才好点。 */
+.card.editable:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+.savedRow.editable {
+  flex-wrap: wrap;
+}
+
+.savedRow.editable > [role='group'] {
+  flex-basis: 100%;
+  margin: -6px 0 -8px -10px;
+  padding: 0;
+  border: 0;
+}
+
+@media (min-width: 800px) {
+  .cards > form,
+  .savedList > form {
+    grid-column: span 2;
+  }
+}
+
+.savedList > button {
+  min-height: 72px;
+  margin-top: 14px;
+}
+
+@media (max-width: 760px) {
+  .tags li,
+  .language,
+  .cardFoot {
+    font-size: 12px;
   }
 }

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import type { ArticleAnalytics } from '../../../lib/use-article-stats'
 import type { PublicPost } from '../../../lib/blog-data'
-import { Icon } from './ui-icon'
+import { GrowArrow, Icon } from './ui-icon'
 import styles from '../home.module.css'
 
 export function PopularArticles({
@@ -92,7 +92,7 @@ export function PopularArticles({
                       {String(index + 1).padStart(2, '0')}
                     </span>
                     <span>{post.title}</span>
-                    <Icon name="arrow" />
+                    <GrowArrow />
                   </Link>
                   <div className={styles.engagement}>
                     <span

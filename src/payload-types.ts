@@ -72,6 +72,8 @@ export interface Config {
     topics: Topic;
     'site-settings': SiteSetting;
     'explore-items': ExploreItem;
+    'uses-categories': UsesCategory;
+    'uses-items': UsesItem;
     articles: Article;
     'article-revisions': ArticleRevision;
     'publish-approvals': PublishApproval;
@@ -88,6 +90,8 @@ export interface Config {
     topics: TopicsSelect<false> | TopicsSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     'explore-items': ExploreItemsSelect<false> | ExploreItemsSelect<true>;
+    'uses-categories': UsesCategoriesSelect<false> | UsesCategoriesSelect<true>;
+    'uses-items': UsesItemsSelect<false> | UsesItemsSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     'article-revisions': ArticleRevisionsSelect<false> | ArticleRevisionsSelect<true>;
     'publish-approvals': PublishApprovalsSelect<false> | PublishApprovalsSelect<true>;
@@ -220,10 +224,85 @@ export interface ExploreItem {
   eyebrow: string;
   title: string;
   description: string;
-  meta: string;
-  status: string;
+  /**
+   * 开源项目填标签（用顿号分隔）；站点填域名；收藏填类型。
+   */
+  meta?: string | null;
+  status?: string | null;
   href: string;
+  logoUrl?: string | null;
+  /**
+   * [{ "label": "标题", "href": "链接" }]
+   */
+  relatedLinks?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  isFeatured: boolean;
   highlightStatus: boolean;
+  isVisible: boolean;
+  sortOrder: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "uses-categories".
+ */
+export interface UsesCategory {
+  id: string;
+  owner: string | User;
+  name: string;
+  subtitle?: string | null;
+  note?: string | null;
+  sortOrder: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "uses-items".
+ */
+export interface UsesItem {
+  id: string;
+  owner: string | User;
+  category: string | UsesCategory;
+  title: string;
+  tagline?: string | null;
+  /**
+   * 多个标签用顿号或逗号分隔。
+   */
+  tags?: string | null;
+  /**
+   * 重点词写成 **这样** 会显示为粗体。
+   */
+  description: string;
+  status: 'using' | 'used';
+  /**
+   * 留空时卡片不显示按钮，适合自己攒的设备这类没有官网的条目。
+   */
+  href?: string | null;
+  ctaLabel: string;
+  isAffiliate: boolean;
+  promoNote?: string | null;
+  logoUrl?: string | null;
+  /**
+   * [{ "label": "标题", "href": "链接" }]
+   */
+  relatedLinks?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   isVisible: boolean;
   sortOrder: number;
   updatedAt: string;
@@ -276,6 +355,10 @@ export interface Article {
    * 留空表示不置顶；数字越小，首页排序越靠前。
    */
   pinPriority?: number | null;
+  /**
+   * 这篇文章在 X 上的原文链接。留空则前台不显示入口。
+   */
+  sourceUrl?: string | null;
   revisionHash: string;
   currentRevision?: (string | null) | ArticleRevision;
   publishedRevision?: (string | null) | ArticleRevision;
@@ -399,6 +482,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'explore-items';
         value: string | ExploreItem;
+      } | null)
+    | ({
+        relationTo: 'uses-categories';
+        value: string | UsesCategory;
+      } | null)
+    | ({
+        relationTo: 'uses-items';
+        value: string | UsesItem;
       } | null)
     | ({
         relationTo: 'articles';
@@ -536,7 +627,46 @@ export interface ExploreItemsSelect<T extends boolean = true> {
   meta?: T;
   status?: T;
   href?: T;
+  logoUrl?: T;
+  relatedLinks?: T;
+  isFeatured?: T;
   highlightStatus?: T;
+  isVisible?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "uses-categories_select".
+ */
+export interface UsesCategoriesSelect<T extends boolean = true> {
+  owner?: T;
+  name?: T;
+  subtitle?: T;
+  note?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "uses-items_select".
+ */
+export interface UsesItemsSelect<T extends boolean = true> {
+  owner?: T;
+  category?: T;
+  title?: T;
+  tagline?: T;
+  tags?: T;
+  description?: T;
+  status?: T;
+  href?: T;
+  ctaLabel?: T;
+  isAffiliate?: T;
+  promoNote?: T;
+  logoUrl?: T;
+  relatedLinks?: T;
   isVisible?: T;
   sortOrder?: T;
   updatedAt?: T;
@@ -571,6 +701,7 @@ export interface ArticlesSelect<T extends boolean = true> {
   visibility?: T;
   status?: T;
   pinPriority?: T;
+  sourceUrl?: T;
   revisionHash?: T;
   currentRevision?: T;
   publishedRevision?: T;

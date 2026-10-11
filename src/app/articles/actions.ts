@@ -3,11 +3,12 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { ArticleSlugUnavailableError, archiveArticle, createDraft, updateDraft, previewDraft, publishDraft, makePrivate, parseArticlePinPriority, setArticlePinPriority } from '../../lib/article-service';
+import { ArticleSlugUnavailableError, archiveArticle, createDraft, updateDraft, previewDraft, publishDraft, makePrivate, parseArticlePinPriority, parseArticleSourceUrl, setArticlePinPriority, setArticleSourceUrl } from '../../lib/article-service';
 import { createTopic, deleteTopic, renameTopic, saveSiteProfile } from '../../lib/blog-admin-service';
 import { getPayloadClient } from '../../lib/payload';
 import { parseArticleContent } from '../../lib/article-content-data';
-import { createExploreItem, deleteExploreItem, parseExploreItemInput, updateExploreItem } from '../../lib/explore-service';
+import { createExploreItem, deleteExploreItem, moveExploreItem, parseExploreItemInput, setExploreItemVisible, updateExploreItem } from '../../lib/explore-service';
+import { createUsesCategory, createUsesItem, deleteUsesCategory, deleteUsesItem, moveUsesCategory, moveUsesItem, parseUsesCategoryInput, parseUsesItemInput, setUsesItemVisible, updateUsesCategory, updateUsesItem } from '../../lib/uses-service';
 
 async function currentUser() {
   const payload = await getPayloadClient();
@@ -165,45 +166,120 @@ export async function saveSiteSettingsFromWeb(_state: { ok: boolean; message: st
 
 export type ExploreActionState = { ok: boolean; message: string };
 
-function exploreInput(formData: FormData) {
-  return parseExploreItemInput({
-    kind: formData.get('kind'),
-    title: formData.get('title'),
-    description: formData.get('description'),
-    meta: formData.get('meta'),
-    status: formData.get('status'),
-    href: formData.get('href'),
-    sortOrder: formData.get('sortOrder'),
-    highlightStatus: formData.get('highlightStatus') === 'on',
-    isVisible: formData.get('isVisible') === 'on',
-  });
+async function runExploreAction(fallback: string, work: (owner: string) => Promise<unknown>): Promise<ExploreActionState> {
+  const owner = await currentUser();
+  try {
+    await work(owner);
+    revalidatePath('/blog/explore');
+    return { ok: true, message: '' };
+  } catch (error) {
+    return { ok: false, message: error instanceof Error ? error.message : fallback };
+  }
 }
 
 export async function saveExploreItemFromWeb(_state: ExploreActionState, formData: FormData): Promise<ExploreActionState> {
-  const owner = await currentUser();
   const id = String(formData.get('itemId') ?? '');
-  try {
-    const input = exploreInput(formData);
+  return runExploreAction('探索条目保存失败。', async (owner) => {
+    const input = parseExploreItemInput({
+      kind: formData.get('kind'),
+      title: formData.get('title'),
+      description: formData.get('description'),
+      meta: formData.get('meta'),
+      status: formData.get('status'),
+      href: formData.get('href'),
+      logoUrl: formData.get('logoUrl'),
+      relatedLabels: formData.getAll('relatedLabel'),
+      relatedHrefs: formData.getAll('relatedHref'),
+      isFeatured: formData.get('isFeatured') === 'on',
+      highlightStatus: formData.get('highlightStatus') === 'on',
+      isVisible: formData.get('isVisible') === 'on',
+    });
     if (id) await updateExploreItem(owner, id, input);
     else await createExploreItem(owner, input);
-    revalidatePath('/articles/explore');
-    revalidatePath('/blog/explore');
-    return { ok: true, message: id ? '探索条目已更新。' : '探索条目已创建。' };
+  });
+}
+
+export async function deleteExploreItemFromWeb(itemId: string) {
+  return runExploreAction('探索条目删除失败。', (owner) => deleteExploreItem(owner, itemId));
+}
+
+export async function moveExploreItemFromWeb(itemId: string, direction: -1 | 1) {
+  return runExploreAction('探索条目移动失败。', (owner) => moveExploreItem(owner, itemId, direction === -1 ? -1 : 1));
+}
+
+export async function setExploreItemVisibleFromWeb(itemId: string, isVisible: boolean) {
+  return runExploreAction('探索条目更新失败。', (owner) => setExploreItemVisible(owner, itemId, Boolean(isVisible)));
+}
+
+export type UsesActionState = { ok: boolean; message: string };
+
+// 「在用」直接在前台页面上编辑：导航是否显示也取决于条目，所以整个前台布局一起刷新。
+function revalidateUses() {
+  revalidatePath('/blog', 'layout');
+}
+
+async function runUsesAction(fallback: string, work: (owner: string) => Promise<unknown>): Promise<UsesActionState> {
+  const owner = await currentUser();
+  try {
+    await work(owner);
+    revalidateUses();
+    return { ok: true, message: '' };
   } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : '探索条目保存失败。' };
+    return { ok: false, message: error instanceof Error ? error.message : fallback };
   }
 }
 
-export async function deleteExploreItemFromWeb(_state: ExploreActionState, formData: FormData): Promise<ExploreActionState> {
-  const owner = await currentUser();
-  try {
-    await deleteExploreItem(owner, String(formData.get('itemId') ?? ''));
-    revalidatePath('/articles/explore');
-    revalidatePath('/blog/explore');
-    return { ok: true, message: '探索条目已删除。' };
-  } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : '探索条目删除失败。' };
-  }
+export async function saveUsesCategoryFromWeb(_state: UsesActionState, formData: FormData): Promise<UsesActionState> {
+  const id = String(formData.get('categoryId') ?? '');
+  return runUsesAction('分类保存失败。', async (owner) => {
+    const input = parseUsesCategoryInput({ name: formData.get('name'), subtitle: formData.get('subtitle'), note: formData.get('note') });
+    if (id) await updateUsesCategory(owner, id, input);
+    else await createUsesCategory(owner, input);
+  });
+}
+
+export async function saveUsesItemFromWeb(_state: UsesActionState, formData: FormData): Promise<UsesActionState> {
+  const id = String(formData.get('itemId') ?? '');
+  return runUsesAction('条目保存失败。', async (owner) => {
+    const input = parseUsesItemInput({
+      categoryId: formData.get('categoryId'),
+      title: formData.get('title'),
+      tagline: formData.get('tagline'),
+      tags: formData.get('tags'),
+      description: formData.get('description'),
+      status: formData.get('status'),
+      href: formData.get('href'),
+      ctaLabel: formData.get('ctaLabel'),
+      promoNote: formData.get('promoNote'),
+      logoUrl: formData.get('logoUrl'),
+      relatedLabels: formData.getAll('relatedLabel'),
+      relatedHrefs: formData.getAll('relatedHref'),
+      isAffiliate: formData.get('isAffiliate') === 'on',
+      isVisible: formData.get('isVisible') === 'on',
+    });
+    if (id) await updateUsesItem(owner, id, input);
+    else await createUsesItem(owner, input);
+  });
+}
+
+export async function deleteUsesCategoryFromWeb(categoryId: string) {
+  return runUsesAction('分类删除失败。', (owner) => deleteUsesCategory(owner, categoryId));
+}
+
+export async function moveUsesCategoryFromWeb(categoryId: string, direction: -1 | 1) {
+  return runUsesAction('分类移动失败。', (owner) => moveUsesCategory(owner, categoryId, direction === -1 ? -1 : 1));
+}
+
+export async function deleteUsesItemFromWeb(itemId: string) {
+  return runUsesAction('条目删除失败。', (owner) => deleteUsesItem(owner, itemId));
+}
+
+export async function moveUsesItemFromWeb(itemId: string, direction: -1 | 1) {
+  return runUsesAction('条目移动失败。', (owner) => moveUsesItem(owner, itemId, direction === -1 ? -1 : 1));
+}
+
+export async function setUsesItemVisibleFromWeb(itemId: string, isVisible: boolean) {
+  return runUsesAction('条目更新失败。', (owner) => setUsesItemVisible(owner, itemId, Boolean(isVisible)));
 }
 
 export async function makePrivateFromWeb(formData: FormData) {
@@ -230,6 +306,19 @@ export async function setArticlePinPriorityFromWeb(formData: FormData) {
     redirect('/articles?error=pin');
   }
   redirect('/articles?notice=pin-updated');
+}
+
+export async function setArticleSourceUrlFromWeb(formData: FormData) {
+  const articleId = String(formData.get('articleId') ?? '');
+  if (!articleId) redirect('/articles?error=source');
+  try {
+    await setArticleSourceUrl(await currentUser(), articleId, parseArticleSourceUrl(formData.get('sourceUrl')));
+    revalidatePath('/articles');
+    revalidatePath('/blog', 'layout');
+  } catch {
+    redirect('/articles?error=source');
+  }
+  redirect('/articles?notice=source-updated');
 }
 
 export async function archiveFromWeb(formData: FormData) {

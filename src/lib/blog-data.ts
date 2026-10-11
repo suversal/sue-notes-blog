@@ -13,6 +13,7 @@ export type PublicPost = {
   coverImage?: { id: string; url: string; alt: string };
   coverStyle: 'none' | 'notes' | 'grid' | 'cache';
   pinPriority: number;
+  sourceUrl?: string;
   publishedAt: string;
   updatedAt: string;
   publicReferences: { label: string; url: string }[];
@@ -35,10 +36,10 @@ export function publicCoverImage(value: unknown): PublicPost['coverImage'] {
 }
 
 export const defaultSiteProfile: SiteProfile = {
-  siteName: '苏码手记',
+  siteName: '苏码玩家',
   authorName: 'Sue',
-  tagline: '关于工具、创造，以及认真生活的小事。',
-  authorBio: '一个爱折腾工具的独立开发者。把亲手做过的事、慢慢想明白的问题，写在这里。',
+  tagline: '一个程序员的折腾记录：Apple 生态、家庭网络、出海基建，还有 AI。',
+  authorBio: '我喜欢折腾。遇到感兴趣的东西，就自己动手试一遍，试明白了再写下来。',
 };
 
 export function relationId(value: unknown): string {
@@ -80,6 +81,7 @@ export async function getPublicPosts(limit = 100, order: 'latest' | 'pinned' = '
       excerpt: revision.excerpt?.trim() || '', content: revision.content, plainText: articleContentPlainText(revision.content),
       topic: topicFrom(revision, article, topicNames), coverStyle: revision.coverStyle || 'none', coverImage: publicCoverImage(revision.coverImage),
       pinPriority: Number(article.pinPriority) || 0,
+      ...(article.sourceUrl ? { sourceUrl: String(article.sourceUrl) } : {}),
       publishedAt: article.publishedAt || article.updatedAt, updatedAt: article.updatedAt,
       publicReferences: revision.publicReferences ?? [],
     } satisfies PublicPost;

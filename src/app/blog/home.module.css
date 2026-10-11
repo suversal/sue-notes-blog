@@ -13,12 +13,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 10px 0 14px;
+  padding: 18px 0 20px;
 }
 .tagline {
   margin: 0;
-  color: var(--muted);
-  font: 400 14px/1.7 var(--sans);
+  font: 400 20px/1.6 var(--serif);
 }
 .introCount {
   display: flex;
@@ -27,7 +26,7 @@
   gap: 8px;
   min-height: 44px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 .introCount svg {
   width: 14px;
@@ -43,16 +42,17 @@
   align-items: center;
   gap: 10px;
   margin: 0;
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
 }
 .feature {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  position: relative;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 14px;
   overflow: hidden;
 }
 .textFeature {
@@ -61,27 +61,17 @@
 .featureCopy {
   display: flex;
   flex-direction: column;
-  padding: 24px 28px;
+  padding: 36px;
   background: var(--surface);
-}
-.kickerLine {
-  width: 26px;
-  height: 1px;
-  background: var(--line);
-}
-.index {
-  font: 10px/1.5 monospace;
-  letter-spacing: 0.08em;
+  animation: slide-in 360ms var(--ease) both;
 }
 .featureTitle {
-  align-self: flex-start;
-  max-width: 100%;
+  align-self: stretch;
 }
 .featureTitle h1 {
   margin: 16px 0 12px;
-  font: 600 clamp(24px, 2.3vw, 30px)/1.45 var(--serif);
+  font: 600 clamp(26px, 2.6vw, 34px)/1.4 var(--serif);
   letter-spacing: -0.025em;
-  text-wrap: balance;
   text-decoration: underline;
   text-decoration-color: transparent;
   text-decoration-thickness: 1px;
@@ -96,8 +86,8 @@
   max-width: 38em;
   margin: 0 0 20px;
   color: var(--muted);
-  font-size: 14px;
-  line-height: 1.9;
+  font-size: 16px;
+  line-height: 1.8;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 4;
 }
@@ -115,17 +105,14 @@
   align-items: center;
   gap: 5px 12px;
   color: var(--muted);
-  font-size: 11px;
-}
-.meta > span:first-child {
-  color: var(--accent);
+  font-size: 14px;
 }
 .readLink {
   display: flex;
   min-height: 44px;
   align-items: center;
   gap: 14px;
-  font-size: 12px;
+  font-size: 14px;
 }
 .readLink > span {
   display: grid;
@@ -166,7 +153,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
   gap: 36px;
-  padding-top: 30px;
+  padding-top: 40px;
 }
 .articlePanel {
   min-width: 0;
@@ -185,12 +172,7 @@
   display: flex;
   gap: 14px;
   margin: 0;
-  font: 600 23px/1.4 var(--serif);
-}
-.sectionHeading h2 > span {
-  padding-top: 3px;
-  color: var(--muted);
-  font: 11px/1.5 monospace;
+  font: 600 28px/1.4 var(--serif);
 }
 .sectionHeading > a {
   display: flex;
@@ -198,7 +180,7 @@
   align-items: center;
   gap: 9px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 .sectionHeading svg {
   width: 15px;
@@ -257,8 +239,8 @@
   flex: none;
   min-height: 44px;
   padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 12px;
+  border-radius: 8px;
+  font-size: 15px;
   color: var(--muted);
   transition:
     color 280ms ease,
@@ -277,43 +259,64 @@
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
-.postRow {
+.postGrid {
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr) auto;
-  gap: 18px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 36px 28px;
+  padding-top: 24px;
+}
+.postCard {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
   animation: row-in 450ms var(--ease) both;
   animation-delay: var(--row-delay, 0ms);
-  transition: background-color 300ms ease;
 }
-.postRow.withThumbnail {
-  padding-block: 5px;
+.cardCover {
+  display: block;
+  overflow: hidden;
+  margin-bottom: 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--plate-bg);
 }
-.completeResults .postRow:last-child {
-  border-bottom: 0;
+.cardCover > div {
+  height: auto;
+  aspect-ratio: 5 / 2;
+  transition: transform 600ms var(--ease);
 }
-.withThumbnail .postTitle h3 {
-  margin-block: 4px;
-}
-.withThumbnail .postEngagement {
-  margin-top: 7px;
-}
-.rowNumber {
-  padding-top: 3px;
+.postCard > p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
   color: var(--muted);
-  font: 10px/1.5 monospace;
+  font-size: 15px;
+  line-height: 1.75;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.cardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.cardMeta > span + span::before {
+  margin: 0 8px;
+  content: '·';
+}
+.cardMeta .postTopic {
+  color: var(--accent);
 }
 .postTitle {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: center;
-  min-height: 44px;
+  display: block;
 }
 .postTitle h3 {
-  margin: 8px 0;
-  font: 600 19px/1.5 var(--serif);
+  margin: 0;
+  font: 600 21px/1.45 var(--serif);
   text-decoration: underline;
   text-decoration-color: transparent;
   text-decoration-thickness: 1px;
@@ -322,67 +325,15 @@
     color 180ms ease,
     text-decoration-color 180ms ease;
 }
-.postTitle svg {
-  flex: none;
-  width: 18px;
-  height: 18px;
-  color: var(--muted);
-  transform: rotate(-35deg);
-  transition:
-    transform 400ms var(--ease),
-    color 220ms;
-}
-.postRow p {
-  margin: 3px 0 0;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.8;
-}
-.thumbnail {
-  align-self: center;
-  width: clamp(184px, 16vw, 236px);
-  overflow: hidden;
-  border-radius: 3px;
-}
-.thumbnail > div {
-  height: auto;
-  aspect-ratio: 5 / 2;
-  transition: transform 600ms var(--ease);
-}
-.postEngagement {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px 18px;
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 12px;
-}
-.postEngagement > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-.postEngagement .postTopic {
-  padding: 3px 8px;
-  border-radius: 4px;
-  color: var(--accent);
-  background: var(--accent-wash);
-}
-.postEngagement svg {
-  width: 16px;
-  height: 16px;
-}
 .listBottom {
   display: flex;
   min-height: 52px;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 12px;
-  padding-left: 42px;
+  padding-top: 12px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 14px;
 }
 .autoLoadStatus {
   display: inline-flex;
@@ -469,7 +420,7 @@
   width: 100%;
   min-height: 44px;
   padding: 8px 0;
-  font-size: 13px;
+  font-size: 16px;
   text-align: left;
   transition: color 260ms ease;
 }
@@ -477,7 +428,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font: 11px monospace;
+  font: 13px monospace;
   color: var(--muted);
   transition: color 260ms ease;
 }
@@ -536,7 +487,6 @@
     transform: rotate(0) translateX(2px);
   }
   .readLink:hover,
-  .allArticles:hover,
   .empty button:hover {
     color: var(--accent);
   }
@@ -549,23 +499,12 @@
   .featureArt:hover > div {
     transform: scale(1.06);
   }
-  .thumbnail:hover > div {
-    transform: scale(1.06);
-  }
-  .postRow:hover {
-    background-color: color-mix(in srgb, var(--panel) 45%, transparent);
-  }
-  .postTitle:hover svg {
-    transform: rotate(0) translateX(3px);
-    color: var(--accent);
-  }
   .sectionHeading > a:hover,
   .introCount:hover,
   .popularTitle:hover {
     color: var(--accent);
   }
-  .sectionHeading > a:hover svg,
-  .allArticles:hover svg {
+  .sectionHeading > a:hover svg{
     transform: rotate(0) translateX(2px);
   }
 }
@@ -579,8 +518,6 @@
   color: var(--accent);
   text-decoration-color: color-mix(in srgb, var(--accent) 58%, transparent);
 }
-.postTitle:active svg,
-.postTitle:focus-visible svg,
 .popularTitle:active > svg,
 .popularTitle:focus-visible > svg {
   color: var(--accent);
@@ -589,9 +526,6 @@
 .home a:active,
 .home button:active {
   opacity: 0.72;
-}
-.home .postTitle:active {
-  opacity: 1;
 }
 @media (max-width: 1000px) {
   .homeGrid {
@@ -672,25 +606,11 @@
   .sectionHeading h2 {
     font-size: 23px;
   }
-  .postRow {
-    gap: 10px;
-    grid-template-columns: 20px minmax(0, 1fr);
-    padding: 24px 0;
-  }
-  .postTitle h3 {
-    font-size: 22px;
-  }
-  .thumbnail {
-    display: none;
-  }
   .home {
     padding-bottom: 0;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .postRow {
-    animation: none;
-  }
   .home *,
   .home *::before,
   .home *::after {
@@ -711,11 +631,11 @@
 }
 .popularHeading h2 {
   margin: 0;
-  font: 600 18px/1.45 var(--serif);
+  font: 600 22px/1.45 var(--serif);
 }
 .statsPending {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 .popularPeriods {
   display: flex;
@@ -728,7 +648,7 @@
   min-height: 44px;
   padding: 8px 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
   border-bottom: 2px solid transparent;
   cursor: pointer;
   transition:
@@ -753,11 +673,11 @@
 .popularPeriods > span {
   margin-left: auto;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 .sidebarEmpty {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.8;
   margin: 12px 0;
 }
@@ -772,10 +692,10 @@
 }
 .popularTitle {
   display: grid;
-  grid-template-columns: 22px minmax(0, 1fr) 14px;
+  grid-template-columns: 24px minmax(0, 1fr) 14px;
   align-items: start;
   gap: 8px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.5;
   overflow-wrap: anywhere;
@@ -783,7 +703,7 @@
 .rankNumber {
   color: var(--muted);
   padding-top: 1px;
-  font: 400 11px/1.7 monospace;
+  font: 400 13px/1.8 monospace;
   font-variant-numeric: tabular-nums;
 }
 .rankNumber.topRank {
@@ -818,35 +738,49 @@
   transform: rotate(0) translateX(2px);
 }
 .popularList .engagement {
-  margin-left: 30px;
+  margin-left: 32px;
   margin-top: 6px;
-  gap: 10px;
-  font-size: 11px;
-}
-.allArticles {
-  display: flex;
-  align-items: center;
   gap: 12px;
-  min-height: 44px;
-  margin-top: 10px;
-  color: var(--muted);
-  font-size: 12px;
-  transition: color 180ms ease;
-}
-.allArticles svg {
-  width: 14px;
-  height: 14px;
-  transform: rotate(-45deg);
-  transform-origin: center;
-  transition: transform 220ms ease;
+  font-size: 13px;
 }
 .sideTopics h2 {
-  font: 600 21px/1.5 var(--serif);
+  font: 600 22px/1.5 var(--serif);
   color: var(--ink);
 }
 .sideTopics,
 .popularSection {
   scroll-margin-top: 24px;
+}
+/* 站点信息：主题列表下面的三行小字，没有标题。只在桌面端、且侧栏剩余高度放得下时显示；
+   放不下时高度收成 0（仍可测量内容高度），不让侧栏出现滚动条。 */
+.siteInfo {
+  overflow: hidden;
+  height: 0;
+  visibility: hidden;
+}
+.siteInfo dl {
+  margin: 20px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.siteInfo dl > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.siteInfo dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+@media (min-width: 761px) {
+  .siteInfo[data-fits] {
+    height: auto;
+    visibility: visible;
+  }
 }
 @media (max-width: 1000px) and (min-width: 761px) {
   .homeGrid {
@@ -933,10 +867,6 @@
   .kicker {
     font-size: 9px;
   }
-  .kickerLine,
-  .index {
-    display: none;
-  }
   .featureTitle h1 {
     margin: 9px 0 6px;
     font-size: 20px;
@@ -995,74 +925,10 @@
     padding: 5px 9px;
     font-size: 11px;
   }
-  .postRow,
-  .postRow.withThumbnail {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
-    padding: 10px 0;
-  }
-  .postCopy {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    column-gap: 10px;
-  }
-  .thumbnail {
-    display: block;
-    grid-column: 1;
-    width: 100%;
-    margin-top: 3px;
-    border-radius: 4px;
-  }
-  .rowNumber {
-    display: none;
-  }
-  .postTitle {
-    order: 3;
-    flex-basis: 100%;
-    min-height: 0;
-    gap: 8px;
-  }
-  .postTitle h3,
-  .withThumbnail .postTitle h3 {
-    margin: 2px 0;
+  .postTitle h3 {
+    margin: 0;
     font-size: 16px;
     line-height: 1.42;
-  }
-  .postTitle svg {
-    width: 15px;
-    height: 15px;
-  }
-  .postRow p {
-    order: 4;
-    flex-basis: 100%;
-    display: -webkit-box;
-    overflow: hidden;
-    margin-top: 2px;
-    font-size: 12px;
-    line-height: 1.6;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-  }
-  .postEngagement,
-  .withThumbnail .postEngagement {
-    order: 2;
-    flex: none;
-    flex-wrap: nowrap;
-    gap: 7px 10px;
-    margin-left: auto;
-    margin-top: 0;
-    font-size: 10px;
-  }
-  .postCopy > .meta {
-    order: 1;
-  }
-  .postEngagement .postTopic {
-    padding: 2px 6px;
-  }
-  .postEngagement svg {
-    width: 14px;
-    height: 14px;
   }
   .listBottom {
     min-height: 42px;
@@ -1095,11 +961,6 @@
     margin-left: 27px;
     font-size: 10px;
   }
-  .allArticles {
-    min-height: 40px;
-    margin-top: 6px;
-    font-size: 11px;
-  }
   .popularList {
     margin-bottom: 8px;
   }
@@ -1115,5 +976,334 @@
     min-height: 40px;
     padding: 4px 0;
     font-size: 12px;
+  }
+}
+
+/* 置顶轮播：箭头和指示条浮在卡片上，不单独占一行。 */
+.carousel .featureCopy {
+  padding-left: 72px;
+  padding-bottom: 44px;
+}
+.carouselArrow {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent) !important;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bg) 62%, transparent) !important;
+  transform: translateY(-50%);
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+  backdrop-filter: blur(6px);
+}
+.carouselArrow svg {
+  width: 18px;
+  height: 18px;
+}
+.carouselPrev {
+  left: 14px;
+}
+.carouselNext {
+  right: 14px;
+}
+.carouselDots {
+  position: absolute;
+  z-index: 2;
+  bottom: 8px;
+  left: 50%;
+  display: flex;
+  padding: 0 6px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg) 62%, transparent);
+  transform: translateX(-50%);
+  backdrop-filter: blur(6px);
+}
+.carouselDots button {
+  display: grid;
+  width: 22px;
+  height: 28px;
+  place-items: center;
+  transition: width 240ms var(--ease);
+}
+.carouselDots button::before {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ink) 34%, transparent);
+  content: '';
+  transition: background-color 240ms ease;
+}
+.carouselDots button {
+  padding: 0 4px;
+}
+.carouselDots button[aria-current='true'] {
+  width: 36px;
+}
+.carouselDots button[aria-current='true']::before {
+  background: var(--accent);
+}
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .carouselArrow:hover {
+    background: var(--bg) !important;
+    color: var(--accent);
+  }
+  .cardCover:hover > div {
+    transform: scale(1.04);
+  }
+}
+@media (max-width: 1000px) {
+  .postGrid {
+    gap: 28px 20px;
+  }
+}
+@media (max-width: 760px) {
+  .tagline {
+    font-size: 17px;
+  }
+  .carousel .featureCopy {
+    padding-left: 24px;
+  }
+  /* 手机上用左右滑动和指示条切换，箭头会压住标题。 */
+  .carouselArrow {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .tagline {
+    font-size: 14px;
+  }
+  .carousel .featureCopy {
+    padding: 14px 14px 36px;
+  }
+  .postGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding-top: 12px;
+  }
+  .postCard {
+    gap: 6px;
+  }
+  .cardCover {
+    margin-bottom: 2px;
+    border-radius: 8px;
+  }
+  .postCard > p {
+    font-size: 12px;
+    line-height: 1.6;
+    -webkit-line-clamp: 2;
+  }
+  .cardMeta {
+    font-size: 11px;
+  }
+  .statsPending,
+  .popularPeriods > span,
+  .sidebarEmpty {
+    font-size: 11px;
+  }
+  .rankNumber {
+    font-size: 11px;
+  }
+  .sideTopics button > span:last-child {
+    font-size: 11px;
+  }
+  .introCount,
+  .meta,
+  .listBottom {
+    font-size: 11px;
+  }
+}
+
+/* 置顶卡片的高度由 5:2 的封面决定：封面不裁切，标题长短也不会改变卡片高度。 */
+@media (min-width: 761px) {
+  .feature:not(.textFeature) {
+    grid-template-columns: minmax(0, 9fr) minmax(0, 16fr);
+  }
+  .feature:not(.textFeature) .featureArt {
+    aspect-ratio: 5 / 2;
+  }
+  /* 文字栏不参与撑高：高度跟随封面，放不下的内容截断。 */
+  .feature:not(.textFeature) .featureCopy {
+    height: 0;
+    min-height: 100%;
+    overflow: hidden;
+    padding: 28px 32px 40px;
+  }
+  /* 有封面时两个切换箭头和指示条都放在封面上，文字栏不用再给左箭头让位。 */
+  .feature.carousel:not(.textFeature) .carouselPrev {
+    left: calc(36% + 14px);
+  }
+  .feature.carousel:not(.textFeature) .carouselDots {
+    left: 68%;
+  }
+  .feature:not(.textFeature) .featureTitle h1 {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 12px 0 10px;
+    font-size: clamp(22px, 2.2vw, 30px);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+  .feature:not(.textFeature) .excerpt {
+    margin-bottom: 12px;
+    font-size: 15px;
+    line-height: 1.7;
+    -webkit-line-clamp: 2;
+  }
+  .homeGrid {
+    padding-bottom: 56px;
+  }
+}
+/* 中等宽度下卡片更矮，摘要让位给标题。 */
+@media (min-width: 761px) and (max-width: 1240px) {
+  .feature:not(.textFeature) .excerpt {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .feature,
+  .feature.textFeature {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .featureArt {
+    display: block;
+    aspect-ratio: 5 / 2;
+  }
+  /* 手机上标题固定占两行，切换置顶时卡片高度不跳动。 */
+  .carousel .featureTitle h1 {
+    display: -webkit-box;
+    overflow: hidden;
+    min-height: 2.8em;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  .carousel .excerpt {
+    display: none;
+  }
+  .carousel .featureCopy {
+    padding-bottom: 14px;
+  }
+  .carouselDots {
+    bottom: 6px;
+  }
+  .homeGrid {
+    padding-bottom: 28px;
+  }
+}
+
+/* 站内链接改用「› 长成 →」的箭头（见 grow-arrow.module.css），这里去掉原来的斜向初始角度。 */
+.introCount svg,
+.sectionHeading svg,
+.readLink svg,
+.popularTitle > svg,
+.sideTopics button svg {
+  transform: none;
+}
+
+/* 置顶切换：封面左右推移（新的推进来、旧的推出去），文字按翻页方向逐行滑入。 */
+.artSlide {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+.artSlide.artActive {
+  z-index: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+.artSlide.artEntering {
+  animation: push-in 650ms var(--ease) both;
+}
+.artSlide.artLeaving {
+  animation: push-out 650ms var(--ease) both;
+  visibility: visible;
+}
+@keyframes push-in {
+  from {
+    transform: translateX(var(--push-from, 100%));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes push-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(var(--push-from, 100%) * -1));
+  }
+}
+.artSlide > div {
+  height: 100%;
+  min-height: 0;
+  transition: transform 600ms var(--ease);
+}
+.artSlide > div > img,
+.artSlide > div > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.featureCopy {
+  animation: none;
+}
+.featureCopy > * {
+  animation: slide-from 560ms var(--ease) both;
+}
+.featureCopy > :nth-child(2) {
+  animation-delay: 60ms;
+}
+.featureCopy > :nth-child(3) {
+  animation-delay: 120ms;
+}
+.featureCopy > :nth-child(4) {
+  animation-delay: 180ms;
+}
+@keyframes slide-from {
+  from {
+    opacity: 0;
+    transform: translateX(var(--slide-from, 22px));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .artSlide.artActive:hover > div {
+    transform: scale(1.05);
+  }
+}
+@media (max-width: 760px) {
+  .artSlide > div > div {
+    display: none;
+  }
+}
+
+/* 手机上不显示页头下面那句介绍，留一点间距后直接进入置顶文章。 */
+@media (max-width: 760px) {
+  .intro {
+    display: none;
+  }
+  .home {
+    padding-top: 12px;
   }
 }

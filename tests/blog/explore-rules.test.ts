@@ -7,20 +7,18 @@ describe('探索条目规则', () => {
     expect(validateExploreHref('/blog')).toBe('/blog')
   })
 
-  it('拒绝脚本地址、协议相对地址和无效排序', () => {
+  it('拒绝脚本地址和协议相对地址', () => {
     expect(() => validateExploreHref('javascript:alert(1)')).toThrow('http(s)')
     expect(() => validateExploreHref('//example.com')).toThrow('http(s)')
-    expect(() => parseExploreItemInput({
-      kind: 'project', eyebrow: 'OPEN SOURCE', title: 'Test', description: 'Test item',
-      meta: 'Tool', status: 'Active', href: 'https://example.com', sortOrder: '1.5',
-    })).toThrow('整数')
   })
 
-  it('解析可见性和状态强调开关', () => {
+  it('解析可见性、状态强调和重点项目；标签与状态文字可以留空', () => {
     expect(parseExploreItemInput({
-      kind: 'site', eyebrow: 'MY SITE', title: 'Test', description: 'Test item',
-      meta: 'example.com', status: '运行中', href: 'https://example.com', sortOrder: '20',
-      isVisible: true, highlightStatus: true,
-    })).toMatchObject({ kind: 'site', sortOrder: 20, isVisible: true, highlightStatus: true })
+      kind: 'site', title: 'Test', description: 'Test item', meta: 'example.com', status: '运行中',
+      href: 'https://example.com', isVisible: true, highlightStatus: true, isFeatured: true,
+    })).toMatchObject({ kind: 'site', isVisible: true, highlightStatus: true, isFeatured: false })
+    expect(parseExploreItemInput({
+      kind: 'project', title: 'Test', description: 'Test item', href: 'https://github.com/a/b', isFeatured: true,
+    })).toMatchObject({ meta: '', status: '', isFeatured: true, relatedLinks: [], logoUrl: '' })
   })
 })

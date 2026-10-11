@@ -161,6 +161,21 @@ export async function setArticlePinPriority(owner: string, articleId: string, pi
   return payload.update({ collection: 'articles', id: articleId, overrideAccess: true, data: { pinPriority: pinPriority || null } });
 }
 
+/** 只接受 X（推特）上的帖子或文章链接；留空表示清除。 */
+export function parseArticleSourceUrl(value: unknown) {
+  const raw = String(value ?? '').trim();
+  if (!raw) return '';
+  let url: URL;
+  try { url = new URL(raw); } catch { throw new Error('请填写完整的 X 链接，例如 https://x.com/用户名/status/…'); }
+  if (url.protocol !== 'https:' || !/^(?:www\.|mobile\.)?(?:x|twitter)\.com$/.test(url.hostname) || raw.length > 500) throw new Error('请填写 x.com 或 twitter.com 上的链接。');
+  return url.toString();
+}
+
+export async function setArticleSourceUrl(owner: string, articleId: string, sourceUrl: string) {
+  const payload = await getPayloadClient(); await ownedArticle(payload, owner, articleId);
+  return payload.update({ collection: 'articles', id: articleId, overrideAccess: true, data: { sourceUrl: sourceUrl || null } });
+}
+
 export async function archiveArticle(owner: string, articleId: string) {
   const payload = await getPayloadClient(); await ownedArticle(payload, owner, articleId);
   return payload.update({ collection: 'articles', id: articleId, overrideAccess: true, data: { status: 'archived', visibility: 'private', privateAt: new Date().toISOString() } });

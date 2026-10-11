@@ -18,6 +18,7 @@ export const Articles: CollectionConfig = {
     { name: 'visibility', type: 'select', required: true, options: ['private', 'public'], defaultValue: 'private' },
     { name: 'status', type: 'select', required: true, options: ['draft', 'published', 'archived'], defaultValue: 'draft' },
     { name: 'pinPriority', type: 'number', min: 1, max: 999, index: true, admin: { description: '留空表示不置顶；数字越小，首页排序越靠前。' } },
+    { name: 'sourceUrl', type: 'text', maxLength: 500, admin: { description: '这篇文章在 X 上的原文链接。留空则前台不显示入口。' } },
     { name: 'revisionHash', type: 'text', required: true },
     { name: 'currentRevision', type: 'relationship', relationTo: 'article-revisions' },
     { name: 'publishedRevision', type: 'relationship', relationTo: 'article-revisions' },

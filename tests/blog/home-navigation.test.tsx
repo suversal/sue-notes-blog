@@ -81,7 +81,7 @@ describe('首页阅读入口', () => {
     )
     render(<HomeClient site={site} posts={posts} />)
     const results = screen.getByRole('region', { name: '文章列表' })
-    expect(within(results).getAllByRole('link')).toHaveLength(6)
+    expect(within(results).getAllByRole('link')).toHaveLength(7)
     expect(screen.queryByRole('button', { name: /加载更多/ })).toBeNull()
     expect(screen.queryByText(/已显示全部/)).toBeNull()
     const filters = screen.getByRole('group', { name: '筛选文章主题' })
@@ -90,5 +90,29 @@ describe('首页阅读入口', () => {
     expect(within(filtered).getAllByRole('link')).toHaveLength(1)
     expect(within(filtered).getByRole('link', { name: '文章 6' })).toBeTruthy()
     expect(screen.getByRole('list', { name: '近 30 天阅读排行' })).toBeTruthy()
+  })
+  it('置顶文章进入轮播，同时仍留在按时间排序的列表里', () => {
+    const posts = [
+      { ...post(1), pinPriority: 2, publishedAt: '2026-09-10T00:00:00.000Z' },
+      { ...post(2), pinPriority: 1, publishedAt: '2026-09-11T00:00:00.000Z' },
+      { ...post(3), publishedAt: '2026-09-12T00:00:00.000Z' },
+    ].sort((a, b) => (b.pinPriority ? 1 : 0) - (a.pinPriority ? 1 : 0) || a.pinPriority - b.pinPriority)
+    render(<HomeClient site={site} posts={posts} />)
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('文章 2')
+    fireEvent.click(screen.getByRole('button', { name: '下一篇置顶' }))
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('文章 1')
+    fireEvent.click(screen.getByRole('button', { name: '下一篇置顶' }))
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('文章 2')
+    const results = screen.getByRole('region', { name: '文章列表' })
+    expect(within(results).getAllByRole('heading', { level: 3 }).map((item) => item.textContent)).toEqual([
+      '文章 3',
+      '文章 2',
+      '文章 1',
+    ])
+  })
+  it('没有置顶时只展示最新一篇，不显示轮播控件', () => {
+    render(<HomeClient site={site} posts={[post(0), post(1)]} />)
+    expect(screen.queryByRole('button', { name: '下一篇置顶' })).toBeNull()
+    expect(screen.getByText(/最新手记/)).toBeTruthy()
   })
 })

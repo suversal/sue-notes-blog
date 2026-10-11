@@ -27,6 +27,14 @@ async function deleteTestUsers(payload: Awaited<ReturnType<typeof getPayload>>) 
         overrideAccess: true,
       })
     }
+    // 条目引用分类，先删条目再删分类。
+    for (const collection of ['uses-items', 'uses-categories'] as const) {
+      await payload.delete({
+        collection,
+        overrideAccess: true,
+        where: { owner: { equals: user.id } },
+      })
+    }
     await payload.delete({
       collection: 'users',
       id: user.id,

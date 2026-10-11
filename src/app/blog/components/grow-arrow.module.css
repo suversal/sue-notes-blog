@@ -1,0 +1,28 @@
+/* 站内链接的箭头：静止时是「›」，所在的链接或按钮被悬停、聚焦或选中时，横线从箭头尖向左长出来变成「→」。 */
+.arrow {
+  transition:
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 220ms ease;
+}
+
+.arrow [data-tail] {
+  transform: scaleX(0);
+  transform-origin: 19px 12px;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+a:hover .arrow [data-tail],
+a:focus-visible .arrow [data-tail],
+a:active .arrow [data-tail],
+button:hover .arrow [data-tail],
+button:focus-visible .arrow [data-tail],
+button[aria-pressed='true'] .arrow [data-tail] {
+  transform: scaleX(1);
+}
+
+a:hover .arrow,
+a:focus-visible .arrow,
+button:hover .arrow,
+button:focus-visible .arrow {
+  transform: translateX(2px);
+}

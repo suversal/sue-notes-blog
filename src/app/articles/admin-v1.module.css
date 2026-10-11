@@ -1017,7 +1017,9 @@
 .previewToolbar > div button.selected {
   background: var(--panel);
 }
-.previewToolbar > .primaryButton {
+/* 「准备发布」外面包着一层表单，「确认发布」是直接的按钮，两种情况都要靠右。 */
+.previewToolbar > .primaryButton,
+.previewToolbar > form {
   justify-self: end;
 }
 .previewFrame {
@@ -1029,10 +1031,29 @@
   box-shadow: 0 8px 35px rgb(0 0 0 / 8%);
   transition: width 220ms ease;
 }
+/* 手机预览是一个真实的手机宽度窗口，里面加载的是同一篇预览。 */
 .phoneFrame {
+  display: block;
   width: 390px;
   max-width: calc(100% - 24px);
-  padding: 0 18px;
+  height: calc(100dvh - 68px - 64px);
+  min-height: 560px;
+  margin: 32px auto;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--paper);
+  box-shadow: 0 8px 35px rgb(0 0 0 / 8%);
+}
+.previewEmbedded {
+  background: var(--paper);
+}
+/* 写成两个类名叠加，才能压过后面窄屏规则里给预览框留的外边距。 */
+.previewFrame.embeddedFrame {
+  width: 100%;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0 16px;
+  box-shadow: none;
 }
 .previewBrand {
   display: flex;
