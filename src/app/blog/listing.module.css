@@ -1,0 +1,187 @@
+/* 归档、探索、在用三个列表页共用的页头、筛选胶囊和工具栏。 */
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px 48px;
+  padding: 44px 0 28px;
+}
+
+.headText {
+  display: flex;
+  min-width: 0;
+  flex: 999 1 420px;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.headText h1 {
+  margin: 0;
+  font: 600 40px/1.25 var(--serif);
+}
+
+.headText > span {
+  max-width: 640px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.head .search {
+  max-width: 380px;
+  min-height: 48px;
+  flex: 1 1 280px;
+  border-radius: 12px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* 胶囊与首页主题筛选同一种样式：不带边框，选中时浅色底。 */
+.chips {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chips .chip {
+  display: inline-flex;
+  min-height: 44px;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 15px;
+  white-space: nowrap;
+  transition:
+    background-color 280ms ease,
+    color 280ms ease;
+}
+
+.chip > span {
+  opacity: 0.75;
+}
+
+.chips .chip:hover,
+.chips .chip:focus-visible,
+.chips .chip[aria-pressed='true'] {
+  background: var(--accent-wash);
+  color: var(--accent);
+}
+
+.chips .chip[aria-pressed='true'] {
+  font-weight: 600;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.yearSelect {
+  width: 150px;
+}
+
+.segment {
+  display: flex;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.segment button {
+  min-height: 44px;
+  padding: 0 16px;
+  color: var(--muted);
+  font-size: 15px;
+  white-space: nowrap;
+  transition:
+    background-color 220ms ease,
+    color 220ms ease;
+}
+
+.segment button[aria-pressed='true'] {
+  background: var(--panel);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.segment button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+@media (max-width: 760px) {
+  .head {
+    gap: 14px;
+    padding: 22px 0 16px;
+  }
+
+  .headText {
+    gap: 4px;
+  }
+
+  .headText h1 {
+    font-size: 26px;
+  }
+
+  .headText > span {
+    font-size: 13px;
+  }
+
+  .head .search {
+    max-width: none;
+    min-height: 44px;
+    flex-basis: 100%;
+  }
+
+  .toolbar {
+    gap: 10px;
+    padding-bottom: 12px;
+  }
+
+  /* 手机上胶囊排成一行横向滑动，不换行占高度。 */
+  .toolbar .chips {
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .toolbar .chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chips .chip {
+    min-height: 38px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .controls {
+    width: 100%;
+  }
+
+  .yearSelect {
+    width: auto;
+    flex: 1;
+  }
+
+  .segment button {
+    min-height: 40px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+}

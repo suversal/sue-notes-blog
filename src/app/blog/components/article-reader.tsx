@@ -201,6 +201,12 @@ export function ArticleReader({
               {formatBlogDateTime(post.publishedAt)}
             </time>
             <small>{readingMinutes(post.plainText)} 分钟阅读</small>
+            {post.sourceUrl && (
+              <a className={styles.sourceLink} href={post.sourceUrl} target="_blank" rel="noopener noreferrer">
+                <Icon name="x" />
+                原文
+              </a>
+            )}
           </div>
           {(post.coverStyle !== 'none' || post.coverImage) && <Plate type={post.coverStyle} image={post.coverImage} />}
           <ArticleRichText content={post.content} />
@@ -224,6 +230,13 @@ export function ArticleReader({
               <br />
               谢谢你读到这里。
             </span>
+            {post.sourceUrl && (
+              <a className={styles.sourceButton} href={post.sourceUrl} target="_blank" rel="noopener noreferrer">
+                <Icon name="x" />
+                在 X 上查看原文
+                <Icon name="arrow" />
+              </a>
+            )}
           </div>
           {(previousPost || nextPost) && (
             <nav className={styles.articlePager} aria-label="上一篇和下一篇文章">

@@ -1,0 +1,653 @@
+.affiliate {
+  color: color-mix(in srgb, #c98a16 72%, var(--ink));
+}
+
+/* 分类标题：名称、副标题、数量，下面是「我的搭配」。 */
+.category {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 32px;
+  animation: uses-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.categoryHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+}
+
+.categoryHead h2 {
+  margin: 0;
+  font: 600 28px/1.35 var(--serif);
+}
+
+.categoryHead > span {
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.categoryHead > small {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.note {
+  margin: 0;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: var(--surface);
+  color: color-mix(in srgb, var(--ink) 78%, var(--bg));
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.note strong {
+  color: var(--ink);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+  padding: 24px 0 20px;
+}
+
+.cards > section {
+  grid-column: 1 / -1;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  animation: uses-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(80ms + var(--i, 0) * 55ms);
+  transition:
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 240ms ease,
+    box-shadow 320ms ease;
+}
+
+/* 弹出相关文章列表时，这张卡片要压在相邻卡片上面。 */
+.card:hover,
+.card:focus-within {
+  z-index: 3;
+}
+
+/* 所有者眼里的隐藏条目：还在，但明显和公开的不一样。 */
+.card.hidden > :not(.controls) {
+  opacity: 0.45;
+}
+
+.cardHead {
+  /* 相关文章的列表以这一行为基准，和卡片内容等宽。 */
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cardHead > div {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.logo {
+  display: grid;
+  overflow: hidden;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--muted);
+  font: 600 20px/1 var(--serif);
+  object-fit: cover;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card h3 {
+  margin: 0;
+  font: 600 22px/1.3 var(--serif);
+  overflow-wrap: anywhere;
+}
+
+.card small {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.affiliate {
+  position: relative;
+  flex: none;
+  cursor: help;
+  letter-spacing: 0.06em;
+  padding: 1px 6px;
+  border: 1px solid color-mix(in srgb, #d9a441 42%, var(--line));
+  border-radius: 5px;
+  background: color-mix(in srgb, #d9a441 12%, var(--surface));
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* 悬停、键盘聚焦或在手机上点一下 AFF 标记时出现的说明。 */
+.affiliateTip {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 8px);
+  right: 0;
+  width: max-content;
+  max-width: min(280px, 70vw);
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: 0 10px 28px -14px color-mix(in srgb, var(--ink) 60%, transparent);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.65;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+  visibility: hidden;
+}
+
+.affiliate:hover .affiliateTip,
+.affiliate:focus .affiliateTip {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.affiliate:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.pitch {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pitch > strong {
+  color: var(--accent);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.pitch ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pitch li {
+  padding: 2px 10px;
+  border-radius: 6px;
+  background: var(--accent-wash);
+  color: color-mix(in srgb, var(--accent) 70%, var(--ink));
+  font-size: 13px;
+}
+
+.description {
+  flex: 1;
+  margin: 0;
+  color: color-mix(in srgb, var(--ink) 78%, var(--bg));
+  font-size: 16px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.description strong {
+  color: var(--ink);
+}
+
+.promo {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: color-mix(in srgb, #d9a441 12%, var(--surface));
+  color: color-mix(in srgb, #c98a16 42%, var(--ink));
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.visit {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 15px;
+  font-weight: 600;
+  transition: background-color 180ms ease;
+}
+
+.visit:hover,
+.visit:focus-visible {
+  background: var(--accent);
+}
+
+.visit svg {
+  width: 15px;
+  height: 15px;
+  transform: rotate(-45deg);
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 进入动效；系统开启「减少动态效果」时由全局规则关闭。 */
+.enter,
+.note {
+  animation: uses-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes uses-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  article.card:hover {
+    border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+    box-shadow: 0 10px 28px -18px color-mix(in srgb, var(--ink) 55%, transparent);
+    transform: translateY(-3px);
+  }
+
+  .card:hover .logo {
+    transform: scale(1.06);
+  }
+
+  .visit:hover svg,
+  .visit:focus-visible svg {
+    transform: rotate(0) translateX(3px);
+  }
+}
+
+/* ── 以下是站点所有者的编辑界面，访客不会看到 ── */
+.editToggle {
+  position: fixed;
+  z-index: 30;
+  right: max(20px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px;
+  border-radius: 24px;
+  background: var(--ink) !important;
+  color: var(--bg) !important;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 8px 24px -10px color-mix(in srgb, var(--ink) 70%, transparent);
+}
+
+.editToggle[aria-pressed='true'] {
+  background: var(--accent) !important;
+}
+
+.editToggle svg,
+.addChip svg,
+.addCard svg {
+  width: 16px;
+  height: 16px;
+}
+
+.addChip {
+  border: 1px dashed color-mix(in srgb, var(--ink) 30%, transparent) !important;
+}
+
+.addCard {
+  display: flex;
+  min-height: 180px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px dashed color-mix(in srgb, var(--ink) 30%, transparent) !important;
+  border-radius: 16px;
+  color: var(--muted) !important;
+  font-size: 16px;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+/* 编辑表单比卡片需要更多横向空间；「添加」卡片不跟着表单被拉高。 */
+.addCard {
+  align-self: start;
+}
+
+@media (min-width: 800px) {
+  .cards > .form {
+    grid-column: span 2;
+  }
+}
+
+.addCard:hover,
+.addChip:hover {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin: -8px -8px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.categoryControls {
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+}
+
+.controls button,
+.formActions button,
+.logoField > div button,
+.linksField > button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.controls button:hover:not(:disabled),
+.formActions button:hover:not(:disabled),
+.logoField > div button:hover,
+.linksField > button:hover {
+  background: var(--accent-wash);
+  color: var(--accent);
+}
+
+.controls button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.controls svg,
+.linksField svg {
+  width: 15px;
+  height: 15px;
+}
+
+.controls .danger {
+  color: #d8574f;
+}
+
+.controls > p,
+.formError {
+  flex-basis: 100%;
+  margin: 0;
+  color: #d8574f;
+  font-size: 14px;
+}
+
+.form {
+  gap: 14px;
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  animation: none;
+}
+
+.categoryForm {
+  display: flex;
+  flex-direction: column;
+  margin-top: 24px;
+  padding: 24px;
+  border-width: 1px;
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.form label,
+.linksField {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.form label > span,
+.linksField legend {
+  padding: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.form input:not([type='checkbox']),
+.form select,
+.form textarea {
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+}
+
+.form textarea {
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.form input:focus-visible,
+.form select:focus-visible,
+.form textarea:focus-visible {
+  border-color: var(--accent);
+  outline: 0;
+}
+
+.fieldRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 12px;
+}
+
+.form .check {
+  min-height: 42px;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.form .check > span {
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.logoField {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoField .logo {
+  cursor: pointer;
+}
+
+.logoField .logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.logoField .logo svg {
+  width: 20px;
+  height: 20px;
+}
+
+.logoField > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.linksField > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 36px;
+  gap: 8px;
+}
+
+.linksField > div > button {
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--muted);
+}
+
+.linksField > div > button:hover {
+  background: var(--accent-wash);
+  color: var(--accent);
+}
+
+.linksField > button {
+  align-self: flex-start;
+}
+
+.formActions {
+  display: flex;
+  gap: 8px;
+}
+
+.formActions .save {
+  min-height: 42px;
+  padding: 0 20px;
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+.formActions .save:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+@media (max-width: 760px) {
+  .category {
+    gap: 10px;
+    padding-top: 18px;
+  }
+
+  .categoryHead h2 {
+    font-size: 21px;
+  }
+
+  .categoryHead > span,
+  .categoryHead > small {
+    font-size: 13px;
+  }
+
+  .note {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+
+  .cards {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding-top: 14px;
+  }
+
+  .card {
+    gap: 10px;
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 17px;
+  }
+
+  .card h3 {
+    font-size: 17px;
+  }
+
+  .card small,
+  .pitch li {
+    font-size: 12px;
+  }
+
+  .pitch > strong {
+    font-size: 14px;
+  }
+
+  .description,
+  .promo {
+    font-size: 13px;
+  }
+
+  .visit {
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  .fieldRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .linksField > div {
+    grid-template-columns: minmax(0, 1fr) 36px;
+  }
+
+  .linksField > div > input:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* 这页的介绍比其他页长，放开共用页头的宽度上限，桌面上排成一行。 */
+.intro.intro {
+  max-width: none;
+}

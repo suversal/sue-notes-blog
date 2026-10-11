@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type TouchEvent } from 'react'
 import type { PublicPost, SiteProfile } from '../../../lib/blog-data'
 import { readingMinutes } from '../../../lib/blog-shared'
-import { Icon } from './ui-icon'
+import { GrowArrow, Icon } from './ui-icon'
 import { Plate } from './plate'
 import { Reveal } from './reveal'
 import { useArticleStats } from '../../../lib/use-article-stats'
@@ -12,10 +12,9 @@ import { PopularArticles } from './popular-articles'
 import { BackToTop } from './back-to-top'
 import styles from '../home.module.css'
 
-function Meta({ post, showTopic = true }: { post: PublicPost; showTopic?: boolean }) {
+function Meta({ post }: { post: PublicPost }) {
   return (
     <div className={styles.meta}>
-      {showTopic && <span>{post.topic.name}</span>}
       <time dateTime={post.publishedAt}>
         {new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' }).format(
           new Date(post.publishedAt),
@@ -26,10 +25,138 @@ function Meta({ post, showTopic = true }: { post: PublicPost; showTopic?: boolea
   )
 }
 
+const hasCover = (post: PublicPost) => post.coverStyle !== 'none' || Boolean(post.coverImage)
+
+function FeaturedCarousel({ posts }: { posts: PublicPost[] }) {
+  const [index, setIndex] = useState(0)
+  // 切换方向决定文字从哪一侧滑入：往后翻从右边来，往前翻从左边来。
+  const [direction, setDirection] = useState<1 | -1>(1)
+  // 记住上一张，让它和新的一张同时横向移动：一张推出去，一张推进来。
+  const [leaving, setLeaving] = useState<string | null>(null)
+  const paused = useRef(false)
+  const touchStart = useRef<number | null>(null)
+  const count = posts.length
+  const current = posts[index % count]
+  const pinned = current.pinPriority > 0
+  const go = (next: number) => {
+    if ((next + count) % count === index) return
+    setDirection(next < index ? -1 : 1)
+    setLeaving(posts[index].id)
+    setIndex((next + count) % count)
+  }
+
+  useEffect(() => {
+    if (count < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const timer = window.setInterval(() => {
+      if (paused.current || document.hidden) return
+      setDirection(1)
+      setIndex((value) => {
+        setLeaving(posts[value].id)
+        return (value + 1) % count
+      })
+    }, 6000)
+    return () => window.clearInterval(timer)
+  }, [count, posts])
+
+  const onTouchEnd = (event: TouchEvent) => {
+    const start = touchStart.current
+    touchStart.current = null
+    if (start === null || count < 2) return
+    const distance = event.changedTouches[0].clientX - start
+    if (Math.abs(distance) > 48) go(index + (distance < 0 ? 1 : -1))
+  }
+
+  return (
+    <section
+      className={`${styles.feature} ${hasCover(current) ? '' : styles.textFeature} ${count > 1 ? styles.carousel : ''}`}
+      aria-labelledby="latest-title"
+      aria-roledescription={count > 1 ? '轮播' : undefined}
+      style={{ '--slide-from': `${direction * 22}px`, '--push-from': `${direction * 100}%` } as CSSProperties}
+      onMouseEnter={() => (paused.current = true)}
+      onMouseLeave={() => (paused.current = false)}
+      onFocusCapture={() => (paused.current = true)}
+      onBlurCapture={() => (paused.current = false)}
+      onTouchStart={(event) => (touchStart.current = event.touches[0].clientX)}
+      onTouchEnd={onTouchEnd}
+    >
+      <div className={styles.featureCopy} key={current.id}>
+        <p className={styles.kicker}>
+          {pinned ? '置顶' : '最新手记'} · {current.topic.name}
+        </p>
+        <Link href={`/blog/${current.slug}`} className={styles.featureTitle} title={current.title}>
+          <h1 id="latest-title">{current.title}</h1>
+        </Link>
+        {current.excerpt && <p className={styles.excerpt}>{current.excerpt}</p>}
+        <div className={styles.featureBottom}>
+          <Meta post={current} />
+          <Link className={styles.readLink} href={`/blog/${current.slug}`}>
+            阅读手记{' '}
+            <span>
+              <GrowArrow />
+            </span>
+          </Link>
+        </div>
+      </div>
+      {hasCover(current) && (
+        <div className={styles.featureArt}>
+          {/* 所有封面叠在同一位置，切换时新的一张从翻页方向推进来，旧的一张同步被推出去。 */}
+          {posts.filter(hasCover).map((post) => {
+            const active = post.id === current.id
+            return (
+              <Link
+                className={`${styles.artSlide} ${active ? styles.artActive : ''} ${active && leaving ? styles.artEntering : ''} ${!active && post.id === leaving ? styles.artLeaving : ''}`}
+                href={`/blog/${post.slug}`}
+                aria-label={`打开精选文章：${post.title}`}
+                aria-hidden={!active}
+                tabIndex={active ? undefined : -1}
+                key={post.id}
+              >
+                <Plate type={post.coverStyle} image={post.coverImage} />
+              </Link>
+            )
+          })}
+        </div>
+      )}
+      {count > 1 && (
+        <>
+          <button
+            className={`${styles.carouselArrow} ${styles.carouselPrev}`}
+            type="button"
+            aria-label="上一篇置顶"
+            onClick={() => go(index - 1)}
+          >
+            <Icon name="back" />
+          </button>
+          <button
+            className={`${styles.carouselArrow} ${styles.carouselNext}`}
+            type="button"
+            aria-label="下一篇置顶"
+            onClick={() => go(index + 1)}
+          >
+            <Icon name="arrow" />
+          </button>
+          <div className={styles.carouselDots} role="group" aria-label="选择置顶文章">
+            {posts.map((post, dot) => (
+              <button
+                type="button"
+                aria-label={`第 ${dot + 1} 篇：${post.title}`}
+                aria-current={dot === index ? 'true' : undefined}
+                onClick={() => go(dot)}
+                key={post.id}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+  )
+}
+
 export function HomeClient({ posts, site }: { posts: PublicPost[]; site: SiteProfile }) {
   const analytics = useArticleStats(posts)
   const topics = [...new Map(posts.map((post) => [post.topic.id, post.topic])).values()]
-  const featured = posts[0]
+  const pinnedPosts = posts.filter((post) => post.pinPriority > 0).slice(0, 5)
+  const featuredPosts = pinnedPosts.length ? pinnedPosts : posts.slice(0, 1)
   const [topic, setTopic] = useState('all')
   const [visible, setVisible] = useState(8)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -38,9 +165,34 @@ export function HomeClient({ posts, site }: { posts: PublicPost[]; site: SitePro
   const loadMoreTrigger = useRef<HTMLDivElement>(null)
   const loadingMoreRef = useRef(false)
   const listHeading = useRef<HTMLHeadingElement>(null)
-  const rows = posts.filter((post) =>
-    topic === 'all' ? post.id !== featured?.id : post.topic.id === topic,
-  )
+  const aside = useRef<HTMLElement>(null)
+  const siteInfo = useRef<HTMLElement>(null)
+  const [siteInfoFits, setSiteInfoFits] = useState(false)
+  // 站点信息只在侧栏剩余高度放得下时才显示，放不下就不显示，避免侧栏自己出现滚动条。
+  useEffect(() => {
+    const rail = aside.current
+    const info = siteInfo.current
+    const content = rail?.firstElementChild as HTMLElement | null
+    if (!rail || !info || !content) return
+    const check = () => {
+      const style = getComputedStyle(rail)
+      const available = parseFloat(style.maxHeight) - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)
+      const needed = content.offsetHeight - info.offsetHeight + info.scrollHeight
+      setSiteInfoFits(Number.isFinite(available) && needed <= available)
+    }
+    check()
+    const observer = new ResizeObserver(check)
+    observer.observe(content)
+    window.addEventListener('resize', check)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', check)
+    }
+  }, [])
+  // 置顶只是额外的展示位：列表始终按发布时间列出全部文章。
+  const rows = posts
+    .filter((post) => topic === 'all' || post.topic.id === topic)
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
   const shown = rows.slice(0, visible)
 
   useEffect(() => {
@@ -110,45 +262,13 @@ export function HomeClient({ posts, site }: { posts: PublicPost[]; site: SitePro
       <section className={styles.intro} aria-label="手记介绍">
         <p className={styles.tagline}>{site.tagline}</p>
         <Link className={styles.introCount} href="/blog/archive">
-          已发布 {posts.length} 篇文章 <Icon name="arrow" />
+          已发布 {posts.length} 篇文章 <GrowArrow />
         </Link>
       </section>
 
-      {featured ? (
+      {featuredPosts.length ? (
         <Reveal delay={70}>
-          <section
-            className={`${styles.feature} ${featured.coverStyle === 'none' && !featured.coverImage ? styles.textFeature : ''}`}
-            aria-labelledby="latest-title"
-          >
-            <div className={styles.featureCopy}>
-              <p className={styles.kicker}>
-                最新手记 <span className={styles.kickerLine} />{' '}
-                <span className={styles.index}>01 / LATEST</span>
-              </p>
-              <Link href={`/blog/${featured.slug}`} className={styles.featureTitle}>
-                <h1 id="latest-title">{featured.title}</h1>
-              </Link>
-              {featured.excerpt && <p className={styles.excerpt}>{featured.excerpt}</p>}
-              <div className={styles.featureBottom}>
-                <Meta post={featured} />
-                <Link className={styles.readLink} href={`/blog/${featured.slug}`}>
-                  阅读手记{' '}
-                  <span>
-                    <Icon name="arrow" />
-                  </span>
-                </Link>
-              </div>
-            </div>
-            {(featured.coverStyle !== 'none' || featured.coverImage) && (
-              <Link
-                className={styles.featureArt}
-                href={`/blog/${featured.slug}`}
-                aria-label={`打开精选文章：${featured.title}`}
-              >
-                <Plate type={featured.coverStyle} image={featured.coverImage} />
-              </Link>
-            )}
-          </section>
+          <FeaturedCarousel posts={featuredPosts} />
         </Reveal>
       ) : (
         <Reveal>
@@ -175,11 +295,11 @@ export function HomeClient({ posts, site }: { posts: PublicPost[]; site: SitePro
               <div className={styles.sectionHeading}>
                 <div>
                   <h2 id="recent-title" ref={listHeading} tabIndex={-1}>
-                    最近的文字<span>{String(rows.length).padStart(2, '0')}</span>
+                    最近的文字
                   </h2>
                 </div>
                 <Link href="/blog/archive">
-                  查看归档 <Icon name="arrow" />
+                  查看归档 <GrowArrow />
                 </Link>
               </div>
               <div className={styles.topicScroller}>
@@ -238,74 +358,45 @@ export function HomeClient({ posts, site }: { posts: PublicPost[]; site: SitePro
             id="home-results"
             role="region"
             aria-label="文章列表"
-            className={`${styles.homeResults} ${visible >= rows.length ? styles.completeResults : ''}`}
+            className={styles.postGrid}
             key={topic}
           >
-            {shown.map((post, index) => (
-              <article
-                className={`${styles.postRow} ${post.coverStyle !== 'none' || post.coverImage ? styles.withThumbnail : ''}`}
-                key={post.id}
-                style={{ '--row-delay': `${Math.min(index, 3) * 55}ms` } as CSSProperties}
-              >
-                <span className={styles.rowNumber} aria-hidden="true">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <div className={styles.postCopy}>
-                  <Meta post={post} showTopic={false} />
+            {shown.map((post, index) => {
+              const views = analytics.stats[`/blog/${post.slug}`]?.views ?? 0
+              return (
+                <article
+                  className={styles.postCard}
+                  key={post.id}
+                  style={{ '--row-delay': `${Math.min(index, 3) * 55}ms` } as CSSProperties}
+                >
+                  {hasCover(post) && (
+                    <Link
+                      className={styles.cardCover}
+                      href={`/blog/${post.slug}`}
+                      aria-hidden="true"
+                      tabIndex={-1}
+                    >
+                      <Plate type={post.coverStyle} image={post.coverImage} compact />
+                    </Link>
+                  )}
                   <Link className={styles.postTitle} href={`/blog/${post.slug}`}>
                     <h3>{post.title}</h3>
-                    <Icon name="arrow" />
                   </Link>
-                  {post.excerpt && <p>{post.excerpt}</p>}
-                  <div className={styles.postEngagement}>
+                  {!hasCover(post) && post.excerpt && <p>{post.excerpt}</p>}
+                  <div className={styles.cardMeta}>
                     <span className={styles.postTopic}>{post.topic.name}</span>
-                    <span
-                      aria-label={
-                        analytics.status === 'ready'
-                          ? `阅读 ${analytics.stats[`/blog/${post.slug}`]?.views ?? 0} 次`
-                          : '阅读统计暂不可用'
-                      }
-                    >
-                      <Icon name="eye" />
-                      {analytics.status === 'ready'
-                        ? (analytics.stats[`/blog/${post.slug}`]?.views ?? 0).toLocaleString(
-                            'zh-CN',
-                          )
-                        : '—'}
-                    </span>
-                    <span
-                      aria-label={
-                        analytics.status === 'ready'
-                          ? `点赞 ${analytics.stats[`/blog/${post.slug}`]?.likes ?? 0} 次`
-                          : '点赞统计暂不可用'
-                      }
-                    >
-                      <Icon name="heart" />
-                      {analytics.status === 'ready'
-                        ? (analytics.stats[`/blog/${post.slug}`]?.likes ?? 0).toLocaleString(
-                            'zh-CN',
-                          )
-                        : '—'}
-                    </span>
+                    <span>{readingMinutes(post.plainText)} 分钟阅读</span>
+                    {analytics.status === 'ready' && (
+                      <span>{views.toLocaleString('zh-CN')} 阅读</span>
+                    )}
                   </div>
-                </div>
-                {(post.coverStyle !== 'none' || post.coverImage) && (
-                  <Link
-                    className={styles.thumbnail}
-                    href={`/blog/${post.slug}`}
-                    aria-label={`阅读：${post.title}`}
-                  >
-                    <Plate type={post.coverStyle} image={post.coverImage} compact />
-                  </Link>
-                )}
-              </article>
-            ))}
+                </article>
+              )
+            })}
             {rows.length === 0 && (
               <div className={styles.empty}>
                 <p>
-                  {posts.length < 2 && topic === 'all'
-                    ? '更多文字，陆续写下。'
-                    : '这个主题，还在慢慢积累。'}
+                  {topic === 'all' ? '更多文字，陆续写下。' : '这个主题，还在慢慢积累。'}
                 </p>
                 {topic !== 'all' && (
                   <button onClick={() => chooseTopic('all')}>看看全部文章</button>
@@ -328,7 +419,7 @@ export function HomeClient({ posts, site }: { posts: PublicPost[]; site: SitePro
           )}
         </section>
 
-        <aside className={styles.homeAside}>
+        <aside className={styles.homeAside} ref={aside}>
           <Reveal delay={120}>
             <PopularArticles posts={posts} analytics={analytics} />
             <section
@@ -364,14 +455,37 @@ export function HomeClient({ posts, site }: { posts: PublicPost[]; site: SitePro
                       2,
                       '0',
                     )}{' '}
-                    <Icon name="arrow" />
+                    <GrowArrow />
                   </span>
                 </button>
               ))}
-              <a className={styles.allArticles} href="#recent-title">
-                返回文章列表 <Icon name="arrow" />
-              </a>
             </section>
+            {posts.length > 0 && (
+              <section className={styles.siteInfo} ref={siteInfo} data-fits={siteInfoFits || undefined} aria-label="站点信息">
+                <dl>
+                  <div>
+                    <dt>文章</dt>
+                    <dd>{posts.length} 篇</dd>
+                  </div>
+                  <div>
+                    <dt>累计阅读</dt>
+                    <dd>
+                      {analytics.status === 'ready'
+                        ? posts.reduce((sum, post) => sum + (analytics.stats[`/blog/${post.slug}`]?.views ?? 0), 0).toLocaleString('zh-CN')
+                        : '—'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>最近更新</dt>
+                    <dd>
+                      {new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeZone: 'Asia/Shanghai' }).format(
+                        new Date(posts.reduce((latest, post) => (post.publishedAt > latest ? post.publishedAt : latest), '')),
+                      )}
+                    </dd>
+                  </div>
+                </dl>
+              </section>
+            )}
           </Reveal>
         </aside>
       </div>

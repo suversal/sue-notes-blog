@@ -26,7 +26,7 @@ export function AdminShell({
     if (path !== '/articles') return pathname === path || pathname.startsWith(`${path}/`)
     return (
       (pathname === '/articles' || pathname.startsWith('/articles/')) &&
-      !['topics', 'explore', 'settings'].includes(section)
+      !['topics', 'settings'].includes(section)
     )
   }
   return (
@@ -62,13 +62,13 @@ export function AdminShell({
             <Icon name="external" />
             查看博客
           </Link>
-          <Link
-            aria-current={active('/articles/explore') ? 'page' : undefined}
-            className={active('/articles/explore') ? styles.active : ''}
-            href="/articles/explore"
-          >
+          <Link href="/blog/explore">
             <Icon name="compass" />
-            探索管理
+            探索页面
+          </Link>
+          <Link href="/blog/uses">
+            <Icon name="published" />
+            在用清单
           </Link>
           <Link
             aria-current={active('/articles/settings') ? 'page' : undefined}

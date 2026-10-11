@@ -14,15 +14,36 @@ export function PreviewScreen({
   site,
   approvalId,
   updating,
+  embedded = false,
 }: {
   post: PublicPost
   site: SiteProfile
   approvalId?: string
   updating: boolean
+  embedded?: boolean
 }) {
   const [device, setDevice] = useState<'desktop' | 'phone'>('desktop')
   const [confirm, setConfirm] = useState(false)
   const [approved, setApproved] = useState(false)
+  const content = (
+    <>
+      <div className={styles.previewBrand}>
+        {site.siteName}<span>私密预览</span>
+      </div>
+      <ArticleReader post={post} preview />
+    </>
+  )
+
+  // 手机预览把这个页面放进一个手机宽度的内嵌窗口里再加载一次：只有这样，
+  // 前台按屏幕宽度写的手机样式才会真正生效。这里是窗口里那一份，不带工具栏。
+  if (embedded)
+    return (
+      <div className={`${styles.previewScreen} ${styles.previewEmbedded}`}>
+        <div className={`${styles.previewFrame} ${styles.embeddedFrame} ${blogStyles.publicRoot}`}>
+          {content}
+        </div>
+      </div>
+    )
 
   return (
     <div className={styles.previewScreen}>
@@ -59,14 +80,15 @@ export function PreviewScreen({
           </form>
         )}
       </header>
-      <div
-        className={`${styles.previewFrame} ${device === 'phone' ? styles.phoneFrame : ''} ${blogStyles.publicRoot}`}
-      >
-        <div className={styles.previewBrand}>
-          {site.siteName}<span>私密预览</span>
-        </div>
-        <ArticleReader post={post} preview />
-      </div>
+      {device === 'phone' ? (
+        <iframe
+          className={styles.phoneFrame}
+          title="手机预览"
+          src={`/articles/${post.id}/preview?frame=1${approvalId ? `&approval=${encodeURIComponent(approvalId)}` : ''}`}
+        />
+      ) : (
+        <div className={`${styles.previewFrame} ${blogStyles.publicRoot}`}>{content}</div>
+      )}
       {confirm && approvalId && (
         <div className={styles.modalOverlay}>
           <section

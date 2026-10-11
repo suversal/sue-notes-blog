@@ -7,7 +7,7 @@ import { importMap } from './importMap';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: { default: '苏码手记', template: '%s' },
+  title: { default: '苏码玩家', template: '%s' },
   description: '关于工具、创造，以及认真生活的小事。',
 };
 

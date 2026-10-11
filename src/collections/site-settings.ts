@@ -8,9 +8,9 @@ export const SiteSettings: CollectionConfig = {
   indexes: [{ fields: ['owner'], unique: true }],
   fields: [
     { name: 'owner', type: 'relationship', relationTo: 'users', required: true, index: true },
-    { name: 'siteName', type: 'text', required: true, maxLength: 16, defaultValue: '苏码手记' },
+    { name: 'siteName', type: 'text', required: true, maxLength: 16, defaultValue: '苏码玩家' },
     { name: 'authorName', type: 'text', required: true, maxLength: 24, defaultValue: 'Sue' },
-    { name: 'tagline', type: 'text', required: true, maxLength: 60, defaultValue: '关于工具、创造，以及认真生活的小事。' },
-    { name: 'authorBio', type: 'textarea', required: true, maxLength: 250, defaultValue: '一个爱折腾工具的独立开发者。把亲手做过的事、慢慢想明白的问题，写在这里。' },
+    { name: 'tagline', type: 'text', required: true, maxLength: 60, defaultValue: '一个程序员的折腾记录：Apple 生态、家庭网络、出海基建，还有 AI。' },
+    { name: 'authorBio', type: 'textarea', required: true, maxLength: 250, defaultValue: '我喜欢折腾。遇到感兴趣的东西，就自己动手试一遍，试明白了再写下来。' },
   ],
 };

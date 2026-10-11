@@ -18,10 +18,7 @@ function Brand({ site }: { site: SiteProfile }) {
   return (
     <Link href="/blog" className={styles.brand}>
       <img src="/icon.svg" alt="" width="36" height="36" />
-      <span>
-        {site.siteName}
-        <small>SUE NOTES · AN INDEPENDENT JOURNAL</small>
-      </span>
+      <span>{site.siteName}</span>
     </Link>
   )
 }
@@ -29,10 +26,12 @@ function Brand({ site }: { site: SiteProfile }) {
 export function PublicShell({
   site,
   searchPosts,
+  showUses = false,
   children,
 }: {
   site: SiteProfile
   searchPosts: PublicPost[]
+  showUses?: boolean
   children: ReactNode
 }) {
   const pathname = usePathname()
@@ -97,7 +96,7 @@ export function PublicShell({
           .includes(keyword),
     )
     .slice(0, 8)
-  const listingFooter = pathname === '/blog/archive' || pathname === '/blog/explore'
+  const listingFooter = ['/blog/archive', '/blog/explore', '/blog/uses'].includes(pathname)
   return (
     <div className={styles.publicRoot}>
       <div className={styles.publicShell}>
@@ -119,6 +118,11 @@ export function PublicShell({
             >
               探索
             </Link>
+            {showUses && (
+              <Link className={pathname === '/blog/uses' ? styles.active : ''} href="/blog/uses">
+                在用
+              </Link>
+            )}
             <Link className={pathname === '/blog/about' ? styles.active : ''} href="/blog/about">
               关于
             </Link>

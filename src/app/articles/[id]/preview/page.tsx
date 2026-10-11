@@ -19,7 +19,7 @@ export default async function PreviewPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ approval?: string; notice?: string }>
+  searchParams: Promise<{ approval?: string; notice?: string; frame?: string }>
 }) {
   const payload = await getPayloadClient()
   const auth = await payload.auth({ headers: await headers(), canSetHeaders: false })
@@ -97,6 +97,7 @@ export default async function PreviewPage({
     coverStyle: revision.coverStyle || 'none',
     coverImage: publicCoverImage(revision.coverImage),
     pinPriority: Number(article.pinPriority) || 0,
+    ...(article.sourceUrl ? { sourceUrl: String(article.sourceUrl) } : {}),
     publishedAt: article.publishedAt || new Date().toISOString(),
     updatedAt: article.updatedAt,
     publicReferences: revision.publicReferences ?? [],
@@ -109,6 +110,7 @@ export default async function PreviewPage({
         site={site}
         approvalId={query.approval}
         updating={article.status === 'published'}
+        embedded={query.frame === '1'}
       />
     </main>
   )
