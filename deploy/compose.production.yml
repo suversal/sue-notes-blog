@@ -53,7 +53,8 @@ services:
       DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/sue_notes_blog
       PAYLOAD_SECRET: ${PAYLOAD_SECRET:?set PAYLOAD_SECRET}
       PAYLOAD_SERVER_URL: ${PUBLIC_URL:?set PUBLIC_URL}
-    command: [pnpm, payload, migrate]
+    # 不用 `pnpm payload migrate`：它在这个镜像里会静默退出而不执行，见 scripts/run-migrations.ts。
+    command: [pnpm, exec, tsx, scripts/run-migrations.ts]
 
   web:
     image: sue-notes-blog:local

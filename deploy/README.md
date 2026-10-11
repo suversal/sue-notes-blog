@@ -6,7 +6,7 @@
 
 - `postgres`：PostgreSQL 17，数据保存在独立 Docker 卷；不映射到宿主机端口。
 - `artalk`：评论和点赞，与博客共用数据库但使用 `artalk_` 表前缀；不映射到宿主机端口。
-- `migrate`：先运行 Payload 显式迁移；失败时网站不会启动。
+- `migrate`：先运行 Payload 显式迁移（`scripts/run-migrations.ts`，结束后会核对每个迁移都已记录）；失败时网站不会启动。不要改回 `pnpm payload migrate`：2026-10-12 部署时发现它在生产镜像里不输出、以 0 退出却没有执行迁移。
 - `web`：Next.js + Payload，只在 Docker 网络内监听 3100。
 - `gateway`：仅在宿主机 `127.0.0.1:3100` 提供 HTTP，把 `/artalk/*` 转到 Artalk，其余路径转到网站。
 - `edge`：以宿主机网络模式在 `8443` 提供 HTTPS，使用 Oracle 上单独签发的 Cloudflare Origin CA 证书，再转发到本机 `3100`。它只接受 Cloudflare 官方回源 IP 段和本机环回地址；证书与私钥放在 `/etc/sue-notes-blog/tls`，不进入仓库或镜像。使用宿主机网络模式是为了让来源 IP 检查针对实际连接地址生效。
