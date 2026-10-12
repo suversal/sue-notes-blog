@@ -2,8 +2,7 @@
 
 import Link from 'next/link'
 import { useRef, useState } from 'react'
-import type { PublicPost } from '../../../lib/blog-data'
-import { readingMinutes } from '../../../lib/blog-shared'
+import type { PublicPostSummary } from '../../../lib/blog-data'
 import { useArticleStats } from '../../../lib/use-article-stats'
 import { ArchiveSelect } from './archive-select'
 import { Icon } from './ui-icon'
@@ -14,7 +13,7 @@ export function ArchiveClient({
   posts,
   initialTopic = 'all',
 }: {
-  posts: PublicPost[]
+  posts: PublicPostSummary[]
   initialTopic?: string
 }) {
   const overlayRoot = useRef<HTMLDivElement>(null)
@@ -161,7 +160,7 @@ export function ArchiveClient({
                   </h3>
                   <span>{post.topic.name}</span>
                   <small className={styles.archiveRowMeta}>
-                    <span>{readingMinutes(post.plainText)} 分钟</span>
+                    <span>{post.readingMinutes} 分钟</span>
                     <span
                       className={`${styles.archiveMetric} ${byViews ? styles.archiveMetricActive : ''}`}
                       aria-label={`阅读：${status === 'ready' ? (stats[`/blog/${post.slug}`]?.views ?? 0) : '暂无统计'}`}

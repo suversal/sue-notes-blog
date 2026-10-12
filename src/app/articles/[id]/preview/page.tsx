@@ -9,6 +9,7 @@ import {
   type PublicPost,
 } from '../../../../lib/blog-data'
 import { articleContentPlainText } from '../../../../lib/article-content-data'
+import { readingMinutes } from '../../../../lib/blog-shared'
 import { PreviewScreen } from './preview-screen'
 import styles from '../../admin-v1.module.css'
 
@@ -92,7 +93,7 @@ export default async function PreviewPage({
     slug: revision.slug,
     excerpt: revision.excerpt || '',
     content: revision.content,
-    plainText: articleContentPlainText(revision.content),
+    readingMinutes: readingMinutes(articleContentPlainText(revision.content)),
     topic,
     coverStyle: revision.coverStyle || 'none',
     coverImage: publicCoverImage(revision.coverImage),

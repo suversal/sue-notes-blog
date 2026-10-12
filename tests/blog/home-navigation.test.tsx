@@ -22,7 +22,7 @@ const post = (index: number, topic = { id: 'uncategorized', name: '未分类' })
   content: {
     root: { children: [], direction: null, format: '', indent: 0, type: 'root', version: 1 },
   },
-  plainText: '正文',
+  readingMinutes: 1,
   topic,
   coverStyle: 'none',
   pinPriority: 0,

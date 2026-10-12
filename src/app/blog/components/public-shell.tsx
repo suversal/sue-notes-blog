@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import type { PublicPost, SiteProfile } from '../../../lib/blog-data'
+import type { PublicPostSummary, SiteProfile } from '../../../lib/blog-data'
 import { ThemeSettings } from '../../components/theme-settings'
 import { Icon } from './ui-icon'
 import styles from '../blog-v1.module.css'
@@ -30,7 +30,7 @@ export function PublicShell({
   children,
 }: {
   site: SiteProfile
-  searchPosts: PublicPost[]
+  searchPosts: PublicPostSummary[]
   showUses?: boolean
   children: ReactNode
 }) {
