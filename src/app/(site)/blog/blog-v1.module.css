@@ -1964,22 +1964,23 @@
     margin-bottom: 16px;
     border-block: 1px solid var(--line);
   }
+  /* 只有「本文目录」这几个字和箭头可点，不是整行。 */
   .mobileToc summary {
     display: flex;
+    width: fit-content;
     min-height: 44px;
     align-items: center;
-    justify-content: space-between;
     cursor: pointer;
     list-style: none;
   }
   .mobileToc summary::-webkit-details-marker {
     display: none;
   }
-  /* 右侧的箭头提示这一行可以展开；展开后朝上。 */
+  /* 紧跟在文字后面的箭头提示这里可以展开；展开后朝上。 */
   .mobileToc summary::after {
     width: 7px;
     height: 7px;
-    margin: -4px 4px 0 12px;
+    margin: -4px 4px 0 10px;
     border-right: 1.5px solid currentColor;
     border-bottom: 1.5px solid currentColor;
     content: '';
