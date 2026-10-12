@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { NavigationProgress } from './components/navigation-progress';
 import { ThemeSync } from './components/theme-sync';
 
 // 前台 (site) 和写作后台 (studio) 各有自己的根布局，这里是两边共用的部分。
@@ -25,6 +26,7 @@ export function RootChrome({ children }: { children: React.ReactNode }) {
   return (
     <>
       <ThemeSync />
+      <NavigationProgress />
       <a className="skipLink" href="#main-content">跳到主要内容</a>
       {children}
     </>

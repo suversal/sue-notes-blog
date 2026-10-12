@@ -1,0 +1,42 @@
+.bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  width: 100%;
+  height: 2px;
+  background: #147a4a;
+  opacity: 0;
+  pointer-events: none;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+/* 进度条在前台和后台的外壳之外，拿不到它们各自作用域里的强调色，这里按配色主题对应一份。 */
+:global(html[data-blog-palette='paper']) .bar { background: #b94f2f; }
+:global(html[data-blog-palette='mountain']) .bar { background: #3157c8; }
+:global(html[data-blog-palette='indigo']) .bar { background: #514596; }
+:global(html[data-blog-theme='dark']) .bar { background: #55c98d; }
+:global(html[data-blog-theme='dark'][data-blog-palette='paper']) .bar { background: #dc704b; }
+:global(html[data-blog-theme='dark'][data-blog-palette='mountain']) .bar { background: #7187ee; }
+:global(html[data-blog-theme='dark'][data-blog-palette='indigo']) .bar { background: #968bee; }
+/* 点击后立刻出现并慢慢推进，停在接近末尾的位置等新页面。 */
+.loading {
+  animation: navigation-progress-grow 8s cubic-bezier(0.05, 0.7, 0.1, 1) forwards;
+}
+.done {
+  animation: navigation-progress-finish 0.4s ease-out forwards;
+}
+@keyframes navigation-progress-grow {
+  from { opacity: 1; transform: scaleX(0); }
+  to { opacity: 1; transform: scaleX(0.9); }
+}
+@keyframes navigation-progress-finish {
+  0% { opacity: 1; transform: scaleX(0.9); }
+  45% { opacity: 1; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(1); }
+}
+/* 全局的"减少动态效果"规则会把动画压成一瞬间；这里改成不推进，只显示一条满宽的线。 */
+@media (prefers-reduced-motion: reduce) {
+  .loading { opacity: 1; transform: scaleX(1); animation: none; }
+  .done { animation: none; }
+}
