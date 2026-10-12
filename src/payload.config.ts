@@ -42,6 +42,8 @@ export default buildConfig({
     // Apply explicit migrations outside requests; interactive schema push can stall rendering.
     push: false,
   }),
+  // 站点只用本地 API 和 REST，关闭 GraphQL 入口。
+  graphQL: { disable: true },
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },

@@ -6,7 +6,8 @@ import { getPayloadConfig } from '../../lib/payload';
 
 export async function signIn(formData: FormData) {
   const account = String(formData.get('email') ?? '').trim();
-  const email = account === 'admin' ? 'admin@local.test' : account;
+  // 「admin」是本机测试账户的简写，线上不提供这条捷径。
+  const email = account === 'admin' && process.env.NODE_ENV !== 'production' ? 'admin@local.test' : account;
   const password = String(formData.get('password') ?? '');
   if (!account || !password) redirect('/login?error=missing');
 

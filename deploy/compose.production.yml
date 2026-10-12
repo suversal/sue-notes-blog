@@ -39,6 +39,8 @@ services:
       ATK_DB_TABLE_PREFIX: artalk_
       ATK_FRONTEND_VOTE: 'true'
       ATK_FRONTEND_VOTE_DOWN: 'false'
+      # 不让匿名访客往服务器上传文件；评论里仍可用外链图片。
+      ATK_IMG_UPLOAD_ENABLED: 'false'
 
   migrate:
     build:
