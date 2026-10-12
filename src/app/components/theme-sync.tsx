@@ -1,5 +1,6 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import {
   applyTheme,
@@ -9,6 +10,8 @@ import {
 } from './theme-runtime'
 
 export function ThemeSync() {
+  // 站内跳转不会重新挂载本组件，路径变化时要重新同步浏览器栏和页面底色。
+  const pathname = usePathname()
   useEffect(() => {
     const syncStoredTheme = (withTransition = false) => {
       const { palette, preference } = readStoredThemeSettings()
@@ -32,7 +35,7 @@ export function ThemeSync() {
       media.removeEventListener?.('change', syncSystemTheme)
       window.removeEventListener('storage', syncAcrossTabs)
     }
-  }, [])
+  }, [pathname])
 
   return null
 }

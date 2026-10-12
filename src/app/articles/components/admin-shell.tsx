@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { signOut } from '../../login/actions'
 import { Icon } from '../../blog/components/ui-icon'
 import styles from '../admin-v1.module.css'
@@ -29,6 +29,13 @@ export function AdminShell({
       !['topics', 'settings'].includes(section)
     )
   }
+  const nav = useRef<HTMLElement>(null)
+  // 手机上导航是一行可横向滑动的入口，进入页面时把当前项滑到可见范围内。
+  useEffect(() => {
+    const current = nav.current?.querySelector<HTMLElement>('[aria-current="page"]')
+    if (!nav.current || !current) return
+    nav.current.scrollLeft = current.offsetLeft - (nav.current.clientWidth - current.offsetWidth) / 2
+  }, [pathname])
   return (
     <div className={styles.adminRoot}>
       <aside className={styles.sidebar}>
@@ -39,7 +46,7 @@ export function AdminShell({
             <small>WRITING STUDIO</small>
           </span>
         </Link>
-        <nav aria-label="后台导航">
+        <nav aria-label="后台导航" ref={nav}>
           <p>写作空间</p>
           <Link
             aria-current={active('/articles') ? 'page' : undefined}
