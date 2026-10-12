@@ -378,6 +378,11 @@
   flex: 1;
 }
 
+/* 带图标的卡片，标题和状态都对着图标的中线。 */
+.cardHead:has(.logo) {
+  align-items: center;
+}
+
 .logo {
   flex: none;
   align-self: center;

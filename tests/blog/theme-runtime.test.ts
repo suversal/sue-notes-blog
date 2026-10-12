@@ -41,13 +41,37 @@ describe('博客浏览器主题色', () => {
     expect(document.documentElement.style.colorScheme).toBe('dark')
   })
 
-  it('不会修改博客之外页面的浏览器栏和页面背景', () => {
-    window.history.replaceState({}, '', '/articles')
+  it('写作后台和前台一样同步浏览器栏和页面背景', () => {
+    window.history.replaceState({}, '', '/articles/topics')
+
+    applyTheme('dark', 'journal', false)
+
+    const runtimeMeta = document.getElementById(BLOG_THEME_COLOR_META_ID) as HTMLMetaElement
+    expect(runtimeMeta.content).toBe(BLOG_BACKGROUND_COLORS.journal.dark)
+    expect(document.documentElement.style.backgroundColor).toBe('rgb(24, 27, 26)')
+    expect(document.body.style.backgroundColor).toBe('rgb(24, 27, 26)')
+  })
+
+  it('不会修改前台和后台之外页面的浏览器栏和页面背景', () => {
+    window.history.replaceState({}, '', '/login')
 
     applyTheme('dark', 'journal', false)
 
     expect(document.querySelector('meta[name="theme-color"]')).toBeNull()
     expect(document.documentElement.style.backgroundColor).toBe('')
     expect(document.body.style.backgroundColor).toBe('')
+  })
+
+  it('离开后台到登录页时撤掉之前写上的颜色', () => {
+    window.history.replaceState({}, '', '/articles')
+    applyTheme('dark', 'journal', false)
+    window.history.replaceState({}, '', '/login')
+
+    applyTheme('dark', 'journal', false)
+
+    expect(document.querySelector('meta[name="theme-color"]')).toBeNull()
+    expect(document.documentElement.style.backgroundColor).toBe('')
+    expect(document.body.style.backgroundColor).toBe('')
+    expect(document.documentElement.style.colorScheme).toBe('')
   })
 })

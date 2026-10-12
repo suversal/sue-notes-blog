@@ -36,12 +36,26 @@ function resolveTheme(preference: ThemePreference): 'light' | 'dark' {
   return preference === 'system' ? systemTheme() : preference
 }
 
-function syncBlogBrowserChrome(theme: 'light' | 'dark', palette: BlogPalette) {
-  if (!window.location.pathname.startsWith('/blog')) return
+// 前台和写作后台用的是同一套底色；登录、初始化等页面保持全局样式。
+function usesBlogBackground(pathname: string) {
+  return /^\/(blog|articles)(\/|$)/.test(pathname)
+}
 
+function syncBlogBrowserChrome(theme: 'light' | 'dark', palette: BlogPalette) {
   const root = document.documentElement
-  const color = BLOG_BACKGROUND_COLORS[palette][theme]
   const previous = document.getElementById(BLOG_THEME_COLOR_META_ID) as HTMLMetaElement | null
+
+  if (!usesBlogBackground(window.location.pathname)) {
+    // 从前台或后台跳到其他页面时，撤掉之前写上的颜色。
+    if (!previous) return
+    previous.remove()
+    root.style.backgroundColor = ''
+    root.style.colorScheme = ''
+    if (document.body) document.body.style.backgroundColor = ''
+    return
+  }
+
+  const color = BLOG_BACKGROUND_COLORS[palette][theme]
 
   // iOS Safari may keep the previous toolbar color when only `content` changes.
   // Replacing the node makes the browser sample the selected palette immediately.

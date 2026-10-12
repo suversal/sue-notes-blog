@@ -2504,16 +2504,14 @@
     padding: 6px 10px;
     font-size: 12px;
   }
-  /* 分组后日期只有「月/日」，列宽跟着收窄；不分组时显示完整日期，保持原宽度。 */
-  .archiveYear article {
-    grid-template-columns: 40px minmax(0, 1fr);
+  /* 日期列按文字本身的宽度走（等宽字体，各行等宽），标题紧跟在后面。 */
+  .archiveYear article,
+  .archiveGroupFlat .archiveYear article {
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: start;
     gap: 4px 10px;
     min-height: 0;
     padding: 9px 0;
-  }
-  .archiveGroupFlat .archiveYear article {
-    grid-template-columns: 78px minmax(0, 1fr);
   }
   .archiveYear time,
   .archiveYear small {
