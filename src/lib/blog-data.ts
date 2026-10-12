@@ -1,3 +1,5 @@
+import type { Where } from 'payload';
+import { cache } from 'react';
 import { getPayloadClient } from './payload';
 import { articleContentPlainText, type ArticleContent } from './article-content-data';
 
@@ -61,22 +63,22 @@ export async function getSiteProfile(owner?: string): Promise<SiteProfile> {
   return item ? { siteName: item.siteName, authorName: item.authorName, tagline: item.tagline, authorBio: item.authorBio } : defaultSiteProfile;
 }
 
-export async function getPublicPosts(limit = 100, order: 'latest' | 'pinned' = 'latest'): Promise<PublicPost[]> {
-  const payload = await getPayloadClient();
-  const [articles, topics] = await Promise.all([
-    payload.find({ collection: 'articles', overrideAccess: true, depth: 1, limit, sort: order === 'pinned' ? ['pinPriority', '-publishedAt'] : '-publishedAt', where: { and: [{ status: { equals: 'published' } }, { visibility: { equals: 'public' } }] } }),
+const publicArticleFilters: Where[] = [{ status: { equals: 'published' } }, { visibility: { equals: 'public' } }];
+
+/** 一次查询取回这些文章的已发布修订，避免每篇文章单独查一次。 */
+async function loadPublicPosts(payload: Awaited<ReturnType<typeof getPayloadClient>>, articles: any[]): Promise<PublicPost[]> {
+  const published = articles.filter((article) => article.publishedRevision);
+  if (!published.length) return [];
+  const [revisions, topics] = await Promise.all([
+    payload.find({ collection: 'article-revisions', overrideAccess: true, depth: 1, pagination: false, where: { id: { in: published.map((article) => relationId(article.publishedRevision)) } } }),
     payload.find({ collection: 'topics', overrideAccess: true, depth: 0, limit: 100 }),
   ]);
+  const revisionsById = new Map((revisions.docs as any[]).map((revision) => [String(revision.id), revision]));
   const topicNames = new Map((topics.docs as any[]).map((topic) => [String(topic.id), String(topic.name)]));
-  const rows = await Promise.all((articles.docs as any[]).map(async (article) => {
-    if (!article.publishedRevision) return undefined;
-    const revision = await payload.findByID({
-      collection: 'article-revisions',
-      id: relationId(article.publishedRevision),
-      overrideAccess: true,
-      depth: 1,
-    }) as any;
-    return {
+  return published.flatMap((article) => {
+    const revision = revisionsById.get(relationId(article.publishedRevision));
+    if (!revision) return [];
+    return [{
       id: String(article.id), title: revision.title, slug: revision.slug,
       excerpt: revision.excerpt?.trim() || '', content: revision.content, plainText: articleContentPlainText(revision.content),
       topic: topicFrom(revision, article, topicNames), coverStyle: revision.coverStyle || 'none', coverImage: publicCoverImage(revision.coverImage),
@@ -84,12 +86,20 @@ export async function getPublicPosts(limit = 100, order: 'latest' | 'pinned' = '
       ...(article.sourceUrl ? { sourceUrl: String(article.sourceUrl) } : {}),
       publishedAt: article.publishedAt || article.updatedAt, updatedAt: article.updatedAt,
       publicReferences: revision.publicReferences ?? [],
-    } satisfies PublicPost;
-  }));
-  const posts = rows.filter((row) => row !== undefined);
-  return order === 'pinned' ? posts.sort(comparePublicPostPriority) : posts;
+    } satisfies PublicPost];
+  });
 }
 
-export async function getPublicPost(slug: string): Promise<PublicPost | undefined> {
-  return (await getPublicPosts(100)).find((post) => post.slug === slug);
-}
+// cache：同一次请求里（页面元数据和正文各取一次）只查一遍数据库。
+export const getPublicPosts = cache(async (limit = 100, order: 'latest' | 'pinned' = 'latest'): Promise<PublicPost[]> => {
+  const payload = await getPayloadClient();
+  const articles = await payload.find({ collection: 'articles', overrideAccess: true, depth: 1, limit, sort: order === 'pinned' ? ['pinPriority', '-publishedAt'] : '-publishedAt', where: { and: publicArticleFilters } });
+  const posts = await loadPublicPosts(payload, articles.docs);
+  return order === 'pinned' ? posts.sort(comparePublicPostPriority) : posts;
+});
+
+export const getPublicPost = cache(async (slug: string): Promise<PublicPost | undefined> => {
+  const payload = await getPayloadClient();
+  const articles = await payload.find({ collection: 'articles', overrideAccess: true, depth: 1, limit: 1, where: { and: [...publicArticleFilters, { publishedSlug: { equals: slug } }] } });
+  return (await loadPublicPosts(payload, articles.docs))[0];
+});

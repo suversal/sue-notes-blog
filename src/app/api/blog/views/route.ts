@@ -88,7 +88,7 @@ export async function POST(request: Request) {
   const today = dayKey()
   await payload.db.drizzle.execute(sql`
     INSERT INTO "article_view_days" ("page_key", "day_key", "views")
-    VALUES (${pageKey}, ${today}, 1)
+    VALUES (${`/blog/${publishedSlug}`}, ${today}, 1)
     ON CONFLICT ("page_key", "day_key")
     DO UPDATE SET "views" = "article_view_days"."views" + 1;
   `)

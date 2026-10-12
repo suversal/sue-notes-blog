@@ -5,6 +5,12 @@
 }
 
 :8080 {
+	# 单人站点不需要这些公开入口：密码用脚本重置，首个账户走 /setup。
+	@closed path /api/users/forgot-password /api/users/reset-password /api/users/first-register /api/users/unlock /api/graphql /api/graphql-playground
+	handle @closed {
+		respond 404
+	}
+
 	handle_path /artalk/* {
 		reverse_proxy artalk:23366
 	}
