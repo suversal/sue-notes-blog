@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Icon } from '../blog/components/ui-icon'
+import { Icon } from '../(site)/blog/components/ui-icon'
 import {
   applyTheme,
   DEFAULT_PALETTE,

@@ -2,14 +2,14 @@
 import React from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
-import { AdminShell } from '../../src/app/articles/components/admin-shell'
-import { PublicShell } from '../../src/app/blog/components/public-shell'
+import { AdminShell } from '../../src/app/(studio)/articles/components/admin-shell'
+import { PublicShell } from '../../src/app/(site)/blog/components/public-shell'
 import type { SiteProfile } from '../../src/lib/blog-data'
 
 const route = vi.hoisted(() => ({ pathname: '/blog' }))
 
 vi.mock('next/navigation', () => ({ usePathname: () => route.pathname }))
-vi.mock('../../src/app/login/actions', () => ({ signOut: vi.fn() }))
+vi.mock('../../src/app/(site)/login/actions', () => ({ signOut: vi.fn() }))
 vi.mock('../../src/app/components/theme-settings', () => ({
   ThemeSettings: () => <button aria-label="主题设置" />,
 }))

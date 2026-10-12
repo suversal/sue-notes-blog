@@ -2,10 +2,10 @@
 import React from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
-import { HomeClient } from '../../src/app/blog/components/home-client'
+import { HomeClient } from '../../src/app/(site)/blog/components/home-client'
 import type { PublicPost, SiteProfile } from '../../src/lib/blog-data'
 
-vi.mock('../../src/app/blog/components/reveal', () => ({
+vi.mock('../../src/app/(site)/blog/components/reveal', () => ({
   Reveal: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }))
 const site: SiteProfile = {

@@ -52,18 +52,23 @@ Artalk 与博客共用同一个数据库，表名以 `artalk_` 为前缀，迁�
 ### 路由分区
 
 - `/blog/**`：公开前台。`/` 永久跳转到 `/blog`。
-- `/articles/**`：自建写作后台（文章、主题、探索、设置、Obsidian 导入）。`articles/layout.tsx` 统一做登录校验，未登录跳 `/login`。
+- `/articles/**`：自建写作后台（文章、主题、探索、设置、Obsidian 导入）。`(studio)/articles/layout.tsx` 统一做登录校验，未登录跳 `/login`。
 - `/admin/**`：`next.config.ts` 将其重定向到 `/articles`，Payload 自带管理界面不对外暴露（e2e 有回归测试）。`src/app/(payload)` 仍保留 Payload 的 REST/GraphQL 路由。
 - `/api/blog/views`、`/api/editor/*`：阅读量统计、编辑器图片上传与 Markdown/Obsidian 导入。
 - 没有 middleware/proxy；鉴权在 layout 与每个 server action 内通过 `payload.auth({ headers })` 完成。
 
-根 `layout.tsx` 使用 Payload 的 `RootLayout` 包裹整个站点，因为写作后台直接内嵌 Payload 的 Lexical 编辑器，需要它的 server functions 和 `src/app/importMap.ts`。
+`src/app` 下没有顶层 `layout.tsx`，而是两个各带根布局的路由分组（分组名不出现在 URL 里）：
+
+- `(site)`：`blog`、`login`、`setup`，根布局是普通的 `<html>`，页面内容在服务端渲染。
+- `(studio)`：`articles`，根布局使用 Payload 的 `RootLayout`，因为写作后台直接内嵌 Payload 的 Lexical 编辑器，需要它的 server functions 和 `src/app/importMap.ts`。
+
+不要把前台放回 Payload 的根布局里：它会把页面内容推迟到浏览器端渲染，搜索引擎和链接预览拿到的是空页面。两个分组共用的部分在 `src/app/root-shared.tsx`。跨分组跳转（例如文章页的「编辑」入口）是整页刷新。
 
 ### 数据访问方式
 
 页面和 server action 不直接操作集合，而是经由 `src/lib/*-service.ts`。服务层通过 `getPayloadClient()`（延迟加载配置，避免构建阶段连库）调用 Payload 本地 API，并一律使用 `overrideAccess: true`，所有权由服务层自己校验（`ownedArticle` 等按 `owner` 比对）。集合上的 `access` 规则（`ownerOnly`、全部拒绝的 `publish-approvals` / `article-view-days`）只约束 REST/GraphQL 入口，所以新增服务函数时必须自行带上 owner 条件。
 
-`src/app/articles/actions.ts` 是后台所有表单的 server action 入口：解析 FormData → `currentUser()` → 调服务 → `revalidatePath` / `redirect`。
+`src/app/(studio)/articles/actions.ts` 是后台所有表单的 server action 入口：解析 FormData → `currentUser()` → 调服务 → `revalidatePath` / `redirect`。
 
 ### 文章版本与发布模型
 
@@ -83,7 +88,7 @@ Artalk 与博客共用同一个数据库，表名以 `artalk_` 为前缀，迁�
 - `article-content-data.ts`：类型、解析校验、纯文本提取、链接自动识别等纯函数，客户端与测试可直接引用。
 - `article-content-markdown.ts` / `markdown-to-article-content.ts`：导出与导入 Markdown（基于 mdast）。
 - `src/lexical/*`：自定义 feature，按 Payload 约定拆成 `.server.ts` 与 `.client.tsx`；新增或改名后需要 `pnpm generate:importmap`。
-- 前台渲染在 `src/app/blog/components/rich-text.tsx`。
+- 前台渲染在 `src/app/(site)/blog/components/rich-text.tsx`。
 
 ### 图片
 

@@ -2,12 +2,12 @@
 import React from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen, within } from '@testing-library/react'
-import { AdminShell } from '../../src/app/articles/components/admin-shell'
-import styles from '../../src/app/articles/admin-v1.module.css'
+import { AdminShell } from '../../src/app/(studio)/articles/components/admin-shell'
+import styles from '../../src/app/(studio)/articles/admin-v1.module.css'
 
 const route = vi.hoisted(() => ({ pathname: '/articles' }))
 vi.mock('next/navigation', () => ({ usePathname: () => route.pathname }))
-vi.mock('../../src/app/login/actions', () => ({ signOut: vi.fn() }))
+vi.mock('../../src/app/(site)/login/actions', () => ({ signOut: vi.fn() }))
 afterEach(cleanup)
 const shell = () => (
   <AdminShell siteName="苏码手记" authorName="Sue" articleCount={1}>
