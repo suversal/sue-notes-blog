@@ -2,10 +2,10 @@
 import React from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
-import { ExploreClient } from '../../src/app/blog/components/explore-client'
+import { ExploreClient } from '../../src/app/(site)/blog/components/explore-client'
 import type { ExploreItem } from '../../src/lib/explore-service'
 
-vi.mock('../../src/app/blog/components/reveal', () => ({
+vi.mock('../../src/app/(site)/blog/components/reveal', () => ({
   Reveal: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }))
 vi.mock('next/dynamic', () => ({

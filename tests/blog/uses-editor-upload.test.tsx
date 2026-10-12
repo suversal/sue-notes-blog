@@ -2,10 +2,10 @@
 import React from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { ItemForm } from '../../src/app/blog/components/uses-editor'
+import { ItemForm } from '../../src/app/(site)/blog/components/uses-editor'
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }) }))
-vi.mock('../../src/app/articles/actions', () => ({
+vi.mock('../../src/app/(studio)/articles/actions', () => ({
   deleteUsesCategoryFromWeb: vi.fn(), deleteUsesItemFromWeb: vi.fn(), moveUsesCategoryFromWeb: vi.fn(), moveUsesItemFromWeb: vi.fn(),
   saveUsesCategoryFromWeb: vi.fn(), saveUsesItemFromWeb: vi.fn(), setUsesItemVisibleFromWeb: vi.fn(),
 }))

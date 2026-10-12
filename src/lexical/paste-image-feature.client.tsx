@@ -24,7 +24,7 @@ import {
   type SerializedLexicalNode,
 } from 'lexical';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import styles from '../app/articles/admin-v1.module.css';
+import styles from '../app/(studio)/articles/admin-v1.module.css';
 
 const ALLOWED_IMAGE_TYPES = new Set(['image/avif', 'image/gif', 'image/jpeg', 'image/png', 'image/webp']);
 export const EDITOR_IMPORT_STATE_EVENT = 'knowhub:editor-import-state';

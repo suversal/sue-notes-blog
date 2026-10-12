@@ -2,7 +2,7 @@
 import React from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
-import { UsesClient } from '../../src/app/blog/components/uses-client'
+import { UsesClient } from '../../src/app/(site)/blog/components/uses-client'
 import type { UsesCategory, UsesItem } from '../../src/lib/uses-service'
 
 vi.mock('next/dynamic', () => ({

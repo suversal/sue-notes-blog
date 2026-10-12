@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { ArticleRichText } from '../../src/app/blog/components/rich-text'
+import { ArticleRichText } from '../../src/app/(site)/blog/components/rich-text'
 import type { ArticleContent } from '../../src/lib/article-content-data'
 
 function contentWithImage(fields: Record<string, unknown>): ArticleContent {
