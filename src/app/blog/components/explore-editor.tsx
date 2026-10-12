@@ -45,11 +45,12 @@ const metaLabels: Record<ExploreKind, { label: string; placeholder: string }> = 
 
 export function ExploreItemForm({ item, kind: initialKind, onDone }: { item?: ExploreItem; kind: ExploreKind; onDone: () => void }) {
   const { state, formAction, pending } = useSavedForm(saveExploreItemFromWeb, onDone)
+  const [uploading, setUploading] = useState(false)
   const [kind, setKind] = useState<ExploreKind>(item?.kind ?? initialKind)
   return (
     <form className={`${editor.card} ${editor.form}`} action={formAction} aria-label={item ? `编辑 ${item.title}` : '新增条目'}>
       {item && <input type="hidden" name="itemId" value={item.id} />}
-      {kind !== 'saved' && <LogoField initial={item?.logoUrl ?? ''} label="图标" />}
+      {kind !== 'saved' && <LogoField initial={item?.logoUrl ?? ''} label="图标" onUploadingChange={setUploading} />}
       <div className={editor.fieldRow}>
         <label>
           <span>名称</span>
@@ -99,7 +100,7 @@ export function ExploreItemForm({ item, kind: initialKind, onDone }: { item?: Ex
         <input name="isVisible" type="checkbox" defaultChecked={item?.isVisible ?? true} />
         <span>对访客显示</span>
       </label>
-      <FormFooter state={state} pending={pending} onCancel={onDone} />
+      <FormFooter state={state} pending={pending} uploading={uploading} onCancel={onDone} />
     </form>
   )
 }

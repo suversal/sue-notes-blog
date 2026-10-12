@@ -37,6 +37,8 @@ services:
       ATK_DB_USER: postgres
       ATK_DB_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
       ATK_DB_TABLE_PREFIX: artalk_
+      # 访客 IP 由网关写入这个头；不设的话 Artalk 看到的全是网关地址，按 IP 的限流会把所有人算成一个。
+      ATK_HTTP_PROXY_HEADER: X-Real-IP
       ATK_FRONTEND_VOTE: 'true'
       ATK_FRONTEND_VOTE_DOWN: 'false'
       # 不让匿名访客往服务器上传文件；评论里仍可用外链图片。

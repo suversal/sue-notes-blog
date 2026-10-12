@@ -6,6 +6,8 @@ const RETRY_MS = 10 * 60 * 1000
 // 每个 GitHub 账号缓存一份：{ 取到的仓库数据, 下次允许请求的时间 }。
 // 进程内缓存就够用：站点是单个常驻容器，重启后第一次访问会重新取一次。
 const cache = new Map<string, { repos: Map<string, RepoStats>; nextFetchAt: number }>()
+// 正在进行的刷新，按账号记一份：同时到来的访问共用这一次请求，不各发各的。
+const refreshing = new Map<string, Promise<void>>()
 
 /** 从条目地址里认出 GitHub 仓库，例如 https://github.com/suversal/WrapPin → suversal/wrappin。 */
 export function githubRepoKey(href: string) {
@@ -34,11 +36,15 @@ export async function getRepoStats(hrefs: string[], now = Date.now()): Promise<M
   await Promise.all(owners.map(async (owner) => {
     const cached = cache.get(owner)
     if (cached && now < cached.nextFetchAt) return
-    try {
-      cache.set(owner, { repos: await fetchOwnerRepos(owner), nextFetchAt: now + REFRESH_MS })
-    } catch {
-      cache.set(owner, { repos: cached?.repos ?? new Map(), nextFetchAt: now + RETRY_MS })
+    let refresh = refreshing.get(owner)
+    if (!refresh) {
+      refresh = fetchOwnerRepos(owner)
+        .then((repos) => { cache.set(owner, { repos, nextFetchAt: now + REFRESH_MS }) })
+        .catch(() => { cache.set(owner, { repos: cached?.repos ?? new Map(), nextFetchAt: now + RETRY_MS }) })
+        .finally(() => { refreshing.delete(owner) })
+      refreshing.set(owner, refresh)
     }
+    await refresh
   }))
   const result = new Map<string, RepoStats>()
   for (const key of keys) {

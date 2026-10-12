@@ -103,7 +103,7 @@ export function useSavedForm(action: typeof saveUsesItemFromWeb, onDone: () => v
   return { state, formAction, pending }
 }
 
-export function FormFooter({ state, pending, onCancel }: { state: UsesActionState; pending: boolean; onCancel: () => void }) {
+export function FormFooter({ state, pending, uploading = false, onCancel }: { state: UsesActionState; pending: boolean; uploading?: boolean; onCancel: () => void }) {
   return (
     <>
       {state.message && !state.ok && (
@@ -112,7 +112,7 @@ export function FormFooter({ state, pending, onCancel }: { state: UsesActionStat
         </p>
       )}
       <div className={styles.formActions}>
-        <button className={styles.save} type="submit" disabled={pending}>
+        <button className={styles.save} type="submit" disabled={pending || uploading}>
           {pending ? '正在保存…' : '保存'}
         </button>
         <button type="button" disabled={pending} onClick={onCancel}>
@@ -147,13 +147,15 @@ export function CategoryForm({ category, onDone }: { category?: UsesCategory; on
   )
 }
 
-export function LogoField({ initial, label = 'Logo' }: { initial: string; label?: string }) {
+// 上传完成前表单里还是旧地址，所以把上传状态报给表单，让它先别保存。
+export function LogoField({ initial, label = 'Logo', onUploadingChange }: { initial: string; label?: string; onUploadingChange?: (uploading: boolean) => void }) {
   const [url, setUrl] = useState(initial)
   const [status, setStatus] = useState('')
   const input = useRef<HTMLInputElement>(null)
   const upload = async (file: File | undefined) => {
     if (!file) return
     setStatus('正在上传…')
+    onUploadingChange?.(true)
     const body = new FormData()
     body.set('file', file)
     body.set('alt', label)
@@ -165,6 +167,8 @@ export function LogoField({ initial, label = 'Logo' }: { initial: string; label?
       setStatus('')
     } catch (error) {
       setStatus(error instanceof Error ? error.message : '图片上传失败，请稍后重试。')
+    } finally {
+      onUploadingChange?.(false)
     }
   }
   return (
@@ -216,10 +220,11 @@ export function LinksField({ initial }: { initial: UsesLink[] }) {
 
 export function ItemForm({ item, categoryId, categories, onDone }: { item?: UsesItem; categoryId: string; categories: UsesCategory[]; onDone: () => void }) {
   const { state, formAction, pending } = useSavedForm(saveUsesItemFromWeb, onDone)
+  const [uploading, setUploading] = useState(false)
   return (
     <form className={`${styles.card} ${styles.form}`} action={formAction} aria-label={item ? `编辑 ${item.title}` : '新增条目'}>
       {item && <input type="hidden" name="itemId" value={item.id} />}
-      <LogoField initial={item?.logoUrl ?? ''} />
+      <LogoField initial={item?.logoUrl ?? ''} onUploadingChange={setUploading} />
       {/* 卡片上不再展示「在用 / 用过」，表单里也不用选；保留原值，免得改动已有数据。 */}
       <input type="hidden" name="status" value={item?.status ?? 'using'} />
       <label>
@@ -273,7 +278,7 @@ export function ItemForm({ item, categoryId, categories, onDone }: { item?: Uses
           <span>对访客显示</span>
         </label>
       </div>
-      <FormFooter state={state} pending={pending} onCancel={onDone} />
+      <FormFooter state={state} pending={pending} uploading={uploading} onCancel={onDone} />
     </form>
   )
 }

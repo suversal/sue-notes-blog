@@ -33,6 +33,14 @@ describe('GitHub 仓库数据', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
+  it('同时到来的访问共用一次 GitHub 请求', async () => {
+    const fetchMock = vi.fn(async () => reply([{ full_name: 'busy-owner/Repo', stargazers_count: 3, forks_count: 1, language: 'Go', pushed_at: '2026-10-01T00:00:00Z' }]))
+    vi.stubGlobal('fetch', fetchMock)
+    const results = await Promise.all(Array.from({ length: 8 }, () => getRepoStats(['https://github.com/busy-owner/repo'], 1_000_000)))
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(results.every((result) => result.get('busy-owner/repo')?.stars === 3)).toBe(true)
+  })
+
   it('没有 GitHub 链接时不发请求', async () => {
     const fetchMock = vi.fn()
     vi.stubGlobal('fetch', fetchMock)
