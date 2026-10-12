@@ -1,6 +1,7 @@
 {
 	servers {
 		trusted_proxies static private_ranges
+		trusted_proxies_strict
 	}
 }
 
@@ -12,7 +13,10 @@
 	}
 
 	handle_path /artalk/* {
-		reverse_proxy artalk:23366
+		reverse_proxy artalk:23366 {
+			# Artalk 按这个头识别访客（见 compose 里的 ATK_HTTP_PROXY_HEADER），只给它一个地址。
+			header_up X-Real-IP {client_ip}
+		}
 	}
 
 	handle {
