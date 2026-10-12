@@ -2,6 +2,7 @@ import type { Where } from 'payload';
 import { cache } from 'react';
 import { getPayloadClient } from './payload';
 import { articleContentPlainText, type ArticleContent } from './article-content-data';
+import { readingMinutes } from './blog-shared';
 
 export type SiteProfile = { siteName: string; authorName: string; tagline: string; authorBio: string };
 export type PublicPost = {
@@ -10,7 +11,7 @@ export type PublicPost = {
   slug: string;
   excerpt: string;
   content: ArticleContent;
-  plainText: string;
+  readingMinutes: number;
   topic: { id: string; name: string };
   coverImage?: { id: string; url: string; alt: string };
   coverStyle: 'none' | 'notes' | 'grid' | 'cache';
@@ -20,6 +21,9 @@ export type PublicPost = {
   updatedAt: string;
   publicReferences: { label: string; url: string }[];
 };
+
+/** 列表、搜索、上一篇/下一篇只需要这些；正文只随文章页本身下发，不进其他页面的 HTML。 */
+export type PublicPostSummary = Omit<PublicPost, 'content' | 'publicReferences'>;
 
 export function comparePublicPostPriority(
   a: Pick<PublicPost, 'pinPriority' | 'publishedAt'>,
@@ -80,7 +84,7 @@ async function loadPublicPosts(payload: Awaited<ReturnType<typeof getPayloadClie
     if (!revision) return [];
     return [{
       id: String(article.id), title: revision.title, slug: revision.slug,
-      excerpt: revision.excerpt?.trim() || '', content: revision.content, plainText: articleContentPlainText(revision.content),
+      excerpt: revision.excerpt?.trim() || '', content: revision.content, readingMinutes: readingMinutes(articleContentPlainText(revision.content)),
       topic: topicFrom(revision, article, topicNames), coverStyle: revision.coverStyle || 'none', coverImage: publicCoverImage(revision.coverImage),
       pinPriority: Number(article.pinPriority) || 0,
       ...(article.sourceUrl ? { sourceUrl: String(article.sourceUrl) } : {}),
@@ -91,10 +95,10 @@ async function loadPublicPosts(payload: Awaited<ReturnType<typeof getPayloadClie
 }
 
 // cache：同一次请求里（页面元数据和正文各取一次）只查一遍数据库。
-export const getPublicPosts = cache(async (limit = 100, order: 'latest' | 'pinned' = 'latest'): Promise<PublicPost[]> => {
+export const getPublicPosts = cache(async (limit = 100, order: 'latest' | 'pinned' = 'latest'): Promise<PublicPostSummary[]> => {
   const payload = await getPayloadClient();
   const articles = await payload.find({ collection: 'articles', overrideAccess: true, depth: 1, limit, sort: order === 'pinned' ? ['pinPriority', '-publishedAt'] : '-publishedAt', where: { and: publicArticleFilters } });
-  const posts = await loadPublicPosts(payload, articles.docs);
+  const posts = (await loadPublicPosts(payload, articles.docs)).map(({ content: _content, publicReferences: _references, ...summary }): PublicPostSummary => summary);
   return order === 'pinned' ? posts.sort(comparePublicPostPriority) : posts;
 });
 

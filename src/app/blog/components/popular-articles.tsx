@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import type { ArticleAnalytics } from '../../../lib/use-article-stats'
-import type { PublicPost } from '../../../lib/blog-data'
+import type { PublicPostSummary } from '../../../lib/blog-data'
 import { GrowArrow, Icon } from './ui-icon'
 import styles from '../home.module.css'
 
@@ -11,7 +11,7 @@ export function PopularArticles({
   posts,
   analytics,
 }: {
-  posts: PublicPost[]
+  posts: PublicPostSummary[]
   analytics: ArticleAnalytics
 }) {
   const { stats, status, recentStatus } = analytics

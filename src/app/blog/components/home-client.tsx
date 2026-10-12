@@ -2,8 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState, type CSSProperties, type TouchEvent } from 'react'
-import type { PublicPost, SiteProfile } from '../../../lib/blog-data'
-import { readingMinutes } from '../../../lib/blog-shared'
+import type { PublicPostSummary, SiteProfile } from '../../../lib/blog-data'
 import { GrowArrow, Icon } from './ui-icon'
 import { Plate } from './plate'
 import { Reveal } from './reveal'
@@ -12,7 +11,7 @@ import { PopularArticles } from './popular-articles'
 import { BackToTop } from './back-to-top'
 import styles from '../home.module.css'
 
-function Meta({ post }: { post: PublicPost }) {
+function Meta({ post }: { post: PublicPostSummary }) {
   return (
     <div className={styles.meta}>
       <time dateTime={post.publishedAt}>
@@ -20,14 +19,14 @@ function Meta({ post }: { post: PublicPost }) {
           new Date(post.publishedAt),
         )}
       </time>
-      <span>{readingMinutes(post.plainText)} 分钟阅读</span>
+      <span>{post.readingMinutes} 分钟阅读</span>
     </div>
   )
 }
 
-const hasCover = (post: PublicPost) => post.coverStyle !== 'none' || Boolean(post.coverImage)
+const hasCover = (post: PublicPostSummary) => post.coverStyle !== 'none' || Boolean(post.coverImage)
 
-function FeaturedCarousel({ posts }: { posts: PublicPost[] }) {
+function FeaturedCarousel({ posts }: { posts: PublicPostSummary[] }) {
   const [index, setIndex] = useState(0)
   // 切换方向决定文字从哪一侧滑入：往后翻从右边来，往前翻从左边来。
   const [direction, setDirection] = useState<1 | -1>(1)
@@ -152,7 +151,7 @@ function FeaturedCarousel({ posts }: { posts: PublicPost[] }) {
   )
 }
 
-export function HomeClient({ posts, site }: { posts: PublicPost[]; site: SiteProfile }) {
+export function HomeClient({ posts, site }: { posts: PublicPostSummary[]; site: SiteProfile }) {
   const analytics = useArticleStats(posts)
   const topics = [...new Map(posts.map((post) => [post.topic.id, post.topic])).values()]
   const pinnedPosts = posts.filter((post) => post.pinPriority > 0).slice(0, 5)
@@ -385,7 +384,7 @@ export function HomeClient({ posts, site }: { posts: PublicPost[]; site: SitePro
                   {!hasCover(post) && post.excerpt && <p>{post.excerpt}</p>}
                   <div className={styles.cardMeta}>
                     <span className={styles.postTopic}>{post.topic.name}</span>
-                    <span>{readingMinutes(post.plainText)} 分钟阅读</span>
+                    <span>{post.readingMinutes} 分钟阅读</span>
                     {analytics.status === 'ready' && (
                       <span>{views.toLocaleString('zh-CN')} 阅读</span>
                     )}

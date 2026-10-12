@@ -2,9 +2,9 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import type { PublicPost } from '../../../lib/blog-data'
+import type { PublicPost, PublicPostSummary } from '../../../lib/blog-data'
 import { articleContentHeadings } from '../../../lib/article-content-data'
-import { formatBlogDateTime, readingMinutes } from '../../../lib/blog-shared'
+import { formatBlogDateTime } from '../../../lib/blog-shared'
 import { ArticleEngagement } from './article-engagement'
 import { BackToTop } from './back-to-top'
 import { Icon } from './ui-icon'
@@ -20,8 +20,8 @@ export function ArticleReader({
   editHref,
 }: {
   post: PublicPost
-  previousPost?: PublicPost
-  nextPost?: PublicPost
+  previousPost?: PublicPostSummary
+  nextPost?: PublicPostSummary
   preview?: boolean
   editHref?: string
 }) {
@@ -200,7 +200,7 @@ export function ArticleReader({
             <time dateTime={post.publishedAt}>
               {formatBlogDateTime(post.publishedAt)}
             </time>
-            <small>{readingMinutes(post.plainText)} 分钟阅读</small>
+            <small>{post.readingMinutes} 分钟阅读</small>
             {post.sourceUrl && (
               <a className={styles.sourceLink} href={post.sourceUrl} target="_blank" rel="noopener noreferrer">
                 <Icon name="x" />

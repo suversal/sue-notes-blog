@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import type { PublicPost } from './blog-data'
+import type { PublicPostSummary } from './blog-data'
 
 export type ArticleStats = { views: number; views30d: number; likes: number; comments: number }
 type ArtalkPage = { key: string; pv: number; vote_up: number }
@@ -9,7 +9,7 @@ type ArtalkPage = { key: string; pv: number; vote_up: number }
 const artalkServer =
   process.env.NEXT_PUBLIC_ARTALK_SERVER_URL?.replace(/\/$/, '') || 'http://127.0.0.1:23366'
 
-export function useArticleStats(posts: PublicPost[]) {
+export function useArticleStats(posts: PublicPostSummary[]) {
   const [stats, setStats] = useState<Record<string, ArticleStats>>({})
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>(
     posts.length ? 'loading' : 'ready',
