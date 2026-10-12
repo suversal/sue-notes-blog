@@ -1978,17 +1978,18 @@
   }
   /* 紧跟在文字后面的箭头提示这里可以展开；展开后朝上。 */
   .mobileToc summary::after {
-    width: 7px;
-    height: 7px;
-    margin: -4px 4px 0 10px;
-    border-right: 1.5px solid currentColor;
-    border-bottom: 1.5px solid currentColor;
+    width: 5px;
+    height: 5px;
+    margin: -3px 2px 0 7px;
+    border-right: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    opacity: 0.7;
     content: '';
     transform: rotate(45deg);
     transition: transform 0.18s ease;
   }
   .mobileToc[open] summary::after {
-    margin-top: 4px;
+    margin-top: 3px;
     transform: rotate(-135deg);
   }
   .mobileToc summary:hover,
