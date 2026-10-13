@@ -106,5 +106,5 @@ Artalk 与博客共用同一个数据库，表名以 `artalk_` 为前缀，迁�
 
 - 环境变量统一经 `src/lib/env.ts` 的 zod schema 读取；`PAYLOAD_SECRET` 至少 32 位。
 - `designs/` 是设计稿原型，不参与构建和 lint。
-- 生产部署（Oracle 机器、Caddy 网关、Cloudflare 回源 8443）见 `deploy/README.md`，与根目录的本机 `docker-compose.yml` 是两套配置。
+- 生产部署（Oracle 机器、Caddy 网关、Cloudflare 回源 443）见 `deploy/README.md`，与根目录的本机 `docker-compose.yml` 是两套配置。
 - `docs/CHANGELOG.md` 与 `docs/IMPLEMENTATION_PROGRESS.md` 记录各轮改动与验收状态。

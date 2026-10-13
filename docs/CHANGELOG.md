@@ -1,5 +1,25 @@
 # 苏码玩家变更记录
 
+## 2026-10-12：Cloudflare 侧加固
+
+- 范围：只改了 Cloudflare 后台（免费版）和 Spaceship 的 DS 记录，仓库代码和服务器没有动。区域 `suversal.com` 下还有 radar、stats、img 和二十多个 Tunnel 子域名，带「全区域」字样的改动对它们同样生效。
+- 最低 TLS 版本：1.0 改为 1.2（全区域）。
+- DNSSEC：Cloudflare 侧开启，Spaceship「高级 DNS → DNSSEC」添加 DS 记录（Key Tag 2371，算法 13，摘要类型 2）。以后要把 DNS 从 Cloudflare 迁走，必须先在 Spaceship 删掉这条 DS 记录，否则整个域名无法解析。
+- WAF 自定义规则（都只匹配 `suversal.com`）：`blog-block-scanner-paths` 拦截以 `/wp-`、`/.env`、`/.git` 开头或以 `.php` 结尾的路径；`blog-challenge-login` 对 `/login` 做托管质询。质询通过后 30 分钟内有效。
+- 缓存规则 `blog-cache-next-static`：把 `/_next/static/*` 标为可缓存。加完后仍是 `cf-cache-status: DYNAMIC`，当时没有效果，原因和解决见下面 10 月 13 日的记录。
+- DMARC：新增 `_dmarc` TXT，内容 `v=DMARC1; p=none;`，只占位，不拦截。
+- 没有动的：限速规则 `edge-flood-guard`（免费版唯一一条，全区域每 IP 10 秒 200 次）、原有三条缓存规则、回源规则。
+- 验证：从公网确认 TLS 1.0/1.1 握手失败、扫描路径返回 403、`/login` 返回质询；所有者实际登录并发布了一篇文章。前台页面、阅读量和 Artalk 接口、radar/stats/img/edge/cnblog 状态码正常，Tunnel 子域名没有逐个测。
+- 待办：
+  - 别名邮箱与 DMARC：`@suversal.com` 目前只经 Cloudflare Email Routing 收信，没有用它发过信。研究清楚别名邮箱怎么发信之后再定策略：只收不发就把 `_dmarc` 改成 `p=quarantine`（或 `p=reject`）；要发信则先把发信渠道的 SPF、DKIM 配好再收紧。radar 子域名经 Resend 发信，有自己的 SPF 和 DKIM。
+  - Oracle 安全列表里还留着 15 条「Knowledge base Cloudflare origin 8443」放行规则，已经没有用处（服务器防火墙不再放行 8443，也没有进程监听），可以在 Oracle 后台删掉。这个安全列表与 `instance-edge` 共用，删的时候不要碰 22 和 443 两条。
+- 2026-10-13 回源端口从 8443 改为 443：原先 `/_next/static/*` 一直是 `cf-cache-status: DYNAMIC`，原因是 Cloudflare 不缓存经 8443 回源的内容。
+  - 服务器：`edge` 只监听 443；防火墙脚本 `/usr/local/sbin/sue-notes-blog-firewall` 只对 Cloudflare 网段放行 443，原有的 8443 放行规则已删除（最初的脚本备份为同目录 `.bak-20261013`）。
+  - Cloudflare：回源规则 `suversal-root-to-oracle-8443` 已删除，回源走默认端口。Oracle 后台没有改。
+  - 验证：静态资源返回 `HIT`；前台页面、阅读量和 Artalk 接口、扫描路径拦截、`/login` 质询状态码与切换前一致；所有者实际登录过后台。
+  - 文档：`deploy/README.md` 和 `CLAUDE.md` 里的回源端口改为 443；「443 由 Xray 使用」的说法已更正，Xray 在另一台 `instance-edge` 上。
+- 账户名必须全小写：登录时会把输入转成小写再精确匹配，库里存成 `Sue` 时怎么输入都登不上，改成 `sue` 后恢复。直接改数据库里的 `users.email` 时要注意。
+
 ## 2026-10-12：手机端四处调整
 
 - 分支：`fix/mobile-polish`。

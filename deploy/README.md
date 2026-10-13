@@ -1,6 +1,6 @@
 # 甲骨文机器发布准备
 
-此目录定义 Oracle 生产服务；仓库根目录的 `docker-compose.yml` 用于本机开发。公开入口是 `https://suversal.com`：Cloudflare 橙云 A 记录指向 Oracle 公网 IP，Origin Rule 仅将该主机名的回源端口改为 `8443`。知识库不走 Cloudflare Tunnel。服务器的 `443` 由现有 Xray 使用，不改动。
+此目录定义 Oracle 生产服务；仓库根目录的 `docker-compose.yml` 用于本机开发。公开入口是 `https://suversal.com`：Cloudflare 橙云 A 记录指向 Oracle 公网 IP，回源走默认的 `443`。知识库不走 Cloudflare Tunnel。Xray 在另一台机器 `instance-edge` 上，与这台共用同一个 Oracle 安全列表（其中 TCP `443` 对全网放行），这台机器靠系统防火墙只放行 Cloudflare。最初回源用的是 `8443`，Cloudflare 不缓存经它回源的内容，2026-10-13 已停用。
 
 ## 服务与边界
 
@@ -9,7 +9,7 @@
 - `migrate`：先运行 Payload 显式迁移（`scripts/run-migrations.ts`，结束后会核对每个迁移都已记录）；失败时网站不会启动。不要改回 `pnpm payload migrate`：2026-10-12 部署时发现它在生产镜像里不输出、以 0 退出却没有执行迁移。
 - `web`：Next.js + Payload，只在 Docker 网络内监听 3100。
 - `gateway`：仅在宿主机 `127.0.0.1:3100` 提供 HTTP，把 `/artalk/*` 转到 Artalk，其余路径转到网站。
-- `edge`：以宿主机网络模式在 `8443` 提供 HTTPS，使用 Oracle 上单独签发的 Cloudflare Origin CA 证书，再转发到本机 `3100`。它只接受 Cloudflare 官方回源 IP 段和本机环回地址；证书与私钥放在 `/etc/sue-notes-blog/tls`，不进入仓库或镜像。使用宿主机网络模式是为了让来源 IP 检查针对实际连接地址生效。
+- `edge`：以宿主机网络模式在 `443` 提供 HTTPS，使用 Oracle 上单独签发的 Cloudflare Origin CA 证书，再转发到本机 `3100`。它只接受 Cloudflare 官方回源 IP 段和本机环回地址；证书与私钥放在 `/etc/sue-notes-blog/tls`，不进入仓库或镜像。使用宿主机网络模式是为了让来源 IP 检查针对实际连接地址生效。
 
 ## 首次上线前
 
@@ -17,8 +17,8 @@
 2. 在服务器安装 Docker Engine 与 Compose 插件。安装前留存当前 Xray、Cloudflare Tunnel、监听端口和防火墙状态；安装后复查这些服务。本机安装实测 Docker 把 IPv4 `FORWARD` 默认策略从 `ACCEPT` 改成 `DROP`，已通过 `/etc/docker/daemon.json` 的 `ip-forward-no-drop` 配置和恢复原策略处理；后续 Docker 升级仍需复查。
 3. 把仓库代码复制到服务器的 `/home/ubuntu/sue-notes-blog`，不复制 `.env`、本机缓存、测试输出或 Docker 卷。在服务器以 `root:root`、`0600` 权限新建私有 `deploy/.env.production`，参考 `.env.production.example`。`POSTGRES_PASSWORD` 使用 URL 安全的随机十六进制；`PAYLOAD_SECRET` 和 `ARTALK_APP_KEY` 分别生成，不能复用。运行 Compose 时用 `sudo`，不把 `ubuntu` 加入具备 root 等效权限的 Docker 用户组。
 4. 用 `sudo docker compose --env-file deploy/.env.production -f deploy/compose.production.yml config --quiet` 检查配置，记录目标 Git commit 与服务器目录。先运行 `sudo docker compose --env-file deploy/.env.production -f deploy/compose.production.yml build migrate` 和 `sudo docker compose --env-file deploy/.env.production -f deploy/compose.production.yml up -d postgres`。把数据库备份恢复到这一空库，核对文章、修订、用户、主题和迁移记录数量，再运行 `sudo docker compose --env-file deploy/.env.production -f deploy/compose.production.yml up -d`；检查迁移任务退出码、数据库健康状态和容器日志。
-5. 在 Oracle 上生成独立私钥和 CSR，在 Cloudflare 创建包含 `suversal.com` 的 Origin CA 证书，将证书安装为 `/etc/sue-notes-blog/tls/origin.pem`，私钥为同目录的 `origin.key`。证书需与私钥匹配，且有效期内覆盖根域名。Oracle 云侧与系统防火墙仅允许 Cloudflare 官方 IPv4 回源网段访问 TCP `8443`；应用层也按官方回源网段过滤。现有 Xray `443` 不动。
-6. 设 `PUBLIC_URL=https://suversal.com`，启动 `edge` 后先从本机检查 8443 的 TLS、域名和反向代理。Cloudflare 区域保持 Full (strict)，先添加仅匹配 `suversal.com` 的 Origin Rule，将目标端口改写为 `8443`；确认规则活动后，创建根域名的橙云 A 记录。Cloudflare 的“始终使用 HTTPS”保持启用，不让 HTTP 请求回源到未开放的 80。
+5. 在 Oracle 上生成独立私钥和 CSR，在 Cloudflare 创建包含 `suversal.com` 的 Origin CA 证书，将证书安装为 `/etc/sue-notes-blog/tls/origin.pem`，私钥为同目录的 `origin.key`。证书需与私钥匹配，且有效期内覆盖根域名。系统防火墙（`/usr/local/sbin/sue-notes-blog-firewall`）仅允许 Cloudflare 官方 IPv4 回源网段访问 TCP `443`；应用层也按官方回源网段过滤。Oracle 安全列表里的 `443` 是给另一台机器的 Xray 开的，不要改。
+6. 设 `PUBLIC_URL=https://suversal.com`，启动 `edge` 后先从本机检查 443 的 TLS、域名和反向代理。Cloudflare 区域保持 Full (strict)，不需要改写回源端口，直接创建根域名的橙云 A 记录。Cloudflare 的“始终使用 HTTPS”保持启用，不让 HTTP 请求回源到未开放的 80。
 7. 从公网用真实浏览器验证首页、文章、登录、后台、图片、评论和手机布局；检查 `/artalk/api/v2/` 经过同源网关，并复查 Xray 与现有其他 Tunnel 服务。HTTP 200 和容器运行只属于基础检查。生产账号密码未存入此仓库，登录验收需由持有账号的人完成。
 
 ## 数据与更新

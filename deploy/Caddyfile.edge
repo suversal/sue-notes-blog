@@ -11,7 +11,8 @@
 	}
 }
 
-https://suversal.com:8443 {
+# 用 Cloudflare 的默认回源端口。不要换成 8443 这类端口：Cloudflare 不缓存经它们回源的内容。
+https://suversal.com:443 {
 	tls /etc/sue-notes-blog/tls/origin.pem /etc/sue-notes-blog/tls/origin.key
 
 	# Cloudflare's published origin ranges, checked on 2026-09-22.
