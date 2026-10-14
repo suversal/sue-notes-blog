@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { PublicPostSummary, SiteProfile } from '../../../../lib/blog-data'
 import { ThemeSettings } from '../../../components/theme-settings'
+import { BackToTop } from './back-to-top'
 import { Icon } from './ui-icon'
 import styles from '../blog-v1.module.css'
 
@@ -135,6 +136,7 @@ export function PublicShell({
           </div>
         </header>
         {children}
+        <BackToTop />
         <footer
           className={`${styles.footer} ${pathname === '/blog' ? styles.homeFooter : ''} ${listingFooter ? styles.listingFooter : ''}`}
         >

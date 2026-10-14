@@ -2748,9 +2748,10 @@
   .dialogFoot {
     padding: 10px 12px;
   }
+  /* 页脚贴着屏幕底部，按钮要停在它上方，不压住社交图标。 */
   .backToTopButton {
     right: 12px;
-    bottom: 12px;
+    bottom: calc(64px + env(safe-area-inset-bottom));
     width: 36px;
     height: 36px;
   }

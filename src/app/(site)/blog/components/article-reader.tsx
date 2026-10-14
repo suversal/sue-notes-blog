@@ -6,7 +6,6 @@ import type { PublicPost, PublicPostSummary } from '../../../../lib/blog-data'
 import { articleContentHeadings } from '../../../../lib/article-content-data'
 import { formatBlogDateTime } from '../../../../lib/blog-shared'
 import { ArticleEngagement } from './article-engagement'
-import { BackToTop } from './back-to-top'
 import { Icon } from './ui-icon'
 import { ArticleRichText } from './rich-text'
 import { Plate } from './plate'
@@ -84,7 +83,6 @@ export function ArticleReader({
   return (
     <>
       <div className={styles.progress} style={{ width: `${progress}%` }} />
-      <BackToTop />
       <div className={styles.readerTop}>
         <Link href="/blog">
           <Icon name="back" /> 全部文章

@@ -8,7 +8,6 @@ import { Plate } from './plate'
 import { Reveal } from './reveal'
 import { useArticleStats } from '../../../../lib/use-article-stats'
 import { PopularArticles } from './popular-articles'
-import { BackToTop } from './back-to-top'
 import styles from '../home.module.css'
 
 function Meta({ post }: { post: PublicPostSummary }) {
@@ -257,7 +256,6 @@ export function HomeClient({ posts, site }: { posts: PublicPostSummary[]; site: 
 
   return (
     <div className={styles.home}>
-      <BackToTop />
       <section className={styles.intro} aria-label="手记介绍">
         <p className={styles.tagline}>{site.tagline}</p>
         <Link className={styles.introCount} href="/blog/archive">
