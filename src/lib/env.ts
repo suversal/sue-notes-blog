@@ -14,3 +14,8 @@ const serverEnvSchema = z.object({
 export function getServerEnv(env: Record<string, string | undefined> = process.env) {
   return serverEnvSchema.parse(env);
 }
+
+/** 构建时没有生产环境变量，公开元数据默认使用正式域名；运行时沿用站点配置。 */
+export function getSiteOrigin(env: Record<string, string | undefined> = process.env) {
+  return new URL(serverEnvSchema.shape.PAYLOAD_SERVER_URL.parse(env.PAYLOAD_SERVER_URL ?? 'https://suversal.com')).origin;
+}

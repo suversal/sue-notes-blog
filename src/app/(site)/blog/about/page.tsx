@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import { publicPageMetadata } from '../../../../lib/blog-seo'
 import Link from 'next/link'
 import { getSiteProfile } from '../../../../lib/blog-data'
 import { hasPublicUses } from '../../../../lib/uses-service'
@@ -7,12 +7,11 @@ import styles from './about.module.css'
 import avatar from './avatar.png'
 
 export const dynamic = 'force-dynamic'
-export const metadata: Metadata = {
+export const metadata = publicPageMetadata({
   title: '关于 · 苏码玩家',
   description: '关于作者与这个站点。',
-  alternates: { canonical: '/blog/about' },
-  robots: { index: true, follow: true },
-}
+  path: '/blog/about',
+})
 
 // 名片上的四行简介与 X 个人资料保持一致。
 const bioLines = [

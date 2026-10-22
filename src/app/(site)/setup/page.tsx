@@ -7,6 +7,7 @@ import { SubmitButton } from '../../components/submit-button';
 import { PasswordField } from '../login/password-field';
 
 export const dynamic = 'force-dynamic';
+export const metadata = { title: '初始化 · 苏码玩家', robots: { index: false, follow: false } };
 
 export default async function SetupPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const payload = await getPayloadClient();

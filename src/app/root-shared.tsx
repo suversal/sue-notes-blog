@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { NavigationProgress } from './components/navigation-progress';
 import { ThemeSync } from './components/theme-sync';
+import { getSiteOrigin } from '../lib/env';
 
 // 前台 (site) 和写作后台 (studio) 各有自己的根布局，这里是两边共用的部分。
 export const rootMetadata: Metadata = {
+  metadataBase: new URL(getSiteOrigin()),
   title: { default: '苏码玩家', template: '%s' },
   description: '关于工具、创造，以及认真生活的小事。',
 };

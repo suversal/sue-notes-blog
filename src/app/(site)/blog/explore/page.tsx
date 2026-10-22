@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import { publicPageMetadata } from '../../../../lib/blog-seo'
 import { headers } from 'next/headers'
 import { ExploreClient } from '../components/explore-client'
 import { listExploreItems } from '../../../../lib/explore-service'
@@ -6,12 +6,11 @@ import { getRepoStats, githubRepoKey, type RepoStats } from '../../../../lib/git
 import { getPayloadClient } from '../../../../lib/payload'
 import { isPublicOwner } from '../../../../lib/uses-service'
 
-export const metadata: Metadata = {
+export const metadata = publicPageMetadata({
   title: '探索 · 苏码玩家',
   description: 'Sue 的开源项目、网站与互联网收藏。',
-  alternates: { canonical: '/blog/explore' },
-  robots: { index: true, follow: true },
-}
+  path: '/blog/explore',
+})
 
 export const dynamic = 'force-dynamic'
 

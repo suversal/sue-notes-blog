@@ -1,15 +1,14 @@
-import type { Metadata } from 'next'
+import { publicPageMetadata } from '../../../../lib/blog-seo'
 import { headers } from 'next/headers'
 import { UsesClient } from '../components/uses-client'
 import { getPayloadClient } from '../../../../lib/payload'
 import { isPublicOwner, listUses } from '../../../../lib/uses-service'
 
-export const metadata: Metadata = {
+export const metadata = publicPageMetadata({
   title: '在用 · 苏码玩家',
   description: '我长期在用的服务和工具清单。',
-  alternates: { canonical: '/blog/uses' },
-  robots: { index: true, follow: true },
-}
+  path: '/blog/uses',
+})
 
 export const dynamic = 'force-dynamic'
 

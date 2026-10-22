@@ -27,6 +27,7 @@ export async function GET(_request: Request, context: { params: Promise<{ slug: 
   return new Response(markdown, {
     headers: {
       'Content-Type': 'text/markdown; charset=utf-8',
+      'X-Robots-Tag': 'noindex',
       'Content-Disposition': `attachment; filename="${filename.ascii}"; filename*=UTF-8''${filename.encoded}`,
     },
   })

@@ -4,6 +4,8 @@ import { SubmitButton } from '../../components/submit-button';
 import { PasswordField } from './password-field';
 import styles from './styles.module.css';
 
+export const metadata = { title: '登录 · 苏码玩家', robots: { index: false, follow: false } };
+
 const messages: Record<string, string> = {
   missing: '请输入邮箱和密码。',
   invalid: '邮箱或密码不正确。',

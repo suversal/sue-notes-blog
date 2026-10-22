@@ -5,7 +5,7 @@ import { importMap } from '../importMap';
 import { RootChrome, rootHtmlProps, rootMetadata } from '../root-shared';
 import '../globals.css';
 
-export const metadata = rootMetadata;
+export const metadata = { ...rootMetadata, robots: { index: false, follow: false } };
 
 const serverFunction: ServerFunctionClient = async (args) => {
   'use server';

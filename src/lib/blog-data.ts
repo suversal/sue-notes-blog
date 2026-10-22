@@ -60,14 +60,27 @@ function topicFrom(revision: any, article: any, topicNames: Map<string, string>)
   return { id, name: topicNames.get(id) || legacy || '未分类' };
 }
 
-export async function getSiteProfile(owner?: string): Promise<SiteProfile> {
+export const getSiteProfile = cache(async (owner?: string): Promise<SiteProfile> => {
   const payload = await getPayloadClient();
   const result = await payload.find({ collection: 'site-settings', overrideAccess: true, depth: 0, limit: 1, ...(owner ? { where: { owner: { equals: owner } } } : {}) } as any);
   const item = result.docs[0] as any;
   return item ? { siteName: item.siteName, authorName: item.authorName, tagline: item.tagline, authorBio: item.authorBio } : defaultSiteProfile;
-}
+});
 
 const publicArticleFilters: Where[] = [{ status: { equals: 'published' } }, { visibility: { equals: 'public' } }];
+
+/** 站点地图只读取公开地址与发布时间，不加载私有工作副本正文，也不受列表的 100 篇上限影响。 */
+export async function getPublicSitemapPosts(): Promise<{ slug: string; publishedAt?: string }[]> {
+  const payload = await getPayloadClient();
+  const articles = await payload.find({
+    collection: 'articles', overrideAccess: true, depth: 0, pagination: false,
+    select: { publishedSlug: true, publishedAt: true },
+    where: { and: [...publicArticleFilters, { publishedRevision: { exists: true } }, { publishedSlug: { exists: true } }] },
+  });
+  return articles.docs.flatMap((article) => article.publishedSlug
+    ? [{ slug: article.publishedSlug, ...(article.publishedAt ? { publishedAt: article.publishedAt } : {}) }]
+    : []);
+}
 
 /** 一次查询取回这些文章的已发布修订，避免每篇文章单独查一次。 */
 async function loadPublicPosts(payload: Awaited<ReturnType<typeof getPayloadClient>>, articles: any[]): Promise<PublicPost[]> {
