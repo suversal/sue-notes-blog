@@ -57,6 +57,18 @@ docker compose exec artalk artalk admin
 
 Artalk 与博客复用同一个 PostgreSQL 数据库，数据表统一使用 `artalk_` 前缀，与 Payload 表隔离。生产环境通过 `NEXT_PUBLIC_ARTALK_SERVER_URL` 指向公开可访问的 Artalk 服务地址，并把博客域名加入 `ATK_TRUSTED_DOMAINS`。
 
+## Umami 访问统计
+
+博客前台在生产模式下通过 `next/script` 加载 `https://stats.suversal.com/s.js`，站点 ID 为 `a0eae62d-81db-4753-9959-a0a93d462f8e`，对应 Umami 后台的 `blog` 网站。脚本位于 `src/app/(site)/blog/layout.tsx`，采用 `afterInteractive` 策略，由 Umami 自动记录页面访问和前台路由切换。`data-domains="suversal.com"` 限制正式域名上报，开发模式不加载；登录、初始设置、写作后台和 Payload 页面均不接入脚本。
+
+这组公开追踪参数不需要 API Key，也不替换现有 Artalk 阅读量、点赞和评论统计。部署后需用浏览器确认脚本和上报请求成功，再到 Umami 仪表盘核对数据；代码或构建检查不代表线上统计已经生效。
+
+部署验收：
+
+1. 在正式站打开 `/blog`，确认 `s.js` 加载成功且页面只有一个 Umami 脚本。
+2. 点击文章或归档链接，确认首次访问及客户端路由切换均自动向 `stats.suversal.com` 上报，网站 ID、域名和路径正确；不额外手动调用 `umami.track()`，避免重复计数。
+3. 打开 Umami 的 `blog` 网站实时面板，确认出现刚访问的路径。广告拦截器或浏览器隐私设置可能阻止统计，排查时以浏览器网络请求和后台数据为准。
+
 ## 常用命令
 
 ```bash
