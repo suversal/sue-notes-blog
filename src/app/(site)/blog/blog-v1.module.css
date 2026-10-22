@@ -1956,7 +1956,7 @@
     display: none;
   }
   .reader {
-    padding-top: 10px;
+    padding-top: 0;
   }
   .mobileToc {
     display: block;
@@ -2597,7 +2597,7 @@
     font-size: 12px;
   }
   .reader {
-    padding: 6px 0 24px;
+    padding: 0 0 24px;
   }
   .reader > h1 {
     margin: 5px 0 8px;
