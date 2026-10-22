@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "苏码玩家博客与写作后台。",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "packageManager": "pnpm@11.19.0",
   "type": "module",
   "scripts": {
