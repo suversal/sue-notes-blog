@@ -84,9 +84,7 @@ function CardBody({ friend, index }: { friend: FriendLink; index: number }) {
       <div className={styles.address}>
         <span>寄往</span>
         <span className={styles.domain}>{friendDomain(friend.url)}</span>
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7 17 17 7M9 7h8v8" />
-        </svg>
+        <Icon name="arrow" />
       </div>
     </>
   )

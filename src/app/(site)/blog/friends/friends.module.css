@@ -106,11 +106,14 @@
   border-radius: 4px;
   background: var(--surface);
   color: var(--ink);
-  /* 时长和缓动与「在用」页卡片一致 */
+  /* 时长和缓动与「在用」「探索」页卡片一致 */
+  /* 上浮用起步柔和的缓动（ease-out cubic），阴影同步到位；
+     will-change 让浏览器提前把卡片放到独立图层，第一次悬停时不用临时重绘而顿一下 */
+  will-change: transform;
   transition:
-    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 360ms cubic-bezier(0.33, 1, 0.68, 1),
     border-color 240ms ease,
-    box-shadow 320ms ease,
+    box-shadow 360ms cubic-bezier(0.33, 1, 0.68, 1),
     opacity 420ms ease;
 }
 
@@ -217,6 +220,8 @@
   -webkit-mask: linear-gradient(#000 0 0) content-box, radial-gradient(circle at 3px 3px, transparent 2.1px, #000 2.4px) -3px -3px / 6px 6px;
   mask: linear-gradient(#000 0 0) content-box, radial-gradient(circle at 3px 3px, transparent 2.1px, #000 2.4px) -3px -3px / 6px 6px;
   transform: rotate(calc(var(--tilt) * 0.4));
+  /* 邮票带蒙版和滤镜，重绘成本高；悬停时会翘起，提前放到独立图层，避免动画中途掉帧 */
+  will-change: transform, translate, rotate;
   transition:
     translate 640ms var(--spring),
     rotate 640ms var(--spring);
@@ -424,16 +429,16 @@
     border-color 240ms ease;
 }
 
+/* 箭头与「探索」页卡片一致：共用的 arrow 图标，平时斜向右上，悬停时转平向右并右移 2px */
 .page .address svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   flex: none;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.6;
+  color: var(--muted);
+  transform: rotate(-45deg);
   transition:
-    transform 300ms var(--out),
-    color 200ms ease;
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 240ms ease;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -444,7 +449,7 @@
 
   .page a.card:hover .address svg {
     color: var(--accent);
-    transform: translate(3px, -3px);
+    transform: rotate(0) translateX(2px);
   }
 }
 
@@ -608,6 +613,8 @@
 }
 
 .page .row dd code {
+  /* 等宽字体和正文基线不同，按基线对齐会把行撑到 37px，顶对齐保持 36px */
+  vertical-align: top;
   font: 13px/36px ui-monospace, 'SF Mono', Menlo, monospace;
 }
 
@@ -650,8 +657,12 @@
 /* 复制反馈：两行标签叠在同一格里，「复制」上滑淡出、「已复制」从下方带回弹滑入，对勾随后画出；
    复原时「已复制」继续往上走，「复制」再从下方回来，始终是同一个方向，不会倒带。 */
 .page .copy {
-  margin-top: 6px;
-  padding: 3px 9px;
+  /* 行高 36px，按钮固定 28px、上下各留 4px，悬停出现边框时正好居中，不压到底下的横线 */
+  display: inline-flex;
+  height: 28px;
+  align-items: center;
+  margin-top: 4px;
+  padding: 0 9px;
   border: 1px solid transparent;
   border-radius: 6px;
   color: var(--muted);
