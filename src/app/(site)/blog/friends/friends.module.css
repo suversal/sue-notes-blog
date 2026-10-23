@@ -632,26 +632,6 @@
   margin-bottom: 24px;
 }
 
-/* Artalk 暗色模式会用自己的蓝灰配色覆盖网站变量（两者优先级相同），这里再提高一级套回网站配色 */
-.page .mailbox :global(.artalk.atk-dark-mode) {
-  --at-color-font: var(--ink);
-  --at-color-deep: var(--ink);
-  --at-color-sub: var(--muted);
-  --at-color-grey: var(--muted);
-  --at-color-meta: var(--muted);
-  --at-color-border: var(--line);
-  --at-color-light: var(--accent);
-  --at-color-bg: var(--bg);
-  --at-color-bg-transl: color-mix(in srgb, var(--bg) 94%, transparent);
-  --at-color-bg-grey: var(--panel);
-  --at-color-bg-grey-transl: color-mix(in srgb, var(--panel) 75%, transparent);
-  --at-color-bg-light: var(--accent-wash);
-  --at-color-main: var(--accent);
-}
-
-.page .mailbox :global(.atk-send-btn) {
-  color: var(--surface);
-}
 
 /* 复制反馈：两行标签叠在同一格里，「复制」上滑淡出、「已复制」从下方带回弹滑入，对勾随后画出；
    复原时「已复制」继续往上走，「复制」再从下方回来，始终是同一个方向，不会倒带。 */

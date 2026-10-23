@@ -67,6 +67,7 @@ describe('后台导航选中状态', () => {
         '/blog',
         '/blog/explore',
         '/blog/uses',
+        '/blog/friends',
         '/articles/settings',
         'http://127.0.0.1:23366/sidebar/',
       ])

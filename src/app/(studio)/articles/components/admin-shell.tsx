@@ -77,6 +77,10 @@ export function AdminShell({
             <Icon name="published" />
             在用清单
           </Link>
+          <Link href="/blog/friends">
+            <Icon name="heart" />
+            友邻
+          </Link>
           <Link
             aria-current={active('/articles/settings') ? 'page' : undefined}
             className={active('/articles/settings') ? styles.active : ''}

@@ -1597,7 +1597,10 @@
   font-size: 13px;
   text-align: center;
 }
-.commentsMount:global(.artalk) {
+/* Artalk 暗色模式自带一套蓝灰配色，选择器是 .artalk.atk-dark-mode，和这里优先级相同，会把网站配色盖掉；
+   所以把暗色模式也列进来，多一个类名压过它。 */
+.commentsMount:global(.artalk),
+.commentsMount:global(.artalk.atk-dark-mode) {
   --at-color-font: var(--ink);
   --at-color-deep: var(--ink);
   --at-color-sub: var(--muted);
@@ -1614,6 +1617,11 @@
 
   color: var(--ink);
   font-family: var(--sans);
+}
+/* 发送按钮的文字 Artalk 写死为白色；暗色模式的主题色偏亮，白字看不清，改用页面底色。
+   Artalk 的选择器是 .atk-main-editor>.atk-bottom .atk-send-btn，这里沿用同一路径再加外层类名才压得过。 */
+.commentsMount :global(.atk-main-editor > .atk-bottom .atk-send-btn) {
+  color: var(--surface);
 }
 .commentsMount :global(.atk-main-editor) {
   border-radius: var(--control-radius);
