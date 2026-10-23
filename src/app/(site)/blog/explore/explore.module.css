@@ -248,14 +248,19 @@
 
 .card,
 .savedRow {
-  animation: explore-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* 只保留动画开始前的第一帧（backwards）：用 both 会在结束后一直锁住 transform，悬停的放大就失效了 */
+  animation: explore-in 520ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
   animation-delay: calc(80ms + var(--i, 0) * 50ms);
 }
 
 .card {
+  /* 上浮用起步柔和的缓动（ease-out cubic），阴影同步到位；
+     will-change 让浏览器提前把卡片放到独立图层，第一次悬停时不用临时重绘而顿一下 */
+  will-change: transform;
   transition:
-    transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 400ms ease;
+    transform 360ms cubic-bezier(0.33, 1, 0.68, 1),
+    border-color 240ms ease,
+    box-shadow 360ms cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 .cardHead > svg,
@@ -291,11 +296,13 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  /* 和首页封面的悬停一致：整体放大一点，不改边框颜色。 */
+  /* 与「在用」「友邻」的卡片悬停一致：上浮 3px、边框染主题色、收着的阴影。
+     首页封面的放大只作用在框内的图片上，卡片本身不动，和这里不是一回事。 */
   .card:hover {
     z-index: 1;
-    box-shadow: 0 0 28px color-mix(in srgb, var(--ink) 16%, transparent);
-    transform: scale(1.04);
+    border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+    box-shadow: 0 10px 28px -18px color-mix(in srgb, var(--ink) 55%, transparent);
+    transform: translateY(-3px);
   }
 
   .card:hover .cardHead > svg,
@@ -459,8 +466,9 @@
   display: none;
 }
 
-/* 编辑时不放大，按钮位置保持不动才好点。 */
+/* 编辑时卡片不动，按钮位置保持不动才好点。 */
 .card.editable:hover {
+  border-color: var(--line);
   box-shadow: none;
   transform: none;
 }

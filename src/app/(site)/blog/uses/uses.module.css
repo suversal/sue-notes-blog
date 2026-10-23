@@ -69,12 +69,16 @@
   border: 1px solid var(--line);
   border-radius: 16px;
   background: var(--surface);
-  animation: uses-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* 只保留动画开始前的第一帧（backwards）：用 both 会在结束后一直锁住 transform，悬停的上浮就失效了 */
+  animation: uses-in 520ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
   animation-delay: calc(80ms + var(--i, 0) * 55ms);
+  /* 上浮用起步柔和的缓动（ease-out cubic），阴影同步到位；
+     will-change 让浏览器提前把卡片放到独立图层，第一次悬停时不用临时重绘而顿一下 */
+  will-change: transform;
   transition:
-    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 360ms cubic-bezier(0.33, 1, 0.68, 1),
     border-color 240ms ease,
-    box-shadow 320ms ease;
+    box-shadow 360ms cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 /* 弹出相关文章列表时，这张卡片要压在相邻卡片上面。 */
