@@ -773,6 +773,19 @@
 .archiveResults {
   border-bottom: 0;
 }
+/* 首次打开时前几行依次浮现，节奏与「在用」「探索」的卡片一致。
+   超过 12 行的部分按第 12 行的时间出现，长列表也不用等；只保留开始前的第一帧，结束后不锁样式。 */
+.archiveIntro .archiveYearHead,
+.archiveIntro .archiveYear article {
+  animation: archive-in 520ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(80ms + min(var(--i, 0), 12) * 40ms);
+}
+@keyframes archive-in {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
 .archiveYear {
   display: block;
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import type { PublicPostSummary } from '../../../../lib/blog-data'
 import { useArticleStats } from '../../../../lib/use-article-stats'
 import { ArchiveSelect } from './archive-select'
@@ -26,6 +26,10 @@ export function ArchiveClient({
   const [year, setYear] = useState('all')
   const [query, setQuery] = useState('')
   const [order, setOrder] = useState<'newest' | 'views'>('newest')
+  // 只在刚打开页面时让前几行依次浮现；动画播完就撤掉，之后筛选出来的新行不再重播。
+  const [intro, setIntro] = useState(true)
+  const results = useRef<HTMLDivElement>(null)
+  const filterKey = useRef('')
   const byViews = order === 'views' && status === 'ready'
   const keyword = query.trim().toLocaleLowerCase('zh-CN')
   const rows = posts
@@ -51,6 +55,26 @@ export function ArchiveClient({
         rows: rows.filter((post) => post.publishedAt.startsWith(item)),
       }))
   const filtered = topic !== 'all' || year !== 'all' || Boolean(query) || order !== 'newest'
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIntro(false), 1400)
+    return () => window.clearTimeout(timer)
+  }, [])
+  // 换主题、年份或排序时，结果整体淡入一下；搜索框打字不加，免得每敲一个字闪一次。
+  useEffect(() => {
+    const key = `${topic}|${year}|${order}`
+    const changed = filterKey.current && filterKey.current !== key
+    filterKey.current = key
+    if (!changed || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    results.current?.animate(
+      [
+        { opacity: 0.45, transform: 'translateY(5px)' },
+        { opacity: 1, transform: 'translateY(0)' },
+      ],
+      { duration: 240, easing: 'ease' },
+    )
+  }, [topic, year, order])
+  // 每行在整张列表里的序号，用来错开进场；年份标题跟着它那组的第一行一起出来。
+  let rowIndex = 0
   const reset = () => {
     setTopic('all')
     setYear('all')
@@ -136,7 +160,7 @@ export function ArchiveClient({
           阅读统计暂不可用，暂时无法按阅读量排序。
         </p>
       )}
-      <div className={styles.archiveResults}>
+      <div ref={results} className={`${styles.archiveResults} ${intro ? styles.archiveIntro : ''}`}>
         {groups.map((group) => (
           <section
             className={`${styles.archiveGroup} ${group.year ? '' : styles.archiveGroupFlat}`}
@@ -144,14 +168,14 @@ export function ArchiveClient({
             key={group.year || 'all'}
           >
             {group.year && (
-              <header className={styles.archiveYearHead}>
+              <header className={styles.archiveYearHead} style={{ '--i': rowIndex } as CSSProperties}>
                 <strong>{group.year}</strong>
                 <span>{group.rows.length} 篇</span>
               </header>
             )}
             <div className={styles.archiveYear}>
               {group.rows.map((post) => (
-                <article key={post.id}>
+                <article key={post.id} style={{ '--i': rowIndex++ } as CSSProperties}>
                   <time dateTime={post.publishedAt}>
                     {post.publishedAt.slice(group.year ? 5 : 0, 10).replaceAll('-', '/')}
                   </time>
