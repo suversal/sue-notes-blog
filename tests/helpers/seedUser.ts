@@ -28,7 +28,7 @@ async function deleteTestUsers(payload: Awaited<ReturnType<typeof getPayload>>) 
       })
     }
     // 条目引用分类，先删条目再删分类。
-    for (const collection of ['uses-items', 'uses-categories'] as const) {
+    for (const collection of ['uses-items', 'uses-categories', 'friend-links'] as const) {
       await payload.delete({
         collection,
         overrideAccess: true,

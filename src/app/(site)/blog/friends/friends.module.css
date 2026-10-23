@@ -1,0 +1,1000 @@
+/* 友邻：每位朋友是一张贴了邮票、盖了邮戳的明信片。
+   选择器都挂在 .page 下面，压过 .publicRoot 对 button / svg 的全局重置。 */
+.page {
+  /* out：长尾减速，用于进场；glide：两头缓，用于高亮滑行；spring：约 2% 的轻微回弹，用于落定 */
+  --out: cubic-bezier(0.16, 1, 0.3, 1);
+  --glide: cubic-bezier(0.45, 0, 0.2, 1);
+  --spring: linear(0, 0.0058 1%, 0.0236 2.1%, 0.0957 4.5%, 0.2137 7.2%, 0.5225 13%, 0.6595 16.3%, 0.7774 19.8%, 0.8693 23.6%, 0.9365 27.8%, 0.9808 32.4%, 1.0083 37.7%, 1.0193 43.2%, 1.0206 49.6%, 1.0104 62%, 1.0019 77.5%, 1);
+}
+
+/* —— 页头：左边标题和介绍，右边统计叠在串门按钮上面，按钮和介绍底部对齐 —— */
+.page .head {
+  border-bottom: 1px solid var(--line);
+}
+
+.page .headSide {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.page .ledger {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.page .ledger b {
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 亮点按钮：一枚待盖的章 */
+.page .knock {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px 0 8px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 15px;
+  transition: transform 240ms var(--out);
+}
+
+.page .knock:hover {
+  transform: translateY(-2px);
+}
+
+.page .knock:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.page .seal {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--surface);
+  font: 600 15px/1 var(--serif);
+  transition: transform 600ms var(--out);
+}
+
+.page .knock:hover .seal {
+  transform: rotate(-24deg);
+}
+
+.page .knock[aria-busy='true'] .seal {
+  animation: friends-rock 560ms var(--glide) infinite alternate;
+}
+
+@keyframes friends-rock {
+  from {
+    transform: rotate(-22deg);
+  }
+  to {
+    transform: rotate(12deg);
+  }
+}
+
+/* —— 明信片网格 —— */
+.page .grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 20px;
+  padding: 28px 0 8px;
+}
+
+/* 进场分三拍：卡片浮起 → 邮票贴上 → 邮戳墨线画出。--d 是同一批卡片的错峰。 */
+.page .card {
+  --tilt: 0deg;
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 280px;
+  flex-direction: column;
+  padding: 22px 22px 18px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--ink);
+  transition:
+    transform 560ms var(--spring),
+    border-color 320ms ease,
+    box-shadow 560ms var(--out),
+    opacity 420ms ease;
+}
+
+.page .card:not([data-shown]) {
+  opacity: 0;
+}
+
+.page .card[data-shown] {
+  animation: friends-rise 900ms var(--out) var(--d, 0ms) backwards;
+}
+
+@keyframes friends-rise {
+  from {
+    opacity: 0;
+    translate: 0 22px;
+  }
+}
+
+/* 航空信封的斜纹封边 */
+.page .card::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  content: '';
+  opacity: 0.55;
+  background: repeating-linear-gradient(-45deg, var(--accent) 0 10px, transparent 10px 20px, color-mix(in srgb, var(--ink) 70%, transparent) 20px 30px, transparent 30px 40px);
+}
+
+.page a.card:hover,
+.page a.card:focus-visible,
+.page .card[data-picked] {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--line));
+  box-shadow: 0 18px 36px -22px color-mix(in srgb, var(--ink) 50%, transparent);
+  transform: translateY(-3px);
+}
+
+.page a.card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* 随机串门：其余卡片退后，一枚细框在卡片之间滑行 */
+.page .grid[data-dim] .card {
+  opacity: 0.4;
+}
+
+.page .grid[data-dim] .card[data-lit],
+.page .grid[data-dim] .card[data-picked] {
+  opacity: 1;
+}
+
+.page .focusRing {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  border: 1.5px solid var(--accent);
+  border-radius: 8px;
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 12%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms ease;
+}
+
+.page .focusRing[data-on] {
+  opacity: 1;
+}
+
+.page .serial {
+  display: flex;
+  gap: 10px;
+  color: var(--muted);
+  font: 500 11px/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.page .serial em {
+  color: var(--accent);
+  font-style: normal;
+  letter-spacing: 0.04em;
+}
+
+/* 邮票：齿孔用 radial-gradient 蒙版打出来；位移、旋转用独立属性，和 transform 不打架 */
+.page .stamp {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 66px;
+  height: 78px;
+  padding: 6px;
+  background: var(--plate-paper);
+  filter: drop-shadow(0 1px 0 rgb(0 0 0 / 12%));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, radial-gradient(circle at 3px 3px, transparent 2.1px, #000 2.4px) -3px -3px / 6px 6px;
+  mask: linear-gradient(#000 0 0) content-box, radial-gradient(circle at 3px 3px, transparent 2.1px, #000 2.4px) -3px -3px / 6px 6px;
+  transform: rotate(calc(var(--tilt) * 0.4));
+  transition:
+    translate 640ms var(--spring),
+    rotate 640ms var(--spring);
+}
+
+.page .card[data-shown] .stamp {
+  animation: friends-place 820ms var(--spring) calc(var(--d, 0ms) + 240ms) backwards;
+}
+
+@keyframes friends-place {
+  from {
+    opacity: 0;
+    rotate: 9deg;
+    scale: 1.14;
+    translate: -10px -16px;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+/* 悬停时邮票一角微微翘起 */
+.page a.card:hover .stamp {
+  rotate: -3deg;
+  translate: -1px -3px;
+}
+
+.page .stampFace {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  overflow: hidden;
+  background: linear-gradient(160deg, hsl(var(--h) 42% 62%), hsl(calc(var(--h) + 28) 38% 38%));
+  color: #fffdf6;
+  font: 600 26px/1 var(--serif);
+}
+
+/* 头像一律裁成圆形肖像：方图、本身就是圆形的透明底 PNG 都能统一；外圈一道浅色细框，像邮票上的肖像框 */
+.page .stampFace img {
+  width: 40px;
+  height: 40px;
+  margin-top: -2px;
+  border-radius: 50%;
+  background: var(--plate-paper);
+  box-shadow:
+    0 0 0 1.5px rgb(255 253 246 / 85%),
+    0 0 0 4px rgb(255 253 246 / 18%);
+  object-fit: cover;
+}
+
+.page .stampFace small {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  font: 600 8px/1 var(--sans);
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+.page .stampFace i {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  font: normal 600 7px/1 var(--sans);
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+}
+
+/* 邮戳：盖在邮票左下角，墨色跟主题色走 */
+.page .card .postmark {
+  position: absolute;
+  top: 38px;
+  right: 70px;
+  width: 150px;
+  height: 84px;
+  color: var(--accent);
+  mix-blend-mode: multiply;
+  opacity: 0.78;
+  pointer-events: none;
+  transform: rotate(var(--tilt));
+  transform-origin: 75% 50%;
+}
+
+:global(html[data-blog-theme='dark']) .page .card .postmark {
+  mix-blend-mode: normal;
+  opacity: 0.72;
+}
+
+.page .postmark text {
+  fill: currentColor;
+  font-family: var(--sans);
+}
+
+/* 墨线：pathLength=1，dashoffset 从 1 画到 0；波浪线逐条错开，圆圈随后，文字最后浮现 */
+.page .ink {
+  stroke-dasharray: 1;
+}
+
+.page .card[data-shown] .ink {
+  animation: friends-draw 760ms var(--out) calc(var(--d, 0ms) + 560ms + var(--k) * 70ms) backwards;
+}
+
+.page .card[data-shown] .postmark text {
+  animation: friends-ink-text 700ms ease calc(var(--d, 0ms) + 900ms) backwards;
+}
+
+@keyframes friends-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes friends-ink-text {
+  from {
+    opacity: 0;
+  }
+}
+
+/* 重新盖章时扩散的一圈墨晕 */
+.page .ripple {
+  position: absolute;
+  top: 42px;
+  right: 70px;
+  width: 76px;
+  height: 76px;
+  border: 1.5px solid var(--accent);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.page .card h3 {
+  margin: 86px 0 2px;
+  padding-right: 72px;
+  font: 600 22px/1.3 var(--serif);
+  overflow-wrap: anywhere;
+}
+
+.page .who {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.page .motto {
+  margin: 12px 0 0;
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+.page .note {
+  margin: 14px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+  color: var(--muted);
+  font: italic 14px/1.7 var(--serif);
+}
+
+/* 推荐语用一对和正文同行的引号包起来，引号染一点主题色 */
+.page .note::before,
+.page .note::after {
+  color: var(--accent);
+  font-style: normal;
+}
+
+.page .note::before {
+  content: '“';
+}
+
+.page .note::after {
+  content: '”';
+}
+
+.page .address {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 18px;
+  font-size: 13px;
+}
+
+.page .address > span:first-child {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+}
+
+.page .domain {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font: 13px/1.5 var(--sans);
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition:
+    color 240ms ease,
+    border-color 240ms ease;
+}
+
+.page .address svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  transition:
+    transform 300ms var(--out),
+    color 200ms ease;
+}
+
+.page a.card:hover .domain {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  color: var(--accent);
+}
+
+.page a.card:hover .address svg {
+  color: var(--accent);
+  transform: translate(3px, -3px);
+}
+
+/* —— 编辑模式 —— */
+.page .hiddenCard > :not(.controls) {
+  opacity: 0.5;
+}
+
+.page .controls {
+  margin: 14px -8px 0;
+  padding: 10px 0 0;
+  border-top: 1px dashed var(--line);
+  border-bottom: 0;
+}
+
+.page .addCard {
+  min-height: 280px;
+  border-radius: 4px;
+}
+
+.page .form {
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  border: 1px dashed color-mix(in srgb, var(--accent) 55%, var(--line));
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+@media (min-width: 800px) {
+  .page .form {
+    grid-column: span 2;
+  }
+}
+
+/* 信纸的编辑表单占住信纸原来的位置，两栏照样等高 */
+.page .cardForm {
+  flex: 1;
+}
+
+.page .formHint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* —— 致新朋友：一封回信 —— */
+.page .letterWrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  margin: 56px 0 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--ink);
+}
+
+@media (min-width: 960px) {
+  .page .letterWrap {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 56px;
+  }
+
+  /* 两栏等高：左边的规则列表贴底，最后一条线和信纸底边对齐；信纸里的落款也贴底。
+     哪边内容多，另一边就跟着撑开，不靠文字长度碰巧对齐。 */
+  .page .letterWrap > div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page .letterWrap .rules {
+    margin-top: auto;
+  }
+
+  .page .letterWrap .letter {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  .page .letterWrap .letterFoot {
+    margin-top: auto;
+    padding-top: 20px;
+  }
+}
+
+.page .letterWrap h2 {
+  margin: 0 0 10px;
+  font: 600 28px/1.3 var(--serif);
+}
+
+.page .lede {
+  margin: 0 0 22px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.page .rules {
+  margin: 0;
+  padding: 0;
+  counter-reset: rule;
+  list-style: none;
+}
+
+.page .rules li {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  counter-increment: rule;
+  font-size: 14.5px;
+}
+
+.page .rules li::before {
+  content: counter(rule, decimal-leading-zero);
+  color: var(--accent);
+  font: 600 12px/1.9 var(--sans);
+  font-variant-numeric: tabular-nums;
+}
+
+.page .letter {
+  position: relative;
+  padding: 28px 28px 24px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+.page .salute {
+  margin: 0;
+  font: 600 18px/36px var(--serif);
+}
+
+/* 横线只画在信息这几行：每 36px 一条，压在每行底边，折行的第二行也落在线上 */
+.page .letter dl {
+  margin: 0;
+  border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  background: repeating-linear-gradient(transparent 0 35px, color-mix(in srgb, var(--line) 70%, transparent) 35px 36px);
+}
+
+.page .row {
+  display: grid;
+  min-height: 36px;
+  grid-template-columns: 4.5em minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+}
+
+.page .row dt {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 36px;
+  letter-spacing: 0.12em;
+}
+
+.page .row dd {
+  min-width: 0;
+  margin: 0;
+  /* 行高和信纸横线的间距一致，折行时第二行也落在线上 */
+  font: 15px/36px var(--serif);
+  overflow-wrap: anywhere;
+}
+
+.page .row dd code {
+  font: 13px/36px ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+/* 信纸右上角盖的是自己的章 */
+.page .letter .selfMark {
+  position: absolute;
+  top: -18px;
+  right: 22px;
+  width: 74px;
+  height: 74px;
+  color: var(--accent);
+  opacity: 0.85;
+  transform: rotate(-12deg);
+}
+
+.page .selfMark text {
+  fill: currentColor;
+  font-family: var(--sans);
+}
+
+.page .letterFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.page .sign {
+  color: var(--muted);
+  font: italic 15px/40px var(--serif);
+}
+
+.page .mailbox {
+  margin-bottom: 24px;
+}
+
+/* Artalk 暗色模式会用自己的蓝灰配色覆盖网站变量（两者优先级相同），这里再提高一级套回网站配色 */
+.page .mailbox :global(.artalk.atk-dark-mode) {
+  --at-color-font: var(--ink);
+  --at-color-deep: var(--ink);
+  --at-color-sub: var(--muted);
+  --at-color-grey: var(--muted);
+  --at-color-meta: var(--muted);
+  --at-color-border: var(--line);
+  --at-color-light: var(--accent);
+  --at-color-bg: var(--bg);
+  --at-color-bg-transl: color-mix(in srgb, var(--bg) 94%, transparent);
+  --at-color-bg-grey: var(--panel);
+  --at-color-bg-grey-transl: color-mix(in srgb, var(--panel) 75%, transparent);
+  --at-color-bg-light: var(--accent-wash);
+  --at-color-main: var(--accent);
+}
+
+.page .mailbox :global(.atk-send-btn) {
+  color: var(--surface);
+}
+
+/* 复制反馈：两行标签叠在同一格里，「复制」上滑淡出、「已复制」从下方带回弹滑入，对勾随后画出；
+   复原时「已复制」继续往上走，「复制」再从下方回来，始终是同一个方向，不会倒带。 */
+.page .copy {
+  margin-top: 6px;
+  padding: 3px 9px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  transition:
+    color 240ms ease,
+    border-color 240ms ease,
+    background 240ms ease,
+    scale 260ms var(--spring);
+}
+
+.page .copy:hover {
+  border-color: var(--line);
+  color: var(--accent);
+}
+
+.page .copy.done {
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent);
+}
+
+.page .copyAll {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--surface);
+  font-size: 14px;
+  transition:
+    scale 260ms var(--spring),
+    background 240ms ease;
+}
+
+.page .copyAll:hover {
+  background: color-mix(in srgb, var(--accent) 88%, #000);
+}
+
+.page .copy:active,
+.page .copyAll:active {
+  scale: 0.94;
+}
+
+.page .swap {
+  display: inline-grid;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.page .swap > span {
+  display: inline-flex;
+  grid-area: 1 / 1;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition:
+    translate 560ms var(--spring),
+    opacity 260ms ease,
+    filter 260ms ease;
+}
+
+.page .swapDone {
+  filter: blur(2px);
+  opacity: 0;
+  translate: 0 110%;
+}
+
+.page .done .swapIdle {
+  filter: blur(2px);
+  opacity: 0;
+  translate: 0 -110%;
+}
+
+.page .done .swapDone {
+  filter: none;
+  opacity: 1;
+  translate: 0 0;
+}
+
+.page .out .swapDone {
+  filter: blur(2px);
+  opacity: 0;
+  translate: 0 -110%;
+}
+
+.page .out .swapIdle {
+  opacity: 0;
+  transition: none;
+  translate: 0 110%;
+}
+
+.page .swap svg {
+  width: 1.1em;
+  height: 1.1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.2;
+}
+
+.page .swap path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 380ms var(--out);
+}
+
+.page .done .swap path {
+  stroke-dashoffset: 0;
+  transition-delay: 160ms;
+}
+
+/* —— 随机串门的结果条 ——
+   出现：先从屏幕下方弹上来，同时由中间一枚圆点向两侧展开成长条；内容随后依次浮现，邮戳图标最后「盖」下去。
+   收起：反过来，先收内容、再合拢成圆点沉下去，节奏比出现快。 */
+.page .toast {
+  --x: -50%;
+  position: fixed;
+  z-index: 40;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  left: 50%;
+  display: flex;
+  max-width: calc(100% - 32px);
+  align-items: center;
+  gap: 12px;
+  padding: 8px 8px 8px 10px;
+  border-radius: 999px;
+  background: var(--ink);
+  box-shadow: 0 18px 40px -16px rgb(0 0 0 / 50%);
+  color: var(--bg);
+  font-size: 14px;
+  clip-path: inset(0 calc(50% - 28px) round 999px);
+  pointer-events: none;
+  /* 收起时整条移到屏幕外：自身高度再加上它离底边的距离（手机上被抬高过），留足余量 */
+  transform: translate(var(--x), calc(100% + 160px));
+  transition:
+    transform 420ms var(--glide) 120ms,
+    clip-path 340ms var(--glide);
+}
+
+.page .toast[data-open] {
+  clip-path: inset(0 0 round 999px);
+  pointer-events: auto;
+  transform: translate(var(--x), 0);
+  transition:
+    transform 680ms var(--spring),
+    clip-path 760ms var(--out) 140ms;
+}
+
+.page .toast > * {
+  opacity: 0;
+  translate: 0 8px;
+  transition:
+    opacity 160ms ease,
+    translate 160ms ease;
+}
+
+.page .toast[data-open] > * {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 420ms ease var(--s),
+    translate 620ms var(--spring) var(--s);
+}
+
+.page .toastMark {
+  --s: 260ms;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  color: var(--accent);
+}
+
+:global(html[data-blog-theme='dark']) .page .toastMark {
+  color: color-mix(in srgb, var(--accent) 70%, var(--bg));
+}
+
+.page .toastMark svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-12deg);
+}
+
+.page .toastMark text {
+  font-family: var(--serif);
+}
+
+.page .toast[data-open] .toastMark svg {
+  animation: friends-toast-thud 680ms var(--out) 300ms backwards;
+}
+
+@keyframes friends-toast-thud {
+  0% {
+    opacity: 0;
+    transform: scale(1.7) rotate(-28deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(0.9) rotate(-10deg);
+  }
+  100% {
+    transform: scale(1) rotate(-12deg);
+  }
+}
+
+.page .toastText {
+  --s: 360ms;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page .toastText b {
+  font: 600 15px/1 var(--serif);
+}
+
+.page .toast a {
+  --s: 460ms;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px 9px 16px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--surface);
+  white-space: nowrap;
+  transition:
+    opacity 420ms ease var(--s),
+    translate 620ms var(--spring) var(--s),
+    background 200ms ease,
+    scale 240ms var(--spring);
+}
+
+.page .toast a:hover {
+  background: color-mix(in srgb, var(--accent) 86%, #fff);
+}
+
+.page .toast a:active {
+  scale: 0.96;
+}
+
+.page .arrow {
+  display: inline-block;
+  transition: translate 360ms var(--spring);
+}
+
+.page .toast a:hover .arrow {
+  translate: 2px -2px;
+}
+
+/* 按钮出现后，箭头朝外轻点一下，提示可以点 */
+.page .toast[data-open] .arrow {
+  animation: friends-nudge 900ms var(--glide) 1100ms;
+}
+
+@keyframes friends-nudge {
+  40% {
+    translate: 3px -3px;
+  }
+  70% {
+    translate: 0 0;
+  }
+}
+
+.page .toast button {
+  --s: 520ms;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  color: inherit;
+}
+
+.page .toast button svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  opacity: 0.65;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  transition:
+    transform 420ms var(--spring),
+    opacity 200ms ease;
+}
+
+.page .toast button:hover svg {
+  opacity: 1;
+  transform: rotate(90deg);
+}
+
+@media (max-width: 760px) {
+  /* 抬到「回到顶部」和「编辑」两个浮动按钮上方，免得右端被挡住 */
+  .page .toast {
+    --x: 0;
+    right: 16px;
+    bottom: calc(max(24px, env(safe-area-inset-bottom)) + 60px);
+    left: 16px;
+    max-width: none;
+  }
+
+  .page .toastDomain {
+    display: none;
+  }
+
+  /* 手机上这一组排到介绍下面，统计在左、按钮在右 */
+  .page .headSide {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* 手机上按钮和统计同处一行，收成轻量的胶囊，不压过标题和明信片 */
+  .page .knock {
+    min-height: 40px;
+    gap: 8px;
+    padding: 0 14px 0 5px;
+    border-color: var(--line);
+    font-size: 14px;
+  }
+
+  .page .seal {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page .card[data-shown],
+  .page .card[data-shown] .stamp,
+  .page .card[data-shown] .ink,
+  .page .card[data-shown] .postmark text {
+    animation: none;
+  }
+}

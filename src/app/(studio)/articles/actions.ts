@@ -9,6 +9,7 @@ import { getPayloadClient } from '../../../lib/payload';
 import { parseArticleContent } from '../../../lib/article-content-data';
 import { createExploreItem, deleteExploreItem, moveExploreItem, parseExploreItemInput, setExploreItemVisible, updateExploreItem } from '../../../lib/explore-service';
 import { createUsesCategory, createUsesItem, deleteUsesCategory, deleteUsesItem, moveUsesCategory, moveUsesItem, parseUsesCategoryInput, parseUsesItemInput, setUsesItemVisible, updateUsesCategory, updateUsesItem } from '../../../lib/uses-service';
+import { createFriendLink, deleteFriendLink, moveFriendLink, parseFriendCardInput, parseFriendLinkInput, saveFriendCard, setFriendLinkVisible, updateFriendLink } from '../../../lib/friend-links-service';
 
 async function currentUser() {
   const payload = await getPayloadClient();
@@ -280,6 +281,43 @@ export async function moveUsesItemFromWeb(itemId: string, direction: -1 | 1) {
 
 export async function setUsesItemVisibleFromWeb(itemId: string, isVisible: boolean) {
   return runUsesAction('条目更新失败。', (owner) => setUsesItemVisible(owner, itemId, Boolean(isVisible)));
+}
+
+// 「友邻」和「在用」一样在前台页面上编辑，导航入口也取决于有没有公开条目，刷新方式相同。
+export async function saveFriendLinkFromWeb(_state: UsesActionState, formData: FormData): Promise<UsesActionState> {
+  const id = String(formData.get('friendId') ?? '');
+  return runUsesAction('友邻保存失败。', async (owner) => {
+    const input = parseFriendLinkInput({
+      name: formData.get('name'),
+      author: formData.get('author'),
+      url: formData.get('url'),
+      avatarUrl: formData.get('logoUrl'),
+      motto: formData.get('motto'),
+      note: formData.get('note'),
+      metAt: formData.get('metAt'),
+      isVisible: formData.get('isVisible') === 'on',
+    });
+    if (id) await updateFriendLink(owner, id, input);
+    else await createFriendLink(owner, input);
+  });
+}
+
+export async function saveFriendCardFromWeb(_state: UsesActionState, formData: FormData): Promise<UsesActionState> {
+  return runUsesAction('信纸保存失败。', (owner) =>
+    saveFriendCard(owner, parseFriendCardInput({ name: formData.get('name'), url: formData.get('url'), avatar: formData.get('avatar'), motto: formData.get('motto') })),
+  );
+}
+
+export async function deleteFriendLinkFromWeb(friendId: string) {
+  return runUsesAction('友邻删除失败。', (owner) => deleteFriendLink(owner, friendId));
+}
+
+export async function moveFriendLinkFromWeb(friendId: string, direction: -1 | 1) {
+  return runUsesAction('友邻移动失败。', (owner) => moveFriendLink(owner, friendId, direction === -1 ? -1 : 1));
+}
+
+export async function setFriendLinkVisibleFromWeb(friendId: string, isVisible: boolean) {
+  return runUsesAction('友邻更新失败。', (owner) => setFriendLinkVisible(owner, friendId, Boolean(isVisible)));
 }
 
 export async function makePrivateFromWeb(formData: FormData) {

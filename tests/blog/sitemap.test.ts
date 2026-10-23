@@ -27,7 +27,7 @@ describe('公开站点地图', () => {
         { publishedRevision: { exists: true } }, { publishedSlug: { exists: true } },
       ] },
     }));
-    expect(entries).toHaveLength(130);
+    expect(entries).toHaveLength(131);
     expect(entries.at(-1)).toEqual({ url: 'https://suversal.com/blog/published-124', lastModified: '2026-10-22T12:00:00.000Z' });
     expect(entries.some((entry) => /private-draft|\/articles|\/login/.test(entry.url))).toBe(false);
   });
@@ -37,6 +37,6 @@ describe('公开站点地图', () => {
     find.mockResolvedValue({ docs: [{ publishedSlug: '中文 & 工具' }, { publishedSlug: null }] });
     const entries = await sitemap();
     expect(entries.at(-1)).toEqual({ url: 'https://suversal.com/blog/%E4%B8%AD%E6%96%87%20%26%20%E5%B7%A5%E5%85%B7' });
-    expect(entries).toHaveLength(6);
+    expect(entries).toHaveLength(7);
   });
 });

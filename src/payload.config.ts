@@ -13,6 +13,7 @@ import { SiteSettings } from './collections/site-settings';
 import { Topics } from './collections/topics';
 import { UsesCategories } from './collections/uses-categories';
 import { UsesItems } from './collections/uses-items';
+import { FriendLinks } from './collections/friend-links';
 import { Users } from './collections/users';
 import { Media } from './collections/media';
 import { getServerEnv } from './lib/env';
@@ -48,5 +49,5 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   sharp,
-  collections: [Users, Media, Topics, SiteSettings, ExploreItems, UsesCategories, UsesItems, Articles, ArticleRevisions, PublishApprovals, ArticleViewDays],
+  collections: [Users, Media, Topics, SiteSettings, ExploreItems, UsesCategories, UsesItems, FriendLinks, Articles, ArticleRevisions, PublishApprovals, ArticleViewDays],
 });

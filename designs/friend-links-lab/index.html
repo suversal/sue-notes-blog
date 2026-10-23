@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="zh-CN" data-blog-palette="journal" data-blog-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>苏码手记 · 友邻（邮戳版）</title>
+    <!--
+      Design context: 苏码手记的前台外壳与「在用」页。
+      Direction: 友链 = 互相寄信。每位朋友是一张贴了邮票、盖了邮戳的明信片，
+      邮戳上是「结识于」的日期；「随便敲一扇门」是整页的亮点交互；
+      页底「致新朋友」是一封回信，列出交换友链要的信息。
+      沿用现有 token（--bg/--surface/--ink/--accent…）、serif 标题与细线，四套配色和暗色都要成立。
+    -->
+    <style>
+      :root {
+        --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft Yahei", sans-serif;
+        --serif: "Iowan Old Style", "Baskerville", "Songti SC", "STSong", serif;
+        --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        /* out：长尾减速，用于进场；glide：两头缓，用于高亮滑行；spring：约 2% 的轻微回弹，用于落定 */
+        --out: cubic-bezier(0.16, 1, 0.3, 1);
+        --glide: cubic-bezier(0.45, 0, 0.2, 1);
+        --spring: linear(0, 0.0058 1%, 0.0236 2.1%, 0.0957 4.5%, 0.2137 7.2%, 0.5225 13%, 0.6595 16.3%, 0.7774 19.8%, 0.8693 23.6%, 0.9365 27.8%, 0.9808 32.4%, 1.0083 37.7%, 1.0193 43.2%, 1.0206 49.6%, 1.0104 62%, 1.0019 77.5%, 1);
+      }
+      html { --bg:#efeee8; --panel:#e4e4dc; --ink:#252723; --muted:#5c615b; --line:#cbc9bd; --accent:#147a4a; --surface:#f8f7f2; --accent-wash:#e4e4dc; --plate-paper:#f8f7f2; }
+      html[data-blog-palette='paper'] { --bg:#eee9dc; --panel:#e5decd; --ink:#24221e; --muted:#625d53; --line:#cdc3aa; --accent:#b94f2f; --surface:#f7f3e8; --accent-wash:#e5decd; --plate-paper:#f7f3e8; }
+      html[data-blog-palette='mountain'] { --bg:#eef0f6; --panel:#e1e5f0; --ink:#202534; --muted:#596174; --line:#c7cede; --accent:#3157c8; --surface:#f8f9fc; --accent-wash:#e1e5f0; --plate-paper:#f8f9fc; }
+      html[data-blog-palette='indigo'] { --bg:#efedf6; --panel:#e2deee; --ink:#252131; --muted:#5e586d; --line:#c8c1dc; --accent:#514596; --surface:#f8f6fc; --accent-wash:#e2deee; --plate-paper:#f8f6fc; }
+      html[data-blog-theme='dark'] { color-scheme:dark; --bg:#181b1a; --panel:#2a2e2b; --ink:#f0f1ef; --muted:#b6bab7; --line:#3d423f; --accent:#55c98d; --surface:#212422; --accent-wash:#2a2e2b; --plate-paper:#e8ece8; }
+      html[data-blog-theme='dark'][data-blog-palette='paper'] { --bg:#181815; --panel:#2b2a25; --ink:#f1eddf; --muted:#b9b3a3; --line:#424038; --accent:#dc704b; --surface:#22221e; --accent-wash:#2b2a25; --plate-paper:#eee9dc; }
+      html[data-blog-theme='dark'][data-blog-palette='mountain'] { --bg:#171923; --panel:#292d3d; --ink:#eef0f8; --muted:#b4b9ca; --line:#3b4156; --accent:#7187ee; --surface:#202331; --accent-wash:#292d3d; --plate-paper:#e8ebf5; }
+      html[data-blog-theme='dark'][data-blog-palette='indigo'] { --bg:#19191d; --panel:#2b2b31; --ink:#f1f0f4; --muted:#b9b7c0; --line:#404047; --accent:#968bee; --surface:#222227; --accent-wash:#2b2b31; --plate-paper:#ebe9f0; }
+
+      * { box-sizing: border-box; }
+      body { margin:0; min-width:320px; background:var(--bg); color:var(--ink); font:15px/1.6 var(--sans); -webkit-font-smoothing:antialiased; transition:background 280ms ease,color 280ms ease; }
+      button { font:inherit; color:inherit; cursor:pointer; }
+      a { color:inherit; text-decoration:none; }
+      svg { display:block; }
+
+      /* —— 预览控制栏，不属于设计本身 —— */
+      .review-bar { position:sticky; top:0; z-index:20; display:flex; flex-wrap:wrap; align-items:center; gap:10px 20px; padding:10px max(16px, calc((100% - 1320px) / 2)); background:var(--ink); color:var(--bg); font-size:13px; }
+      .review-bar strong { font-weight:600; }
+      .review-bar span { opacity:.7; }
+      .review-bar .ctrls { display:flex; flex-wrap:wrap; gap:6px; margin-left:auto; }
+      .review-bar button { padding:4px 10px; border:1px solid color-mix(in srgb, var(--bg) 30%, transparent); border-radius:6px; background:none; color:var(--bg); font-size:12px; }
+      .review-bar button[aria-pressed='true'] { background:var(--bg); color:var(--ink); }
+
+      /* —— 站点外壳（简化版） —— */
+      .shell { width:min(1320px, calc(100% - 32px)); margin:auto; }
+      @media (min-width:720px) { .shell { width:min(1320px, calc(100% - 48px)); } }
+      .masthead { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:22px 0 18px; border-bottom:1px solid var(--ink); }
+      .brand { font:600 20px/1 var(--serif); }
+      .brand small { display:block; margin-top:6px; color:var(--muted); font:500 10px/1 var(--sans); letter-spacing:.14em; }
+      .masthead nav { display:flex; gap:4px; overflow-x:auto; }
+      .masthead nav a { padding:8px 12px; border-radius:6px; color:var(--muted); white-space:nowrap; }
+      .masthead nav a.on { color:var(--accent); background:var(--accent-wash); }
+      @media (max-width:719px) { .masthead { flex-direction:column; align-items:flex-start; } .masthead nav { width:100%; } }
+
+      /* —— 页头 —— */
+      .head { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:20px 48px; padding:44px 0 28px; }
+      .head-text { flex:999 1 420px; display:flex; flex-direction:column; gap:8px; }
+      .head h1 { margin:0; font:600 40px/1.25 var(--serif); }
+      .head-text > span { max-width:600px; color:var(--muted); font-size:16px; line-height:1.7; }
+      .ledger { display:flex; gap:28px; color:var(--muted); font-size:13px; }
+      .ledger b { display:block; color:var(--ink); font:600 28px/1.1 var(--serif); font-variant-numeric:tabular-nums; }
+
+      .toolbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px 24px; padding-bottom:20px; border-bottom:1px solid var(--line); }
+      .toolbar p { margin:0; color:var(--muted); font-size:14px; }
+
+      /* 亮点按钮：一枚待盖的章 */
+      .knock { position:relative; display:inline-flex; align-items:center; gap:12px; min-height:48px; padding:0 20px 0 8px; border:1px solid var(--ink); border-radius:999px; background:var(--surface); transition:transform 240ms var(--ease), background 240ms ease; }
+      .knock:hover { transform:translateY(-2px); }
+      .knock:active { transform:translateY(1px) scale(.98); }
+      .knock .seal { display:grid; place-items:center; width:34px; height:34px; border-radius:50%; background:var(--accent); color:var(--surface); font:600 15px/1 var(--serif); transition:transform 600ms var(--ease); }
+      .knock:hover .seal { transform:rotate(-24deg); }
+      .knock[aria-busy='true'] .seal { animation:rock 560ms var(--glide) infinite alternate; }
+      @keyframes rock { from { transform:rotate(-22deg); } to { transform:rotate(12deg); } }
+
+      /* —— 明信片网格 —— */
+      .grid { position:relative; display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap:20px; padding:28px 0 8px; }
+
+      /* 进场分三拍：卡片浮起 → 邮票贴上 → 邮戳墨线画出。滚动到视口内才开始，--d 是同一行内的错峰。 */
+      .card { --tilt:0deg; position:relative; display:flex; flex-direction:column; min-height:280px; padding:22px 22px 18px; border:1px solid var(--line); border-radius:4px; background:var(--surface); overflow:hidden; transition:transform 560ms var(--spring), border-color 320ms ease, box-shadow 560ms var(--out), opacity 420ms ease; }
+      .card:not(.shown) { opacity:0; }
+      .card.shown { animation:rise 900ms var(--out) var(--d, 0ms) backwards; }
+      @keyframes rise { from { opacity:0; translate:0 22px; } }
+      /* 航空信封的斜纹封边，只在顶部一条细边上 */
+      .card::before { content:""; position:absolute; inset:0 0 auto; height:5px; background:repeating-linear-gradient(-45deg, var(--accent) 0 10px, transparent 10px 20px, color-mix(in srgb, var(--ink) 70%, transparent) 20px 30px, transparent 30px 40px); opacity:.55; }
+      .card:hover, .card:focus-visible, .card.picked { transform:translateY(-3px); border-color:color-mix(in srgb, var(--accent) 50%, var(--line)); box-shadow:0 18px 36px -22px color-mix(in srgb, var(--ink) 50%, transparent); }
+      .card:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+
+      /* 随机串门：其余卡片退后，一枚细框在卡片之间滑行 */
+      .grid.dim .card { opacity:.4; }
+      .grid.dim .card.lit, .grid.dim .card.picked { opacity:1; }
+      .focus-ring { position:absolute; top:0; left:0; z-index:2; border:1.5px solid var(--accent); border-radius:8px; box-shadow:0 0 0 5px color-mix(in srgb, var(--accent) 12%, transparent); opacity:0; pointer-events:none; transition:opacity 320ms ease; }
+      .focus-ring.on { opacity:1; }
+
+      .serial { color:var(--muted); font:500 11px/1 var(--sans); letter-spacing:.12em; text-transform:uppercase; font-variant-numeric:tabular-nums; }
+
+      /* 邮票：齿孔用 radial-gradient 蒙版打出来；位移、旋转用独立属性，不打架 */
+      .stamp { position:absolute; top:20px; right:20px; width:66px; height:78px; padding:6px; background:var(--plate-paper); transform:rotate(calc(var(--tilt) * .4)); -webkit-mask:linear-gradient(#000 0 0) content-box, radial-gradient(circle at 3px 3px, transparent 2.1px, #000 2.4px) -3px -3px / 6px 6px; mask:linear-gradient(#000 0 0) content-box, radial-gradient(circle at 3px 3px, transparent 2.1px, #000 2.4px) -3px -3px / 6px 6px; filter:drop-shadow(0 1px 0 color-mix(in srgb, #000 12%, transparent)); transition:translate 640ms var(--spring), rotate 640ms var(--spring); }
+      .card.shown .stamp { animation:place 820ms var(--spring) calc(var(--d, 0ms) + 240ms) backwards; }
+      @keyframes place { from { opacity:0; translate:-10px -16px; rotate:9deg; scale:1.14; } 40% { opacity:1; } }
+      /* 悬停时邮票一角微微翘起 */
+      .card:hover .stamp { translate:-1px -3px; rotate:-3deg; }
+      .stamp-face { position:relative; display:grid; place-items:center; width:100%; height:100%; background:linear-gradient(160deg, hsl(var(--h) 42% 62%), hsl(calc(var(--h) + 28) 38% 38%)); color:#fffdf6; font:600 26px/1 var(--serif); overflow:hidden; }
+      /* 头像一律裁成圆形肖像放在票面中间：方图、本身就是圆形的透明底 PNG 都能统一；外圈一道浅色细框，像邮票上的肖像框 */
+      .stamp-face img { width:40px; height:40px; margin-top:-2px; border-radius:50%; object-fit:cover; background:var(--plate-paper); box-shadow:0 0 0 1.5px rgb(255 253 246 / 85%), 0 0 0 4px rgb(255 253 246 / 18%); }
+      .stamp-face small { position:absolute; left:4px; top:3px; font:600 8px/1 var(--sans); letter-spacing:.04em; opacity:.85; }
+      .stamp-face i { position:absolute; right:4px; bottom:3px; font:normal 600 7px/1 var(--sans); letter-spacing:.1em; opacity:.8; }
+
+      /* 邮戳：盖在邮票左下角，墨色跟主题色走 */
+      .postmark { position:absolute; top:38px; right:70px; width:150px; height:84px; color:var(--accent); opacity:.78; transform:rotate(var(--tilt)); transform-origin:75% 50%; pointer-events:none; mix-blend-mode:multiply; }
+      html[data-blog-theme='dark'] .postmark { mix-blend-mode:normal; opacity:.72; }
+      .postmark text { fill:currentColor; font-family:var(--sans); }
+      /* 墨线：pathLength=1，用 dashoffset 从 1 画到 0；波浪线逐条错开，圆圈随后，文字最后浮现 */
+      .postmark .ink { stroke-dasharray:1; }
+      .card.shown .postmark .ink { animation:draw 760ms var(--out) calc(var(--d, 0ms) + 560ms + var(--k) * 70ms) backwards; }
+      .card.shown .postmark text { animation:inkText 700ms ease calc(var(--d, 0ms) + 900ms) backwards; }
+      @keyframes draw { from { stroke-dashoffset:1; } }
+      @keyframes inkText { from { opacity:0; } }
+      /* 重新盖章时扩散的一圈墨晕 */
+      .ripple { position:absolute; top:42px; right:70px; width:76px; height:76px; border:1.5px solid var(--accent); border-radius:50%; pointer-events:none; opacity:0; }
+
+      .card h3 { margin:86px 0 2px; padding-right:72px; font:600 22px/1.3 var(--serif); }
+      .who { color:var(--muted); font-size:13px; }
+      .motto { margin:12px 0 0; font-size:14.5px; line-height:1.7; }
+      .note { position:relative; margin:14px 0 0; padding:10px 0 0 14px; border-top:1px dashed var(--line); color:var(--muted); font:italic 14px/1.7 var(--serif); }
+      .note::before { content:"“"; position:absolute; left:0; top:4px; color:var(--accent); font:600 22px/1 var(--serif); }
+      .note b { font-style:normal; font-weight:600; color:var(--ink); font-family:var(--sans); font-size:11px; letter-spacing:.08em; margin-right:6px; }
+
+      .address { display:flex; align-items:center; gap:10px; margin-top:auto; padding-top:18px; font-size:13px; }
+      .address span:first-child { color:var(--muted); font-size:11px; letter-spacing:.14em; }
+      .address .domain { flex:1; min-width:0; padding-bottom:2px; border-bottom:1px solid var(--line); color:var(--muted); font:13px/1.5 var(--sans); letter-spacing:.02em; transition:color 240ms ease, border-color 240ms ease; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .address svg { width:18px; height:18px; flex:none; fill:none; stroke:currentColor; stroke-width:1.6; transition:transform 300ms var(--ease), color 200ms; }
+      .card:hover .address .domain { color:var(--accent); border-color:color-mix(in srgb, var(--accent) 45%, var(--line)); }
+      .card:hover .address svg { transform:translate(3px,-3px); color:var(--accent); }
+
+      /* —— 随机串门的结果条 —— */
+      /* 出现：先从屏幕下方弹上来，同时由中间一枚圆点向两侧展开成长条；内容随后依次浮现，邮戳图标最后「盖」下去。
+         收起：反过来，先收内容、再合拢成圆点沉下去，节奏比出现快。 */
+      .toast { --x:-50%; position:fixed; left:50%; bottom:24px; z-index:30; display:flex; align-items:center; gap:12px; max-width:calc(100% - 32px); padding:8px 8px 8px 10px; border-radius:999px; background:var(--ink); color:var(--bg); font-size:14px; box-shadow:0 18px 40px -16px rgb(0 0 0 / 50%); transform:translate(var(--x), 170%); clip-path:inset(0 calc(50% - 28px) round 999px); transition:transform 420ms var(--glide) 120ms, clip-path 340ms var(--glide); }
+      .toast.show { transform:translate(var(--x), 0); clip-path:inset(0 0 round 999px); transition:transform 680ms var(--spring), clip-path 760ms var(--out) 140ms; }
+      .toast > * { opacity:0; translate:0 8px; transition:opacity 160ms ease, translate 160ms ease; }
+      .toast.show > * { opacity:1; translate:0 0; transition:opacity 420ms ease var(--s), translate 620ms var(--spring) var(--s); }
+      .toast-mark { --s:260ms; flex:none; width:38px; height:38px; color:var(--accent); }
+      html[data-blog-theme='dark'] .toast-mark { color:color-mix(in srgb, var(--accent) 70%, var(--bg)); }
+      .toast.show .toast-mark svg { animation:toastThud 680ms var(--out) 300ms backwards; }
+      @keyframes toastThud { 0% { opacity:0; transform:scale(1.7) rotate(-28deg); } 55% { opacity:1; transform:scale(.9) rotate(-10deg); } 100% { transform:scale(1) rotate(-12deg); } }
+      .toast-mark svg { width:100%; height:100%; transform:rotate(-12deg); }
+      #toastText { --s:360ms; min-width:0; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      #toastText b { font:600 15px/1 var(--serif); }
+      .toast a { --s:460ms; display:inline-flex; align-items:center; gap:6px; padding:9px 14px 9px 16px; border-radius:999px; background:var(--accent); color:#fff; white-space:nowrap; transition:opacity 420ms ease var(--s), translate 620ms var(--spring) var(--s), background 200ms ease, scale 240ms var(--spring); }
+      .toast a:hover { background:color-mix(in srgb, var(--accent) 86%, #fff); }
+      .toast a:active { scale:.96; }
+      html[data-blog-theme='dark'] .toast a { color:var(--bg); }
+      .toast a .arr { display:inline-block; transition:translate 360ms var(--spring); }
+      .toast a:hover .arr { translate:2px -2px; }
+      /* 按钮出现后，箭头朝外轻点一下，提示可以点 */
+      .toast.show a .arr { animation:nudge 900ms var(--glide) 1100ms; }
+      @keyframes nudge { 40% { translate:3px -3px; } 70% { translate:0 0; } }
+      .toast button { --s:520ms; flex:none; display:grid; place-items:center; width:32px; height:32px; border:0; border-radius:50%; background:none; color:inherit; }
+      .toast button svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.8; opacity:.65; transition:transform 420ms var(--spring), opacity 200ms; }
+      .toast button:hover svg { transform:rotate(90deg); opacity:1; }
+      @media (max-width:520px) { .toast { --x:0; left:16px; right:16px; max-width:none; } .toast .dom { display:none; } }
+
+      /* —— 致新朋友：一封回信 —— */
+      .letter-wrap { display:grid; grid-template-columns:minmax(0, 1fr); gap:32px; margin:56px 0 72px; padding-top:32px; border-top:1px solid var(--ink); }
+      @media (min-width:960px) { .letter-wrap { grid-template-columns:minmax(0, 5fr) minmax(0, 7fr); gap:56px; } }
+      .letter-wrap h2 { margin:0 0 10px; font:600 28px/1.3 var(--serif); }
+      .letter-wrap .lede { margin:0; color:var(--muted); line-height:1.8; }
+      .rules { margin:22px 0 0; padding:0; list-style:none; counter-reset:r; }
+      .rules li { counter-increment:r; display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); font-size:14.5px; }
+      .rules li::before { content:counter(r, decimal-leading-zero); color:var(--accent); font:600 12px/1.9 var(--sans); font-variant-numeric:tabular-nums; }
+
+      .letter { position:relative; padding:28px 28px 24px; border:1px solid var(--line); border-radius:4px; background:var(--surface) repeating-linear-gradient(transparent 0 35px, color-mix(in srgb, var(--line) 70%, transparent) 35px 36px); background-position:0 62px; }
+      .letter .salute { margin:0 0 6px; font:600 18px/36px var(--serif); }
+      .letter dl { margin:0; }
+      .letter .row { display:grid; grid-template-columns:4.5em minmax(0,1fr) auto; align-items:center; gap:10px; min-height:36px; }
+      .letter dt { color:var(--muted); font-size:12px; letter-spacing:.12em; }
+      .letter dd { margin:0; min-width:0; overflow-wrap:anywhere; font:15px/1.5 var(--serif); }
+      .letter dd code { font:13px/1.5 ui-monospace, "SF Mono", Menlo, monospace; }
+      /* 复制反馈：两行标签叠在同一格里，「复制」上滑淡出、「已复制」从下方带回弹滑入，对勾随后画出；
+         复原时「已复制」继续往上走，「复制」再从下方回来，始终是同一个方向，不会倒带。 */
+      .copy { padding:3px 9px; border:1px solid transparent; border-radius:6px; background:none; color:var(--muted); font-size:12px; transition:color 240ms ease, border-color 240ms ease, background 240ms ease, scale 260ms var(--spring); }
+      .copy:hover { color:var(--accent); border-color:var(--line); }
+      .copy:active, .copy-all:active { scale:.94; }
+      .copy.done { color:var(--accent); border-color:color-mix(in srgb, var(--accent) 35%, transparent); background:color-mix(in srgb, var(--accent) 8%, transparent); }
+      .swap { display:inline-grid; overflow:hidden; vertical-align:middle; }
+      .swap > span { grid-area:1 / 1; display:inline-flex; align-items:center; justify-content:center; gap:4px; transition:translate 560ms var(--spring), opacity 260ms ease, filter 260ms ease; }
+      .swap .b { translate:0 110%; opacity:0; filter:blur(2px); }
+      .done .swap .a { translate:0 -110%; opacity:0; filter:blur(2px); }
+      .done .swap .b { translate:0 0; opacity:1; filter:none; }
+      .out .swap .b { translate:0 -110%; opacity:0; filter:blur(2px); }
+      .out .swap .a { translate:0 110%; transition:none; }
+      .swap svg { width:1.1em; height:1.1em; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+      .swap svg path { stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset 380ms var(--out); }
+      .done .swap svg path { stroke-dashoffset:0; transition-delay:160ms; }
+      .letter-foot { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-top:18px; }
+      .letter-foot .sign { font:italic 15px/36px var(--serif); color:var(--muted); }
+      .copy-all { min-height:40px; padding:0 16px; border:0; border-radius:8px; background:var(--accent); color:#fff; font-size:14px; transition:scale 260ms var(--spring), background 240ms ease; }
+      .copy-all:hover { background:color-mix(in srgb, var(--accent) 88%, #000); }
+      html[data-blog-theme='dark'] .copy-all { color:var(--bg); }
+      /* 信纸右上角盖的是自己的章 */
+      .letter .self-mark { position:absolute; top:-18px; right:22px; width:74px; height:74px; color:var(--accent); opacity:.85; transform:rotate(-12deg); }
+
+      .comments { margin-top:24px; padding:18px; border:1px dashed var(--line); border-radius:8px; color:var(--muted); font-size:14px; text-align:center; }
+
+      @media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+    </style>
+  </head>
+  <body>
+    <header class="review-bar" aria-label="设计预览控制栏">
+      <strong>友邻 · 邮戳版</strong>
+      <span>DESIGN REVIEW · V1</span>
+      <div class="ctrls" role="group" aria-label="配色">
+        <button type="button" data-palette="journal" aria-pressed="true">journal</button>
+        <button type="button" data-palette="paper" aria-pressed="false">paper</button>
+        <button type="button" data-palette="mountain" aria-pressed="false">mountain</button>
+        <button type="button" data-palette="indigo" aria-pressed="false">indigo</button>
+        <button type="button" id="theme" aria-pressed="false">暗色</button>
+      </div>
+    </header>
+
+    <div class="shell">
+      <header class="masthead">
+        <a class="brand" href="#">苏码手记<small>SUE NOTES · AN INDEPENDENT JOURNAL</small></a>
+        <nav aria-label="博客导航">
+          <a href="#">文章</a><a href="#">归档</a><a href="#">探索</a><a href="#">在用</a><a class="on" href="#">友邻</a><a href="#">关于</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="head">
+          <div class="head-text">
+            <h1>友邻。</h1>
+            <span>写字的人，彼此寄一封信。这里是我常去串门的地方，每张明信片上的邮戳，是我们认识的那一天。</span>
+          </div>
+          <div class="ledger" aria-label="统计">
+            <div><b id="count">0</b>封来信</div>
+            <div><b id="since">—</b>第一封</div>
+          </div>
+        </section>
+
+        <section class="toolbar">
+          <p>不知道去哪家？让邮差替你挑一扇门。</p>
+          <button class="knock" type="button" id="knock"><span class="seal">叩</span>随便敲一扇门</button>
+        </section>
+
+        <section class="grid" id="grid" aria-label="友链列表"></section>
+
+        <section class="letter-wrap" id="apply">
+          <div>
+            <h2>想交换一封信？</h2>
+            <p class="lede">欢迎同样在认真写字的你。把右边这张信纸上的信息加到你的友链里，然后在下面留言告诉我你的站点，我会尽快回信。</p>
+            <ol class="rules">
+              <li>原创内容为主，近半年仍有更新</li>
+              <li>全站 HTTPS，能在国内正常打开</li>
+              <li>没有违法、灰产、大段广告内容</li>
+              <li>长期失联的站点会先移到「暂时失联」，恢复后放回原处</li>
+            </ol>
+          </div>
+          <div>
+            <article class="letter">
+              <svg class="self-mark" viewBox="0 0 100 100" aria-hidden="true">
+                <defs><path id="selfRing" d="M50,50 m-36,0 a36,36 0 1,1 72,0 a36,36 0 1,1 -72,0" /></defs>
+                <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="2" />
+                <circle cx="50" cy="50" r="27" fill="none" stroke="currentColor" stroke-width="1.2" />
+                <text font-size="9.5" letter-spacing="2.6" font-weight="600"><textPath href="#selfRing">SUVERSAL · 苏码手记 · 寄出 ·</textPath></text>
+                <text x="50" y="55" text-anchor="middle" font-size="15" font-weight="700">回信</text>
+              </svg>
+              <p class="salute">致新朋友：</p>
+              <dl id="selfInfo"></dl>
+              <div class="letter-foot">
+                <span class="sign">—— Sue，于上海</span>
+                <button class="copy-all" type="button" id="copyAll"><span class="swap"><span class="a">复制全部信息</span><span class="b"><svg viewBox="0 0 16 16" aria-hidden="true"><path pathLength="1" d="M3.5 8.5l3 3 6-7"/></svg>已复制，去贴上吧</span></span></button>
+              </div>
+            </article>
+            <div class="comments">这里接 Artalk 评论区（复用文章页的组件，pageKey 用 /blog/friends）</div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      <span class="toast-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="20" cy="20" r="11" fill="none" stroke="currentColor" stroke-width="1.2"/><text x="20" y="24.5" text-anchor="middle" fill="currentColor" font-size="12" font-weight="700" font-family="var(--serif)">到</text></svg>
+      </span>
+      <span id="toastText"></span>
+      <a id="toastLink" href="#" target="_blank" rel="noopener">前往</a>
+      <button type="button" id="toastClose" aria-label="关闭"><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+    </div>
+
+    <script>
+      // 示例数据：结构即建议的 friend-links 集合字段。
+      const friends = [
+        { name: '林间纪事', owner: '阿林', url: 'https://lin.example.com', motto: '记录一个前端工程师在山里的周末。', note: '他写徒步路线的那几篇，我收藏到现在。', metAt: '2024-05-12', hue: 150 },
+        { name: 'Byte & Tea', owner: 'Mira', url: 'https://byteandtea.example.dev', motto: '一杯茶的时间，讲清楚一个系统设计。', note: '图画得比我好太多，常去偷师。', metAt: '2024-09-03', hue: 24 },
+        { name: '旧船票', owner: '老周', url: 'https://jiuchuanpiao.example.cn', motto: '独立开发第四年，仍然在路上。', note: '每月一次的收入复盘，坦诚得让人佩服。', metAt: '2025-01-20', hue: 210, avatar: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23f2c9a0'/%3E%3Ccircle cx='40' cy='32' r='14' fill='%23714b32'/%3E%3Crect x='16' y='50' width='48' height='40' rx='20' fill='%23714b32'/%3E%3C/svg%3E" },
+        { name: '慢慢来', owner: '小满', url: 'https://manmanlai.example.net', motto: '读书、做饭、写 Rust。', note: '读书笔记很克制，适合周日下午看。', metAt: '2025-03-14', hue: 340, avatar: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='40' fill='%23cfe0f5'/%3E%3Ccircle cx='40' cy='33' r='13' fill='%23284a7a'/%3E%3Cpath d='M16 70a24 20 0 0 1 48 0z' fill='%23284a7a'/%3E%3C/svg%3E" },
+        { name: 'Null Island', owner: 'Kai', url: 'https://null-island.example.io', motto: '地图、坐标系和一些奇怪的数据。', note: '从一篇讲 GeoJSON 的文章认识的。', metAt: '2025-06-08', hue: 260 },
+        { name: '南方有雪', owner: '雪', url: 'https://nanfangyouxue.example.com', motto: '摄影与胶片冲洗日志。', note: '她的博客配色是我改主题时的参考之一。', metAt: '2025-11-30', hue: 190 },
+        { name: '工具箱', owner: 'Tom', url: 'https://toolbox.example.org', motto: '关于效率工具的长期测评。', note: '我「在用」页里一半的东西是从这里知道的。', metAt: '2026-04-02', hue: 45 },
+      ]
+      const self = [
+        ['站名', '苏码手记'],
+        ['地址', 'https://suversal.com', true],
+        ['头像', 'https://suversal.com/icon.png', true],
+        ['一句话', '一个独立开发者的写作与折腾手记。'],
+      ]
+
+      const hash = (s) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 7)
+      const domainOf = (u) => new URL(u).host
+      const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+
+      function postmark(f, i) {
+        const [y, m, d] = f.metAt.split('-')
+        const id = 'ring' + i
+        const ring = (domainOf(f.url) + ' · 结识于 · ').toUpperCase()
+        // 左侧三道波浪注销线 + 右侧圆形日戳
+        const waves = [0, 1, 2].map((k) => {
+          const yy = 28 + k * 14
+          return `<path class="ink" pathLength="1" style="--k:${k}" d="M2 ${yy} q10 -6 20 0 t20 0 t20 0 t20 0" fill="none" stroke="currentColor" stroke-width="2"/>`
+        }).join('')
+        return `<svg class="postmark" viewBox="0 0 150 84" aria-hidden="true">
+          ${waves}
+          <defs><path id="${id}" d="M112,42 m-31,0 a31,31 0 1,1 62,0 a31,31 0 1,1 -62,0"/></defs>
+          <circle class="ink" pathLength="1" style="--k:2" cx="112" cy="42" r="38" fill="none" stroke="currentColor" stroke-width="2" transform="rotate(150 112 42)"/>
+          <circle class="ink" pathLength="1" style="--k:3" cx="112" cy="42" r="24" fill="none" stroke="currentColor" stroke-width="1.2" transform="rotate(150 112 42)"/>
+          <text font-size="7.4" letter-spacing="1.1" font-weight="600"><textPath href="#${id}" textLength="190">${esc(ring)}</textPath></text>
+          <text x="112" y="42" text-anchor="middle" font-size="13" font-weight="700">${y}</text>
+          <text x="112" y="54" text-anchor="middle" font-size="8.5" letter-spacing="1">${m}·${d}</text>
+        </svg>`
+      }
+
+      const grid = document.getElementById('grid')
+      grid.innerHTML = friends.map((f, i) => {
+        const tilt = (Math.abs(hash(f.url)) % 19) - 9
+        return `<a class="card" href="${f.url}" target="_blank" rel="noopener" style="--tilt:${tilt}deg">
+          <span class="serial">No.${String(i + 1).padStart(2, '0')}</span>
+          <span class="stamp"><span class="stamp-face" style="--h:${f.hue}"><small>80分</small>${f.avatar ? `<img src="${f.avatar}" alt="" width="40" height="40" loading="lazy" onerror="this.replaceWith(document.createTextNode('${esc(f.name.slice(0, 1))}'))">` : esc(f.name.slice(0, 1))}<i>友邻</i></span></span>
+          ${postmark(f, i)}
+          <h3>${esc(f.name)}</h3>
+          <span class="who">${esc(f.owner)}</span>
+          <p class="motto">${esc(f.motto)}</p>
+          <p class="note"><b>我说</b>${esc(f.note)}</p>
+          <div class="address"><span>寄往</span><span class="domain">${esc(domainOf(f.url))}</span>
+            <svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></div>
+        </a>`
+      }).join('')
+
+      document.getElementById('count').textContent = friends.length
+      document.getElementById('since').textContent = friends.map((f) => f.metAt).sort()[0].slice(0, 7).replace('-', '.')
+
+      document.getElementById('selfInfo').innerHTML = self.map(([k, v, mono]) =>
+        `<div class="row"><dt>${k}</dt><dd>${mono ? `<code>${esc(v)}</code>` : esc(v)}</dd><button class="copy" type="button" data-v="${esc(v)}"><span class="swap"><span class="a">复制</span><span class="b"><svg viewBox="0 0 16 16" aria-hidden="true"><path pathLength="1" d="M3.5 8.5l3 3 6-7"/></svg>已复制</span></span></button></div>`
+      ).join('')
+      function flash(btn) {
+        clearTimeout(btn._t1); clearTimeout(btn._t2)
+        btn.classList.remove('out')
+        btn.classList.add('done')
+        btn._t1 = setTimeout(() => {
+          btn.classList.add('out')
+          btn.getBoundingClientRect()
+          btn._t2 = setTimeout(() => btn.classList.remove('done', 'out'), 240)
+        }, 1600)
+      }
+      document.getElementById('selfInfo').addEventListener('click', (e) => {
+        const b = e.target.closest('.copy'); if (!b) return
+        navigator.clipboard?.writeText(b.dataset.v).catch(() => {}); flash(b)
+      })
+      document.getElementById('copyAll').addEventListener('click', (e) => {
+        navigator.clipboard?.writeText(self.map(([k, v]) => `${k}：${v}`).join('\n')).catch(() => {}); flash(e.currentTarget)
+      })
+
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+      const cards = [...grid.querySelectorAll('.card')]
+
+      // 进场：进入视口才播放；同一批进来的卡片按顺序错开 90ms。
+      const seen = new IntersectionObserver((entries) => {
+        entries.filter((e) => e.isIntersecting).forEach((e, n) => {
+          e.target.style.setProperty('--d', `${n * 90}ms`)
+          e.target.classList.add('shown')
+          seen.unobserve(e.target)
+        })
+      }, { rootMargin: '0px 0px -8% 0px' })
+      cards.forEach((c) => seen.observe(c))
+
+      // 随便敲一扇门：细框沿阅读顺序挨家滑过、越走越慢，落定后在那张卡上重新盖一次章。
+      const knock = document.getElementById('knock')
+      const toast = document.getElementById('toast')
+      const ring = Object.assign(document.createElement('div'), { className: 'focus-ring' })
+      grid.append(ring)
+      const wait = (ms) => new Promise((r) => setTimeout(r, ms))
+
+      function moveRing(card, ms, easing) {
+        ring.style.transition = ms ? `opacity 320ms ease, transform ${ms}ms ${easing}, width ${ms}ms ${easing}, height ${ms}ms ${easing}` : 'none'
+        ring.style.transform = `translate(${card.offsetLeft - 7}px, ${card.offsetTop - 7}px)`
+        ring.style.width = `${card.offsetWidth + 14}px`
+        ring.style.height = `${card.offsetHeight + 14}px`
+      }
+
+      function light(card) {
+        cards.forEach((c) => c.classList.toggle('lit', c === card))
+      }
+
+      function restamp(card) {
+        if (reduce) return
+        const mark = card.querySelector('.postmark')
+        // 抬起（减速）→ 落下（加速撞上）→ 回稳，每段各用各的缓动
+        mark.animate([
+          { opacity: .78, scale: 1, translate: '0 0', easing: 'cubic-bezier(.2,.7,.3,1)' },
+          { opacity: .12, scale: 1.3, translate: '0 -10px', offset: .38, easing: 'cubic-bezier(.55,0,.9,.45)' },
+          { opacity: .95, scale: .95, translate: '0 0', offset: .6, easing: 'cubic-bezier(.2,.8,.3,1)' },
+          { opacity: .78, scale: 1, translate: '0 0' },
+        ], { duration: 900 })
+        card.animate([{ scale: 1 }, { scale: 1, offset: .58 }, { scale: .988, offset: .64 }, { scale: 1 }], { duration: 900, easing: 'ease-out' })
+        const ripple = Object.assign(document.createElement('span'), { className: 'ripple' })
+        card.append(ripple)
+        ripple.animate([{ scale: .5, opacity: .55 }, { scale: 2.3, opacity: 0 }], { duration: 1000, delay: 560, easing: 'cubic-bezier(.16,1,.3,1)' })
+          .finished.then(() => ripple.remove())
+      }
+
+      async function knockDoor() {
+        if (knock.getAttribute('aria-busy') === 'true') return
+        knock.setAttribute('aria-busy', 'true')
+        toast.classList.remove('show')
+        cards.forEach((c) => c.classList.remove('picked'))
+        const target = Math.floor(Math.random() * cards.length)
+        const columns = getComputedStyle(grid).gridTemplateColumns.split(' ').length
+        grid.classList.add('dim')
+
+        if (reduce || columns === 1) {
+          // 单列时整组卡片放不进一屏，改为直接滑到选中的那张，再亮框。
+          cards[target].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' })
+          await wait(reduce ? 0 : 650)
+          moveRing(cards[target], 0)
+          light(cards[target])
+          ring.classList.add('on')
+        } else {
+          const top = grid.getBoundingClientRect().top
+          if (top < 0 || top > innerHeight * .4) {
+            grid.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            await wait(500)
+          }
+          const begin = Math.floor(Math.random() * cards.length)
+          const steps = cards.length + ((target - begin + cards.length) % cards.length)
+          moveRing(cards[begin], 0)
+          light(cards[begin])
+          ring.getBoundingClientRect()
+          ring.classList.add('on')
+          await wait(240)
+          for (let k = 1; k <= steps; k++) {
+            // 间隔按 t^2.4 增长：开头轻快，最后两三家明显放慢，像在犹豫
+            const t = k / steps
+            const ms = Math.round(80 + 560 * t ** 2.4)
+            const card = cards[(begin + k) % cards.length]
+            moveRing(card, ms, k === steps ? 'var(--spring)' : 'var(--glide)')
+            light(card)
+            await wait(k === steps ? ms * .7 : ms)
+          }
+        }
+
+        const card = cards[target]
+        // 落在屏幕下缘的卡会被结果条挡住，先把它挪到视口中间
+        const box = card.getBoundingClientRect()
+        if (box.bottom > innerHeight - 96 || box.top < 0) {
+          card.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' })
+          await wait(reduce ? 0 : 520)
+        }
+        card.classList.add('picked')
+        restamp(card)
+        const f = friends[target]
+        document.getElementById('toastText').innerHTML = `邮差停在了「<b>${esc(f.name)}</b>」门口`
+        const link = document.getElementById('toastLink'); link.href = f.url; link.innerHTML = `前往<span class="dom">${esc(domainOf(f.url))}</span><span class="arr">↗</span>`
+        await wait(reduce ? 0 : 760)
+        toast.classList.add('show')
+        knock.removeAttribute('aria-busy')
+        await wait(reduce ? 0 : 1400)
+        ring.classList.remove('on')
+        grid.classList.remove('dim')
+        cards.forEach((c) => c.classList.remove('lit'))
+      }
+      knock.addEventListener('click', knockDoor)
+      addEventListener('resize', () => { if (ring.classList.contains('on')) moveRing(cards.find((c) => c.classList.contains('lit')) ?? cards[0], 0) })
+      document.getElementById('toastClose').addEventListener('click', () => {
+        toast.classList.remove('show')
+        cards.forEach((c) => c.classList.remove('picked'))
+      })
+
+      // 预览控制
+      document.querySelectorAll('[data-palette]').forEach((b) => b.addEventListener('click', () => {
+        document.documentElement.dataset.blogPalette = b.dataset.palette
+        document.querySelectorAll('[data-palette]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+      }))
+      document.getElementById('theme').addEventListener('click', (e) => {
+        const dark = document.documentElement.dataset.blogTheme !== 'dark'
+        document.documentElement.dataset.blogTheme = dark ? 'dark' : 'light'
+        e.currentTarget.setAttribute('aria-pressed', String(dark))
+      })
+    </script>
+  </body>
+</html>

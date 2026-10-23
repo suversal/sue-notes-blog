@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const origin = getSiteOrigin();
   const posts = await getPublicSitemapPosts();
   return [
-    ...['/blog', '/blog/archive', '/blog/explore', '/blog/uses', '/blog/about'].map((path) => ({ url: `${origin}${path}` })),
+    ...['/blog', '/blog/archive', '/blog/explore', '/blog/uses', '/blog/friends', '/blog/about'].map((path) => ({ url: `${origin}${path}` })),
     ...posts.map((post) => ({
       url: `${origin}/blog/${encodeURIComponent(post.slug)}`,
       ...(post.publishedAt ? { lastModified: post.publishedAt } : {}),

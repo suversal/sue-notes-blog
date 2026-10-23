@@ -74,6 +74,7 @@ export interface Config {
     'explore-items': ExploreItem;
     'uses-categories': UsesCategory;
     'uses-items': UsesItem;
+    'friend-links': FriendLink;
     articles: Article;
     'article-revisions': ArticleRevision;
     'publish-approvals': PublishApproval;
@@ -92,6 +93,7 @@ export interface Config {
     'explore-items': ExploreItemsSelect<false> | ExploreItemsSelect<true>;
     'uses-categories': UsesCategoriesSelect<false> | UsesCategoriesSelect<true>;
     'uses-items': UsesItemsSelect<false> | UsesItemsSelect<true>;
+    'friend-links': FriendLinksSelect<false> | FriendLinksSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     'article-revisions': ArticleRevisionsSelect<false> | ArticleRevisionsSelect<true>;
     'publish-approvals': PublishApprovalsSelect<false> | PublishApprovalsSelect<true>;
@@ -211,6 +213,10 @@ export interface SiteSetting {
   authorName: string;
   tagline: string;
   authorBio: string;
+  friendCardName?: string | null;
+  friendCardUrl?: string | null;
+  friendCardAvatar?: string | null;
+  friendCardMotto?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -304,6 +310,25 @@ export interface UsesItem {
     | number
     | boolean
     | null;
+  isVisible: boolean;
+  sortOrder: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "friend-links".
+ */
+export interface FriendLink {
+  id: string;
+  owner: string | User;
+  name: string;
+  author?: string | null;
+  url: string;
+  avatarUrl?: string | null;
+  motto: string;
+  note?: string | null;
+  metAt: string;
   isVisible: boolean;
   sortOrder: number;
   updatedAt: string;
@@ -493,6 +518,10 @@ export interface PayloadLockedDocument {
         value: string | UsesItem;
       } | null)
     | ({
+        relationTo: 'friend-links';
+        value: string | FriendLink;
+      } | null)
+    | ({
         relationTo: 'articles';
         value: string | Article;
       } | null)
@@ -613,6 +642,10 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   authorName?: T;
   tagline?: T;
   authorBio?: T;
+  friendCardName?: T;
+  friendCardUrl?: T;
+  friendCardAvatar?: T;
+  friendCardMotto?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -669,6 +702,24 @@ export interface UsesItemsSelect<T extends boolean = true> {
   promoNote?: T;
   logoUrl?: T;
   relatedLinks?: T;
+  isVisible?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "friend-links_select".
+ */
+export interface FriendLinksSelect<T extends boolean = true> {
+  owner?: T;
+  name?: T;
+  author?: T;
+  url?: T;
+  avatarUrl?: T;
+  motto?: T;
+  note?: T;
+  metAt?: T;
   isVisible?: T;
   sortOrder?: T;
   updatedAt?: T;

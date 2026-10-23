@@ -6,6 +6,8 @@ import * as migration_20260920_010000_article_pin_priority from './20260920_0100
 import * as migration_20260920_011000_article_pin_priority_order from './20260920_011000_article_pin_priority_order';
 import * as migration_20261011_120000_uses_and_site_rename from './20261011_120000_uses_and_site_rename';
 import * as migration_20261012_120000_users_reset_password_requested_at from './20261012_120000_users_reset_password_requested_at';
+import * as migration_20261023_120000_friend_links from './20261023_120000_friend_links';
+import * as migration_20261023_130000_friend_card from './20261023_130000_friend_card';
 
 export const migrations = [
   {
@@ -47,5 +49,15 @@ export const migrations = [
     up: migration_20261012_120000_users_reset_password_requested_at.up,
     down: migration_20261012_120000_users_reset_password_requested_at.down,
     name: '20261012_120000_users_reset_password_requested_at',
+  },
+  {
+    up: migration_20261023_120000_friend_links.up,
+    down: migration_20261023_120000_friend_links.down,
+    name: '20261023_120000_friend_links',
+  },
+  {
+    up: migration_20261023_130000_friend_card.up,
+    down: migration_20261023_130000_friend_card.down,
+    name: '20261023_130000_friend_card',
   },
 ];

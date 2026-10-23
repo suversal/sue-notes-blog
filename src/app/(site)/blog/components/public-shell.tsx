@@ -28,11 +28,13 @@ export function PublicShell({
   site,
   searchPosts,
   showUses = false,
+  showFriends = false,
   children,
 }: {
   site: SiteProfile
   searchPosts: PublicPostSummary[]
   showUses?: boolean
+  showFriends?: boolean
   children: ReactNode
 }) {
   const pathname = usePathname()
@@ -97,7 +99,7 @@ export function PublicShell({
           .includes(keyword),
     )
     .slice(0, 8)
-  const listingFooter = ['/blog/archive', '/blog/explore', '/blog/uses'].includes(pathname)
+  const listingFooter = ['/blog/archive', '/blog/explore', '/blog/uses', '/blog/friends'].includes(pathname)
   return (
     <div className={styles.publicRoot}>
       <div className={styles.publicShell}>
@@ -122,6 +124,11 @@ export function PublicShell({
             {showUses && (
               <Link className={pathname === '/blog/uses' ? styles.active : ''} href="/blog/uses">
                 在用
+              </Link>
+            )}
+            {showFriends && (
+              <Link className={pathname === '/blog/friends' ? styles.active : ''} href="/blog/friends">
+                友邻
               </Link>
             )}
             <Link className={pathname === '/blog/about' ? styles.active : ''} href="/blog/about">
