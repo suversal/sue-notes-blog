@@ -105,6 +105,27 @@
 .publicRoot :is(input:not([type='checkbox'], [type='radio'], [type='button'], [type='submit']), textarea, [contenteditable='true']) {
   cursor: text;
 }
+/* Artalk 自带样式给评论区里可点的元素写了 cursor: pointer，照它的选择器逐条盖回来。 */
+.publicRoot :global(.atk-comment-wrap.atk-openable),
+.publicRoot :global(.atk-comment > .atk-main > .atk-header .atk-item.atk-reply-at > .atk-nick),
+.publicRoot :global(.atk-comment > .atk-main > .atk-body > .atk-collapsed .atk-show-btn),
+.publicRoot :global(.atk-comment .atk-height-limit-btn),
+.publicRoot :global(.artalk > .atk-list > .atk-list-header .atk-dropdown-wrap),
+.publicRoot :global(.artalk > .atk-list > .atk-list-header .atk-dropdown-wrap .atk-arrow-down-icon),
+.publicRoot :global(.artalk > .atk-list > .atk-list-header .atk-right-action > span),
+.publicRoot :global(.atk-list-read-more .atk-list-read-more-inner),
+.publicRoot :global(.atk-pagination > .atk-btn),
+.publicRoot :global(.atk-main-editor > .atk-bottom .atk-plug-btn),
+.publicRoot :global(.atk-main-editor > .atk-bottom .atk-state-btn),
+.publicRoot :global(.atk-main-editor > .atk-bottom .atk-send-btn),
+.publicRoot :global(.atk-common-action-btn),
+.publicRoot :global(.atk-editor-plug-emoticons > .atk-grp-wrap > .atk-grp > .atk-item),
+.publicRoot :global(.atk-editor-plug-emoticons > .atk-grp-switcher > span) {
+  cursor: var(--cursor-pointer);
+}
+.publicRoot :global(.atk-pagination > .atk-btn.atk-disabled:hover) {
+  cursor: var(--cursor-default);
+}
 .publicRoot a {
   text-decoration: none;
 }
