@@ -9,9 +9,17 @@ const friend = {
 describe('友邻规则', () => {
   it('站长、头像和推荐语可以留空，文字去掉首尾空白', () => {
     expect(parseFriendLinkInput({ ...friend, isVisible: true })).toEqual({
-      name: '林间纪事', author: '', url: 'https://lin.example.com', avatarUrl: '', motto: '记录山里的周末。',
+      name: '林间纪事', author: '', authorIsX: false, url: 'https://lin.example.com', avatarUrl: '', motto: '记录山里的周末。',
       note: '', metAt: '2024-05-12', isVisible: true,
     })
+  })
+
+  it('勾了「站长是 X 用户名」时站长必须是合法的用户名；站长留空就当没勾', () => {
+    expect(parseFriendLinkInput({ ...friend, author: '@weichen_ink', authorIsX: true }).authorIsX).toBe(true)
+    expect(parseFriendLinkInput({ ...friend, author: '阿林', authorIsX: false }).authorIsX).toBe(false)
+    expect(parseFriendLinkInput({ ...friend, author: '', authorIsX: true }).authorIsX).toBe(false)
+    expect(() => parseFriendLinkInput({ ...friend, author: '阿林', authorIsX: true })).toThrow('X 的用户名')
+    expect(() => parseFriendLinkInput({ ...friend, author: 'a'.repeat(16), authorIsX: true })).toThrow('X 的用户名')
   })
 
   it('网址必须是完整的 http(s) 链接，站内路径和脚本地址都不行', () => {

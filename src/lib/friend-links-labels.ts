@@ -14,6 +14,12 @@ export function friendDomain(url: string) {
   }
 }
 
+/** 「站长」按 X 用户名的格式取出去掉 @ 的用户名；格式不对返回空串，卡片上就不做成链接。 */
+export function friendXHandle(author: string) {
+  const handle = author.trim().replace(/^@/, '')
+  return /^[A-Za-z0-9_]{1,15}$/.test(handle) ? handle : ''
+}
+
 /** 邮戳的倾斜角按网址算，刷新后不变，不同站点彼此错开，范围 -9° 到 9°。 */
 export function friendTilt(url: string) {
   return (hash(url) % 19) - 9

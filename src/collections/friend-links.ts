@@ -31,6 +31,8 @@ export const FriendLinks: CollectionConfig = {
     },
     { name: 'name', label: '站名', type: 'text', required: true, maxLength: 40 },
     { name: 'author', label: '站长', type: 'text', maxLength: 40 },
+    // 勾上时站长按 X 用户名处理，前台点它去对方的 X 主页。
+    { name: 'authorIsX', label: '站长是 X 用户名', type: 'checkbox', required: true, defaultValue: false },
     { name: 'url', label: '网址', type: 'text', required: true, maxLength: 500 },
     { name: 'avatarUrl', label: '头像地址', type: 'text', maxLength: 500 },
     { name: 'motto', label: '一句话介绍', type: 'text', required: true, maxLength: 80 },

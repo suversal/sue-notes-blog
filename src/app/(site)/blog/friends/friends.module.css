@@ -5,6 +5,9 @@
   --out: cubic-bezier(0.16, 1, 0.3, 1);
   --glide: cubic-bezier(0.45, 0, 0.2, 1);
   --spring: linear(0, 0.0058 1%, 0.0236 2.1%, 0.0957 4.5%, 0.2137 7.2%, 0.5225 13%, 0.6595 16.3%, 0.7774 19.8%, 0.8693 23.6%, 0.9365 27.8%, 0.9808 32.4%, 1.0083 37.7%, 1.0193 43.2%, 1.0206 49.6%, 1.0104 62%, 1.0019 77.5%, 1);
+  /* 整页的格线都用同一种虚线：线段 6px、间隔 4px、1px 粗。浏览器自带的 dashed 管不了线段长短，所以用渐变画。
+     用到的地方各自设 --rule-color（悬停、聚焦时换成主题色），这里只给默认值。 */
+  --rule-color: color-mix(in srgb, var(--muted) 50%, transparent);
 }
 
 /* —— 页头：左边标题和介绍，右边统计叠在串门按钮上面，按钮和介绍底部对齐 —— */
@@ -144,7 +147,7 @@
 
 /* 浮起状态与「在用」页卡片完全一致：上浮 3px、边框染主题色、收着的阴影。
    悬停只在鼠标设备上触发（见下方），键盘聚焦和随机串门选中的卡片任何设备都用这个样式。 */
-.page a.card:focus-visible,
+.page .linkCard:has(.domain:focus-visible),
 .page .card[data-picked] {
   border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
   box-shadow: 0 10px 28px -18px color-mix(in srgb, var(--ink) 55%, transparent);
@@ -152,16 +155,27 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .page a.card:hover {
+  .page .linkCard:hover {
     border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
     box-shadow: 0 10px 28px -18px color-mix(in srgb, var(--ink) 55%, transparent);
     transform: translateY(-3px);
   }
 }
 
-.page a.card:focus-visible {
+.page .linkCard:has(.domain:focus-visible) {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
+}
+
+.page .linkCard .domain:focus-visible {
+  outline: none;
+}
+
+/* 域名链接铺满整张卡片，点卡片任何地方都去对方网站 */
+.page .linkCard .domain::after {
+  position: absolute;
+  inset: 0;
+  content: '';
 }
 
 /* 随机串门：其余卡片退后，一枚细框在卡片之间滑行 */
@@ -214,11 +228,9 @@
   right: 20px;
   width: 66px;
   height: 78px;
-  padding: 6px;
-  background: var(--plate-paper);
-  filter: drop-shadow(0 1px 0 rgb(0 0 0 / 12%));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, radial-gradient(circle at 3px 3px, transparent 2.1px, #000 2.4px) -3px -3px / 6px 6px;
-  mask: linear-gradient(#000 0 0) content-box, radial-gradient(circle at 3px 3px, transparent 2.1px, #000 2.4px) -3px -3px / 6px 6px;
+  /* 投影要放在遮罩外面一层：和遮罩写在同一个元素上会被一起裁掉，
+     亮色模式下白色齿孔贴在浅色卡片上就看不出邮票的轮廓 */
+  filter: drop-shadow(0 0 0.6px rgb(0 0 0 / 38%)) drop-shadow(0 1px 1.5px rgb(0 0 0 / 14%));
   transform: rotate(calc(var(--tilt) * 0.4));
   /* 邮票带蒙版和滤镜，重绘成本高；悬停时会翘起，提前放到独立图层，避免动画中途掉帧 */
   will-change: transform, translate, rotate;
@@ -245,10 +257,20 @@
 
 /* 悬停时邮票一角微微翘起；触屏上不触发，免得点过之后一直翘着 */
 @media (hover: hover) and (pointer: fine) {
-  .page a.card:hover .stamp {
+  .page .linkCard:hover .stamp {
     rotate: -3deg;
     translate: -1px -3px;
   }
+}
+
+.page .stampPaper {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 6px;
+  background: var(--plate-paper);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, radial-gradient(circle at 3px 3px, transparent 2.1px, #000 2.4px) -3px -3px / 6px 6px;
+  mask: linear-gradient(#000 0 0) content-box, radial-gradient(circle at 3px 3px, transparent 2.1px, #000 2.4px) -3px -3px / 6px 6px;
 }
 
 .page .stampFace {
@@ -369,6 +391,32 @@
   font-size: 13px;
 }
 
+/* 站长的 X 链接叠在铺满卡片的域名链接上面；前面带个 X 图标，一看就知道点了去哪 */
+.page a.who {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition:
+    color 240ms ease,
+    text-decoration-color 240ms ease;
+}
+
+.page a.who svg {
+  width: 11px;
+  height: 11px;
+  flex: none;
+}
+
+.page a.who:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .page .motto {
   margin: 12px 0 0;
   font-size: 14.5px;
@@ -378,7 +426,7 @@
 .page .note {
   margin: 14px 0 0;
   padding-top: 10px;
-  border-top: 1px dashed var(--line);
+  background: repeating-linear-gradient(90deg, var(--rule-color) 0 6px, transparent 6px 10px) top / 100% 1px no-repeat;
   color: var(--muted);
   font: italic 14px/1.7 var(--serif);
 }
@@ -398,12 +446,15 @@
   content: '”';
 }
 
+/* 格线贯穿整行，「寄往」、域名和箭头都写在线上，和回信纸上每一行的结构一样 */
 .page .address {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-top: auto;
   padding-top: 18px;
+  padding-bottom: 7px;
+  background: repeating-linear-gradient(90deg, var(--rule-color) 0 6px, transparent 6px 10px) bottom / 100% 1px no-repeat;
   font-size: 13px;
 }
 
@@ -417,16 +468,12 @@
   min-width: 0;
   flex: 1;
   overflow: hidden;
-  padding-bottom: 2px;
-  border-bottom: 1px solid var(--line);
   color: var(--muted);
-  font: 13px/1.5 var(--sans);
-  letter-spacing: 0.02em;
+  /* 和回信纸上的地址一样用等宽字，像打字机打上去的 */
+  font: 12.5px/1.5 ui-monospace, 'SF Mono', Menlo, monospace;
   text-overflow: ellipsis;
   white-space: nowrap;
-  transition:
-    color 240ms ease,
-    border-color 240ms ease;
+  transition: color 240ms ease;
 }
 
 /* 箭头与「探索」页卡片一致：共用的 arrow 图标，平时斜向右上，悬停时转平向右并右移 2px */
@@ -442,12 +489,21 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .page a.card:hover .domain {
-    border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  .page a.who:hover {
+    color: var(--accent);
+    text-decoration-color: currentColor;
+  }
+
+  /* 指着站长链接时，「寄往」不跟着亮，免得看起来会去对方网站 */
+  .page .linkCard:hover:not(:has(a.who:hover)) .address {
+    --rule-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  }
+
+  .page .linkCard:hover:not(:has(a.who:hover)) .domain {
     color: var(--accent);
   }
 
-  .page a.card:hover .address svg {
+  .page .linkCard:hover:not(:has(a.who:hover)) .address svg {
     color: var(--accent);
     transform: rotate(0) translateX(2px);
   }
@@ -582,11 +638,23 @@
   font: 600 18px/36px var(--serif);
 }
 
-/* 横线只画在信息这几行：每 36px 一条，压在每行底边，折行的第二行也落在线上 */
+/* 格线只画在信息这几行：顶上一条，之后每 36px 一条压在每行底边，折行的第二行也落在线上。
+   先画实线，再用横向的虚线图案做遮罩切成段，和明信片上的虚线一样长短。 */
 .page .letter dl {
+  position: relative;
   margin: 0;
-  border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
-  background: repeating-linear-gradient(transparent 0 35px, color-mix(in srgb, var(--line) 70%, transparent) 35px 36px);
+}
+
+.page .letter dl::before {
+  position: absolute;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  background:
+    linear-gradient(var(--rule-color), var(--rule-color)) top / 100% 1px no-repeat,
+    repeating-linear-gradient(transparent 0 35px, var(--rule-color) 35px 36px);
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 10px);
+  mask: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 10px);
 }
 
 .page .row {
@@ -685,20 +753,73 @@
   color: var(--accent);
 }
 
-.page .copyAll {
+/* 「复制全部信息」和留言框的「寄出」做成一枚盖上去的章：双线框、略微歪着，悬停时摆正。
+   寄出按钮沿用 Artalk 的选择器路径再加外层类名，才压得过它和文章页评论区的样式。 */
+.page .copyAll,
+.page .mailbox :global(.atk-main-editor > .atk-bottom .atk-send-btn) {
+  height: auto;
   min-height: 40px;
-  padding: 0 16px;
-  border-radius: 8px;
-  background: var(--accent);
-  color: var(--surface);
-  font-size: 14px;
+  padding: 0 18px;
+  border: 1.5px solid var(--accent);
+  border-radius: 4px;
+  outline: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  outline-offset: -5px;
+  background: transparent;
+  color: var(--accent);
+  font: 600 14px/1 var(--serif);
+  letter-spacing: 0.12em;
+  rotate: -1.5deg;
   transition:
     scale 260ms var(--spring),
+    rotate 420ms var(--spring),
     background 240ms ease;
 }
 
-.page .copyAll:hover {
-  background: color-mix(in srgb, var(--accent) 88%, #000);
+.page .copyAll:hover,
+.page .mailbox :global(.atk-main-editor > .atk-bottom .atk-send-btn:hover) {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  rotate: 0deg;
+}
+
+/* 留言框也是一张信纸：航空信封的斜纹封边、信纸底色，称呼和邮箱写在点线格上 */
+.page .mailbox :global(.atk-main-editor) {
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+.page .mailbox :global(.atk-main-editor)::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  content: '';
+  opacity: 0.55;
+  background: repeating-linear-gradient(-45deg, var(--accent) 0 10px, transparent 10px 20px, color-mix(in srgb, var(--ink) 70%, transparent) 20px 30px, transparent 30px 40px);
+}
+
+.page .mailbox :global(.atk-main-editor > .atk-header) {
+  gap: 16px;
+  padding: 18px 20px 0;
+}
+
+.page .mailbox :global(.atk-main-editor > .atk-header input) {
+  padding-inline: 0;
+  border: 0;
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--rule-color) 0 6px, transparent 6px 10px) bottom / 100% 1px no-repeat;
+}
+
+.page .mailbox :global(.atk-main-editor > .atk-header input:focus) {
+  --rule-color: var(--accent);
+}
+
+.page .mailbox :global(.atk-main-editor > .atk-textarea-wrap > .atk-textarea) {
+  padding-inline: 20px;
+  background-color: transparent;
+}
+
+.page .mailbox :global(.atk-main-editor > .atk-bottom) {
+  align-items: center;
+  padding: 6px 14px 14px;
 }
 
 .page .copy:active,

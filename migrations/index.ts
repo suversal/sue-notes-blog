@@ -8,6 +8,7 @@ import * as migration_20261011_120000_uses_and_site_rename from './20261011_1200
 import * as migration_20261012_120000_users_reset_password_requested_at from './20261012_120000_users_reset_password_requested_at';
 import * as migration_20261023_120000_friend_links from './20261023_120000_friend_links';
 import * as migration_20261023_130000_friend_card from './20261023_130000_friend_card';
+import * as migration_20261025_120000_friend_author_is_x from './20261025_120000_friend_author_is_x';
 
 export const migrations = [
   {
@@ -59,5 +60,10 @@ export const migrations = [
     up: migration_20261023_130000_friend_card.up,
     down: migration_20261023_130000_friend_card.down,
     name: '20261023_130000_friend_card',
+  },
+  {
+    up: migration_20261025_120000_friend_author_is_x.up,
+    down: migration_20261025_120000_friend_author_is_x.down,
+    name: '20261025_120000_friend_author_is_x',
   },
 ];

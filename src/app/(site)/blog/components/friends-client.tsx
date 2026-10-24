@@ -6,7 +6,7 @@ import archiveStyles from '../blog-v1.module.css'
 import styles from '../friends/friends.module.css'
 import listing from '../listing.module.css'
 import usesStyles from '../uses/uses.module.css'
-import { earliestMetMonth, friendDomain, friendHue, friendTilt } from '../../../../lib/friend-links-labels'
+import { earliestMetMonth, friendDomain, friendHue, friendTilt, friendXHandle } from '../../../../lib/friend-links-labels'
 import type { FriendCard, FriendLink } from '../../../../lib/friend-links-service'
 import { FriendsComments } from './friends-comments'
 import { Icon } from './ui-icon'
@@ -53,20 +53,25 @@ function Stamp({ friend }: { friend: FriendLink }) {
   }, [])
   return (
     <span className={styles.stamp}>
-      <span className={styles.stampFace} style={{ '--h': friendHue(friend.url) } as CSSProperties}>
-        <small>80分</small>
-        {friend.avatarUrl && !broken ? (
-          <img ref={image} src={friend.avatarUrl} alt="" width="40" height="40" loading="lazy" onError={() => setBroken(true)} />
-        ) : (
-          friend.name.slice(0, 1)
-        )}
-        <i>友邻</i>
+      <span className={styles.stampPaper}>
+        <span className={styles.stampFace} style={{ '--h': friendHue(friend.url) } as CSSProperties}>
+          <small>80分</small>
+          {friend.avatarUrl && !broken ? (
+            <img ref={image} src={friend.avatarUrl} alt="" width="40" height="40" loading="lazy" onError={() => setBroken(true)} />
+          ) : (
+            friend.name.slice(0, 1)
+          )}
+          <i>友邻</i>
+        </span>
       </span>
     </span>
   )
 }
 
-function CardBody({ friend, index }: { friend: FriendLink; index: number }) {
+// 访客看到的卡片里，「寄往」的域名是指向对方网站的链接，并铺满整张卡片；
+// 编辑时勾了「站长是 X 用户名」的，站长是另一个链接，叠在上面单独可点。链接里不能再套链接，所以外层不是 <a>。
+function CardBody({ friend, index, linked = false }: { friend: FriendLink; index: number; linked?: boolean }) {
+  const handle = linked && friend.authorIsX ? friendXHandle(friend.author) : ''
   return (
     <>
       <span className={styles.serial}>
@@ -76,14 +81,27 @@ function CardBody({ friend, index }: { friend: FriendLink; index: number }) {
       <Stamp friend={friend} />
       <Postmark friend={friend} />
       <h3>{friend.name}</h3>
-      {friend.author && <span className={styles.who}>{friend.author}</span>}
+      {handle ? (
+        <a className={styles.who} href={`https://x.com/${handle}`} target="_blank" rel="noopener" aria-label={`${friend.author} 的 X 主页`}>
+          <Icon name="x" />
+          {friend.author}
+        </a>
+      ) : (
+        friend.author && <span className={styles.who}>{friend.author}</span>
+      )}
       <p className={styles.motto}>{friend.motto}</p>
       {friend.note && (
         <p className={styles.note}>{friend.note}</p>
       )}
       <div className={styles.address}>
         <span>寄往</span>
-        <span className={styles.domain}>{friendDomain(friend.url)}</span>
+        {linked ? (
+          <a className={styles.domain} href={friend.url} target="_blank" rel="noopener">
+            {friendDomain(friend.url)}
+          </a>
+        ) : (
+          <span className={styles.domain}>{friendDomain(friend.url)}</span>
+        )}
         <Icon name="arrow" />
       </div>
     </>
@@ -309,9 +327,9 @@ export function FriendsClient({ friends, self, card, cardDefaults, canEdit = fal
               <FriendControls friend={friend} index={index} total={shown.length} onEdit={() => setEditing(friend.id)} />
             </article>
           ) : (
-            <a className={styles.card} href={friend.url} target="_blank" rel="noopener" style={{ '--tilt': `${friendTilt(friend.url)}deg` } as CSSProperties} data-card={index} key={friend.id}>
-              <CardBody friend={friend} index={index} />
-            </a>
+            <article className={`${styles.card} ${styles.linkCard}`} style={{ '--tilt': `${friendTilt(friend.url)}deg` } as CSSProperties} data-card={index} key={friend.id}>
+              <CardBody friend={friend} index={index} linked />
+            </article>
           ),
         )}
         {editMode &&

@@ -290,6 +290,7 @@ export async function saveFriendLinkFromWeb(_state: UsesActionState, formData: F
     const input = parseFriendLinkInput({
       name: formData.get('name'),
       author: formData.get('author'),
+      authorIsX: formData.get('authorIsX') === 'on',
       url: formData.get('url'),
       avatarUrl: formData.get('logoUrl'),
       motto: formData.get('motto'),

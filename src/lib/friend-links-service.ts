@@ -1,5 +1,6 @@
 import { defaultSiteProfile, relationId } from './blog-data'
 import { parseLogoUrl, requiredText, resolvePublicOwner } from './explore-service'
+import { friendXHandle } from './friend-links-labels'
 import { getPayloadClient } from './payload'
 import type { Where } from 'payload'
 import type { FriendLink as PayloadFriendLink } from '../payload-types'
@@ -8,6 +9,7 @@ export type FriendLink = {
   id: string
   name: string
   author: string
+  authorIsX: boolean
   url: string
   avatarUrl: string
   motto: string
@@ -50,9 +52,14 @@ export function parseMetAt(value: unknown) {
 }
 
 export function parseFriendLinkInput(input: Record<string, unknown>): FriendLinkInput {
+  const author = optionalText(input.author, '站长', 40)
+  // 站长留空时勾不勾都没意义，按没勾处理；填了却不是用户名就提示，免得前台链到一个不存在的主页。
+  const authorIsX = Boolean(input.authorIsX) && author !== ''
+  if (authorIsX && !friendXHandle(author)) throw new Error('勾选了 X 用户名时，站长只能填 X 的用户名：字母、数字或下划线，最多 15 位。')
   return {
     name: requiredText(input.name, '站名', 40),
-    author: optionalText(input.author, '站长', 40),
+    author,
+    authorIsX,
     url: parseFriendUrl(input.url),
     avatarUrl: parseLogoUrl(input.avatarUrl, '头像地址'),
     motto: requiredText(input.motto, '一句话介绍', 80),
@@ -95,6 +102,7 @@ function publicFriend(row: PayloadFriendLink): FriendLink {
     id: String(row.id),
     name: row.name,
     author: row.author ?? '',
+    authorIsX: Boolean(row.authorIsX),
     url: row.url,
     avatarUrl: row.avatarUrl ?? '',
     motto: row.motto,

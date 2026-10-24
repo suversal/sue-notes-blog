@@ -324,6 +324,7 @@ export interface FriendLink {
   owner: string | User;
   name: string;
   author?: string | null;
+  authorIsX: boolean;
   url: string;
   avatarUrl?: string | null;
   motto: string;
@@ -715,6 +716,7 @@ export interface FriendLinksSelect<T extends boolean = true> {
   owner?: T;
   name?: T;
   author?: T;
+  authorIsX?: T;
   url?: T;
   avatarUrl?: T;
   motto?: T;

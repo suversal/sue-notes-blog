@@ -27,7 +27,7 @@ afterEach(() => {
 
 const self = { name: '苏码玩家', url: 'https://suversal.com', avatar: 'https://suversal.com/icon.svg', motto: '一个程序员的折腾记录。', author: 'Sue' }
 const friend = (overrides: Partial<FriendLink>): FriendLink => ({
-  id: 'lin', name: '林间纪事', author: '阿林', url: 'https://lin.example.com', avatarUrl: '', motto: '记录山里的周末。',
+  id: 'lin', name: '林间纪事', author: '阿林', authorIsX: false, url: 'https://lin.example.com', avatarUrl: '', motto: '记录山里的周末。',
   note: '徒步那几篇我收藏到现在。', metAt: '2024-05-12', isVisible: true, sortOrder: 10, ...overrides,
 })
 const friends = [
@@ -49,7 +49,7 @@ describe('友邻页面', () => {
 
   it('卡片显示编号、邮戳日期、推荐语和域名；有头像用头像，没有就用站名首字', () => {
     render(<FriendsClient friends={friends} self={self} />)
-    const [lin, tea] = within(screen.getByRole('region', { name: '友链列表' })).getAllByRole('link')
+    const [lin, tea] = within(screen.getByRole('region', { name: '友链列表' })).getAllByRole('article')
     expect(within(lin).getByText('No.01')).toBeTruthy()
     expect(within(lin).getByText('05·12')).toBeTruthy()
     expect(within(lin).getByText('徒步那几篇我收藏到现在。')).toBeTruthy()
@@ -58,6 +58,26 @@ describe('友邻页面', () => {
     expect(tea.querySelector('img')?.getAttribute('src')).toBe('https://img.example.com/tea.png')
     // 没填推荐语的卡片只有一句介绍，不留空引号
     expect(tea.querySelectorAll('p')).toHaveLength(1)
+  })
+
+  it('站长勾了 X 用户名时链到对方的 X 主页，其余照旧是文字', () => {
+    render(<FriendsClient friends={[friend({ author: '@AdrianPunk115', authorIsX: true }), friends[1]]} self={self} />)
+    const list = within(screen.getByRole('region', { name: '友链列表' }))
+    const x = list.getByRole('link', { name: '@AdrianPunk115 的 X 主页' })
+    expect(x.getAttribute('href')).toBe('https://x.com/AdrianPunk115')
+    expect(x.getAttribute('target')).toBe('_blank')
+    expect(list.getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual([
+      'https://x.com/AdrianPunk115',
+      'https://lin.example.com',
+      'https://byteandtea.example.dev',
+    ])
+  })
+
+  it('没勾 X 用户名的站长不做成链接，即使写法像个用户名', () => {
+    render(<FriendsClient friends={[friend({ author: 'Mira', authorIsX: false })]} self={self} />)
+    const list = within(screen.getByRole('region', { name: '友链列表' }))
+    expect(list.getByText('Mira').tagName).toBe('SPAN')
+    expect(list.getAllByRole('link')).toHaveLength(1)
   })
 
   it('页头统计公开的来信数和最早的结识月份，回信里列出本站信息', () => {

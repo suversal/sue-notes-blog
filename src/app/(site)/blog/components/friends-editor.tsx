@@ -52,6 +52,10 @@ export function FriendForm({ friend, onDone }: { friend?: FriendLink; onDone: ()
           <input name="author" maxLength={40} defaultValue={friend?.author} />
         </label>
       </div>
+      <label className={usesStyles.check}>
+        <input name="authorIsX" type="checkbox" defaultChecked={friend?.authorIsX ?? true} />
+        <span>站长填的是 X 用户名（卡片上点它去对方的 X 主页）</span>
+      </label>
       <label>
         <span>网址</span>
         <input name="url" type="url" required maxLength={500} defaultValue={friend?.url} placeholder="https://…" />
