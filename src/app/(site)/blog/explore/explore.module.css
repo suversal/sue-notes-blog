@@ -320,7 +320,7 @@
 .card,
 .savedRow {
   position: relative;
-  cursor: pointer;
+  cursor: var(--cursor-pointer, pointer);
 }
 
 .card h3 a::after,
@@ -459,7 +459,7 @@
 
 /* 编辑时卡片不再整张可点，否则操作按钮和链接会抢点击。 */
 .editable {
-  cursor: default;
+  cursor: var(--cursor-default, default);
 }
 
 .editable h3 a::after {

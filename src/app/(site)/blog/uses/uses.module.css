@@ -405,7 +405,7 @@
 }
 
 .controls button:disabled {
-  cursor: default;
+  cursor: var(--cursor-default, default);
   opacity: 0.35;
 }
 
@@ -515,7 +515,7 @@
 }
 
 .logoField .logo {
-  cursor: pointer;
+  cursor: var(--cursor-pointer, pointer);
 }
 
 .logoField .logo img {

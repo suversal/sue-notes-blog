@@ -119,7 +119,7 @@
 }
 
 .segment button:disabled {
-  cursor: default;
+  cursor: var(--cursor-default, default);
   opacity: 0.5;
 }
 

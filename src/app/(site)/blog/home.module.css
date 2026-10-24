@@ -215,7 +215,7 @@
 }
 .topicArrow:disabled {
   opacity: 0.24;
-  cursor: default;
+  cursor: var(--cursor-default, default);
 }
 .topicArrow svg {
   width: 16px;
@@ -650,7 +650,7 @@
   color: var(--muted);
   font-size: 14px;
   border-bottom: 2px solid transparent;
-  cursor: pointer;
+  cursor: var(--cursor-pointer, pointer);
   transition:
     color 150ms ease,
     border-color 150ms ease;

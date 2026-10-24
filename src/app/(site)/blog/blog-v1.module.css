@@ -25,12 +25,17 @@
   --plate-paper: #f8f7f2;
   --plate-secondary: #cbc9bd;
   --plate-highlight: #d8e4da;
+  /* 指针跟着配色走：平时是墨色小箭头，可点的地方换成强调色的手形。 */
+  --cursor-default: url('/cursors/default-light.svg') 6 5, default;
+  --cursor-pointer: url('/cursors/pointer-journal-light.svg') 10 2, pointer;
+  cursor: var(--cursor-default);
   overflow-x: clip;
 }
 :global(html[data-blog-transition='true']) .publicRoot {
   transition-duration: 360ms;
 }
 :global(html[data-blog-palette='paper']) .publicRoot {
+  --cursor-pointer: url('/cursors/pointer-paper-light.svg') 10 2, pointer;
   --bg: #eee9dc;
   --panel: #e5decd;
   --ink: #24221e;
@@ -48,6 +53,7 @@
   --plate-highlight: #ead2c5;
 }
 :global(html[data-blog-palette='mountain']) .publicRoot {
+  --cursor-pointer: url('/cursors/pointer-mountain-light.svg') 10 2, pointer;
   --bg: #eef0f6;
   --panel: #e1e5f0;
   --ink: #202534;
@@ -65,6 +71,7 @@
   --plate-highlight: #d7def1;
 }
 :global(html[data-blog-palette='indigo']) .publicRoot {
+  --cursor-pointer: url('/cursors/pointer-indigo-light.svg') 10 2, pointer;
   --bg: #efedf6;
   --panel: #e2deee;
   --ink: #252131;
@@ -90,7 +97,13 @@
   border: 0;
   background: none;
   color: inherit;
-  cursor: pointer;
+  cursor: var(--cursor-pointer);
+}
+.publicRoot :is(a[href], summary, label, select, [role='button']) {
+  cursor: var(--cursor-pointer);
+}
+.publicRoot :is(input:not([type='checkbox'], [type='radio'], [type='button'], [type='submit']), textarea, [contenteditable='true']) {
+  cursor: text;
 }
 .publicRoot a {
   text-decoration: none;
@@ -1721,6 +1734,8 @@
   --line: #3d423f;
   --accent: #55c98d;
   --olive: #9fa9a4;
+  --cursor-default: url('/cursors/default-dark.svg') 6 5, default;
+  --cursor-pointer: url('/cursors/pointer-journal-dark.svg') 10 2, pointer;
 
   --surface: #212422;
   --accent-wash: #2a2e2b;
@@ -1740,6 +1755,7 @@
   -webkit-backdrop-filter: none;
 }
 :global(html[data-blog-theme='dark'][data-blog-palette='paper']) .publicRoot {
+  --cursor-pointer: url('/cursors/pointer-paper-dark.svg') 10 2, pointer;
   --bg: #181815;
   --panel: #2b2a25;
   --ink: #f1eddf;
@@ -1757,6 +1773,7 @@
   --plate-highlight: #57382d;
 }
 :global(html[data-blog-theme='dark'][data-blog-palette='mountain']) .publicRoot {
+  --cursor-pointer: url('/cursors/pointer-mountain-dark.svg') 10 2, pointer;
   --bg: #171923;
   --panel: #292d3d;
   --ink: #eef0f8;
@@ -1774,6 +1791,7 @@
   --plate-highlight: #303b66;
 }
 :global(html[data-blog-theme='dark'][data-blog-palette='indigo']) .publicRoot {
+  --cursor-pointer: url('/cursors/pointer-indigo-dark.svg') 10 2, pointer;
   --bg: #19191d;
   --panel: #2b2b31;
   --ink: #f1f0f4;
@@ -1991,7 +2009,7 @@
     width: fit-content;
     min-height: 44px;
     align-items: center;
-    cursor: pointer;
+    cursor: var(--cursor-pointer, pointer);
     list-style: none;
   }
   .mobileToc summary::-webkit-details-marker {

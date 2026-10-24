@@ -17,7 +17,7 @@
   color: var(--ink);
   font: inherit;
   text-align: left;
-  cursor: pointer;
+  cursor: var(--cursor-pointer, pointer);
   transition:
     color 160ms,
     border-color 160ms,
@@ -99,7 +99,7 @@
   padding: 9px 11px;
   border-radius: 6px;
   color: var(--ink);
-  cursor: pointer;
+  cursor: var(--cursor-pointer, pointer);
 }
 .selectOptions > div[data-active='true']:not([aria-disabled='true']) {
   background: var(--select-option-hover-bg, var(--panel));
