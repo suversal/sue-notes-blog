@@ -9,7 +9,7 @@
 - `migrate`：先运行 Payload 显式迁移（`scripts/run-migrations.ts`，结束后会核对每个迁移都已记录）；失败时网站不会启动。不要改回 `pnpm payload migrate`：2026-10-12 部署时发现它在生产镜像里不输出、以 0 退出却没有执行迁移。
 - `web`：Next.js + Payload，只在 Docker 网络内监听 3100。
 - `gateway`：仅在宿主机 `127.0.0.1:3100` 提供 HTTP，把 `/artalk/*` 转到 Artalk，其余路径转到网站。
-- `edge`：以宿主机网络模式在 `443` 提供 HTTPS，使用 Oracle 上单独签发的 Cloudflare Origin CA 证书，再转发到本机 `3100`。它只接受 Cloudflare 官方回源 IP 段和本机环回地址；证书与私钥放在 `/etc/sue-notes-blog/tls`，不进入仓库或镜像。使用宿主机网络模式是为了让来源 IP 检查针对实际连接地址生效。
+- 对外入口（原 `edge` 服务）：2026-10-25 移到独立仓库 `server-gateway`（本机 `~/Developer/server-gateway`，服务器 `/home/ubuntu/server-gateway`），这样同一台机器加别的站点（如 pic.suversal.com）不用动博客。它以宿主机网络模式在 `443` 提供 HTTPS，使用 Cloudflare Origin CA 证书，把 suversal.com 转发到本机 `3100`；只接受 Cloudflare 官方回源 IP 段和本机环回地址；证书与私钥放在 `/etc/sue-notes-blog/tls`，不进入仓库或镜像。
 
 ## 首次上线前
 
@@ -18,7 +18,7 @@
 3. 把仓库代码复制到服务器的 `/home/ubuntu/sue-notes-blog`，不复制 `.env`、本机缓存、测试输出或 Docker 卷。在服务器以 `root:root`、`0600` 权限新建私有 `deploy/.env.production`，参考 `.env.production.example`。`POSTGRES_PASSWORD` 使用 URL 安全的随机十六进制；`PAYLOAD_SECRET` 和 `ARTALK_APP_KEY` 分别生成，不能复用。运行 Compose 时用 `sudo`，不把 `ubuntu` 加入具备 root 等效权限的 Docker 用户组。
 4. 用 `sudo docker compose --env-file deploy/.env.production -f deploy/compose.production.yml config --quiet` 检查配置，记录目标 Git commit 与服务器目录。先运行 `sudo docker compose --env-file deploy/.env.production -f deploy/compose.production.yml build migrate` 和 `sudo docker compose --env-file deploy/.env.production -f deploy/compose.production.yml up -d postgres`。把数据库备份恢复到这一空库，核对文章、修订、用户、主题和迁移记录数量，再运行 `sudo docker compose --env-file deploy/.env.production -f deploy/compose.production.yml up -d`；检查迁移任务退出码、数据库健康状态和容器日志。
 5. 在 Oracle 上生成独立私钥和 CSR，在 Cloudflare 创建包含 `suversal.com` 的 Origin CA 证书，将证书安装为 `/etc/sue-notes-blog/tls/origin.pem`，私钥为同目录的 `origin.key`。证书需与私钥匹配，且有效期内覆盖根域名。系统防火墙（`/usr/local/sbin/sue-notes-blog-firewall`）仅允许 Cloudflare 官方 IPv4 回源网段访问 TCP `443`；应用层也按官方回源网段过滤。Oracle 安全列表里的 `443` 是给另一台机器的 Xray 开的，不要改。
-6. 设 `PUBLIC_URL=https://suversal.com`，启动 `edge` 后先从本机检查 443 的 TLS、域名和反向代理。Cloudflare 区域保持 Full (strict)，不需要改写回源端口，直接创建根域名的橙云 A 记录。Cloudflare 的“始终使用 HTTPS”保持启用，不让 HTTP 请求回源到未开放的 80。
+6. 设 `PUBLIC_URL=https://suversal.com`，启动入口网关（现在是 `server-gateway`）后先从本机检查 443 的 TLS、域名和反向代理。Cloudflare 区域保持 Full (strict)，不需要改写回源端口，直接创建根域名的橙云 A 记录。Cloudflare 的“始终使用 HTTPS”保持启用，不让 HTTP 请求回源到未开放的 80。
 7. 从公网用真实浏览器验证首页、文章、登录、后台、图片、评论和手机布局；检查 `/artalk/api/v2/` 经过同源网关，并复查 Xray 与现有其他 Tunnel 服务。HTTP 200 和容器运行只属于基础检查。生产账号密码未存入此仓库，登录验收需由持有账号的人完成。
 
 ## 数据与更新
@@ -29,4 +29,4 @@
 
 ## 回源网段维护
 
-`Caddyfile.edge` 中的地址来自 Cloudflare 官方 `ips-v4` / `ips-v6` 列表，记录日期见文件注释。Cloudflare 更新地址时，应核对官方列表并更新配置、验证 Caddyfile、重建 `edge`；否则新网段回源会收到 403。旧的 Tunnel 仍为其他服务运行，知识库根域名不配置 Tunnel 路由。
+回源网段在 `server-gateway` 仓库的 `Caddyfile` 里维护，地址来自 Cloudflare 官方 `ips-v4` / `ips-v6` 列表。Cloudflare 更新地址时，应核对官方列表并更新配置、验证 Caddyfile、重建网关；否则新网段回源会收到 403。旧的 Tunnel 仍为其他服务运行，知识库根域名不配置 Tunnel 路由。

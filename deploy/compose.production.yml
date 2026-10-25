@@ -91,16 +91,8 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
 
-  edge:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    network_mode: host
-    depends_on:
-      gateway:
-        condition: service_started
-    volumes:
-      - ./Caddyfile.edge:/etc/caddy/Caddyfile:ro
-      - /etc/sue-notes-blog/tls:/etc/sue-notes-blog/tls:ro
+  # 对外 443 的入口（原 edge 服务）已移到独立仓库 server-gateway（服务器 /home/ubuntu/server-gateway），
+  # 它把 suversal.com 转到上面 gateway 的 127.0.0.1:3100。
 
 volumes:
   postgres_data:
