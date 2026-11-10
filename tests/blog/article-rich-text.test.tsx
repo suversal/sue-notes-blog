@@ -114,3 +114,16 @@ describe('public article links', () => {
     expect(html).toContain(`>X链接：<a`)
   })
 })
+describe('public article video', () => {
+  it('renders persisted MP4 media with inline controls and without autoplay', () => {
+    const content = { root: { type: 'root', version: 1, children: [{ type: 'article-video', version: 1, fields: { media: { id: 'video', url: 'https://img.example.com/demo.mp4', mimeType: 'video/mp4', alt: '操作演示' } } }] } } as unknown as ArticleContent
+    const html = renderToStaticMarkup(<ArticleRichText content={content} />)
+    expect(html).toContain('<video')
+    expect(html).toContain('controls=""')
+    expect(html).toContain('playsInline=""')
+    expect(html).toContain('preload="metadata"')
+    expect(html).toContain('aria-label="操作演示"')
+    expect(html).toContain('src="https://img.example.com/demo.mp4"')
+    expect(html).not.toContain('autoPlay')
+  })
+})

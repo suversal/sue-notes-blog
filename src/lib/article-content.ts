@@ -9,6 +9,7 @@ import type { Payload, RichTextField } from 'payload';
 import type { ArticleContent } from './article-content-data';
 import { PasteImageFeature } from '../lexical/paste-image-feature.server';
 import { EditorUxFeature } from '../lexical/editor-ux-feature.server';
+import { VideoFeature } from '../lexical/video-feature.server';
 
 const articleContentEditor = lexicalEditor({
   admin: { placeholder: '开始写正文，输入 / 可插入内容块…' },
@@ -18,6 +19,7 @@ const articleContentEditor = lexicalEditor({
     EXPERIMENTAL_TableFeature(),
     PasteImageFeature(),
     EditorUxFeature(),
+    VideoFeature(),
     FixedToolbarFeature(),
   ],
 });

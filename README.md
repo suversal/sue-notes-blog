@@ -18,7 +18,7 @@
 - 博客前台：首页、归档、探索、在用、友邻、关于页和文章详情，文章支持置顶和 Markdown 导出
 - 四套配色与明暗模式
 - 写作后台：登录、站点设置、主题管理和文章管理
-- Lexical 富文本编辑、Markdown/网页图文粘贴、图片上传和 Obsidian 笔记导入
+- Lexical 富文本编辑、Markdown/网页图文粘贴、图片与 MP4 视频上传和 Obsidian 笔记导入
 - 草稿、预览批准、发布、更新后二次确认、转为私密
 - Artalk 总阅读量、文章点赞、评论与评论管理；近 30 天阅读量和热门排行由博客自己的 `article_view_days` 表统计
 - SEO：站点地图、robots、Open Graph 与 X 分享卡片、文章结构化数据
@@ -70,6 +70,10 @@ Artalk 与博客复用同一个 PostgreSQL 数据库，数据表统一使用 `ar
 ## 图片存储
 
 图片上传到自建的 [CloudFlare-ImgBed](https://github.com/MarSeventh/CloudFlare-ImgBed)，数据库只保存外链。服务端配置见 `.env.example` 中的 `IMGBED_*`：上传 Token 只在服务端使用；上传渠道名由 `IMGBED_CHANNEL_NAME` 指定，默认 `Tel_Channel`，需要与你的 ImgBed 实例中实际存在的渠道一致，否则上传会失败。
+
+正文视频复用同一图床与 `media` 集合。点击编辑器工具栏的「插入视频」或在 `/` 菜单选择该项，上传单个不超过 50 MB 的 MP4；支持上传反馈、取消和失败重试，上传期间不能保存或发布。正文保存媒体 ID，读取文章和修订时由 Payload 填充媒体地址，编辑器、发布预览和博客正文均可播放。Markdown 导出保留视频文件链接。
+
+推荐上传 H.264 视频 / AAC 音频编码的 MP4；当前不做自动转码，其他编码的播放能力取决于浏览器。图床渠道必须允许 MP4，文件读取应支持 `Range` / `206 Partial Content`，以便手机播放和进度拖动。部署后用真实 MP4 验证上传、播放、保存刷新和预览；涉及大文件时还需核对网关请求大小、超时及图床渠道的分片支持。
 
 ## Umami 访问统计
 

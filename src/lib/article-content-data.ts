@@ -113,7 +113,7 @@ export function articleContentHasMeaningfulContent(content: ArticleContent): boo
   if (articleContentPlainText(content).trim()) return true;
   let hasUpload = false;
   const visit = (node: RichNode) => {
-    if (node.type === 'upload') hasUpload = true;
+    if (node.type === 'upload' || node.type === 'article-video') hasUpload = true;
     if (!hasUpload) for (const child of node.children ?? []) visit(child);
   };
   visit(content.root as RichNode);
@@ -139,6 +139,9 @@ export function normalizeArticleContentForEditor(content: ArticleContent): Artic
     if (node.type === 'upload' && node.value && typeof node.value === 'object' && 'id' in node.value) {
       const id = (node.value as { id?: unknown }).id;
       if (typeof id === 'string' || typeof id === 'number') node.value = id;
+    }
+    if (node.type === 'article-video' && node.fields?.media && typeof node.fields.media === 'object' && 'id' in node.fields.media) {
+      node.fields.media = (node.fields.media as { id: string }).id;
     }
     for (const child of node.children ?? []) visit(child);
   };

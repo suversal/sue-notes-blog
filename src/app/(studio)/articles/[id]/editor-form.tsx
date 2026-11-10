@@ -81,7 +81,7 @@ export function EditorForm({ articleId, status: articleStatus, initial, topics, 
   const persist = useCallback(async () => {
     if (!form.current || saving.current) return true;
     if (importing) {
-      setMessage('正文图片正在上传，请等待完成后再保存。');
+      setMessage('正文媒体正在上传，请等待完成后再保存。');
       return false;
     }
     if (coverUploading) {

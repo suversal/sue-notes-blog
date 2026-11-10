@@ -30,7 +30,7 @@ export function NewArticleForm({ topics }: { topics: { id: string; name: string 
   return <form className={styles.editorLayout} action={formAction} onSubmit={(event) => {
     if (importing || coverUploading) {
       event.preventDefault();
-      setSyncError(importing ? '请等待正文图片上传完成。' : '请等待封面上传完成。');
+      setSyncError(importing ? '请等待正文媒体上传完成。' : '请等待封面上传完成。');
       return;
     }
     setSyncError('');

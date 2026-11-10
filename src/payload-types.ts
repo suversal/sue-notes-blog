@@ -172,7 +172,7 @@ export interface Media {
   id: string;
   owner: string | User;
   /**
-   * 简短描述图片内容，供读屏和 Markdown 导出使用。
+   * 简短描述图片或视频内容，供读屏和导出使用。
    */
   alt: string;
   provider: 'imgbed';

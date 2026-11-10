@@ -21,6 +21,7 @@ const EDITOR_CONTROL_LABELS = [
   ['[data-button-key="inlineCode"]', '行内代码'],
   ['[data-button-key="codeBlock"]', '代码块'],
   ['[data-button-key="tableDirect"]', '插入表格'],
+  ['[data-button-key="insertVideo"]', '插入视频'],
   ['[data-button-key="horizontalRuleDirect"]', '分隔线'],
   ['[data-button-key="quoteToolbar"]', '引用'],
   ['.draggable-block-menu', '拖动调整段落位置'],
@@ -56,7 +57,13 @@ export function ArticleContentEditor({ value, onChange, onImportStateChange }: {
   useEffect(() => {
     const element = container.current;
     if (!element || !onImportStateChange) return;
-    const listener = (event: Event) => onImportStateChange(Boolean((event as CustomEvent<{ busy?: boolean }>).detail?.busy));
+    const active = new Set<string>();
+    const listener = (event: Event) => {
+      const { busy, source = 'images' } = (event as CustomEvent<{ busy?: boolean; source?: string }>).detail ?? {};
+      if (busy) active.add(source);
+      else active.delete(source);
+      onImportStateChange(active.size > 0);
+    };
     element.addEventListener(EDITOR_IMPORT_STATE_EVENT, listener);
     return () => element.removeEventListener(EDITOR_IMPORT_STATE_EVENT, listener);
   }, [onImportStateChange]);

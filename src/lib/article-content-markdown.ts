@@ -143,6 +143,8 @@ function fencedCode(codeValue: string, languageValue: unknown) {
 
 function blockNodeToMarkdown(node: LexicalNode): string {
   switch (node.type) {
+    case 'article-video':
+      return uploadToMarkdown({ ...node, value: node.fields?.media });
     case 'paragraph':
       return childMarkdown(node);
     case 'heading': {

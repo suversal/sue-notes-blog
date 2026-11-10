@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { uploadImageToImgBed } from '../../src/lib/imgbed';
+import { uploadImageToImgBed, uploadMediaToImgBed } from '../../src/lib/imgbed';
 
 const env = {
   DATABASE_URL: 'postgresql://postgres:postgres@localhost:55433/sue_notes_blog',
@@ -19,6 +19,18 @@ const file = {
 };
 
 describe('ImgBed client', () => {
+  it('uploads MP4 bytes through the existing authenticated channel', async () => {
+    const data = Buffer.from('000000186674797069736f6d0000020069736f6d6d703432', 'hex');
+    const request = vi.fn(async (_input: URL | RequestInfo, init?: RequestInit) => {
+      const uploaded = (init?.body as FormData).get('file') as File;
+      expect(uploaded.type).toBe('video/mp4');
+      expect(Buffer.from(await uploaded.arrayBuffer())).toEqual(data);
+      return Response.json([{ src: '/file/demo.mp4' }]);
+    });
+    const result = await uploadMediaToImgBed({ data, mimetype: 'video/mp4', name: 'demo.mp4', size: data.length }, { env, fetch: request as typeof fetch });
+    expect(result.publicUrl).toBe('https://img.suversal.com/file/demo.mp4');
+    await expect(uploadImageToImgBed({ data, mimetype: 'video/mp4', name: 'demo.mp4', size: data.length }, { env })).rejects.toThrow('只接受图片');
+  });
   it('uses server-side bearer auth and accepts the configured public origin', async () => {
     const request = vi.fn(async (input: URL | RequestInfo, init?: RequestInit) => {
       const endpoint = input instanceof URL ? input : new URL(String(input));

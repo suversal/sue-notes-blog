@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import type { File as PayloadFile } from 'payload';
 import { getServerEnv } from './env';
+import { isMP4, videoFileError } from './video-file';
 
 type ImgBedUpload = {
   publicUrl?: unknown;
@@ -17,14 +18,14 @@ export type ImgBedUploadResult = {
 async function fileBuffer(file: PayloadFile) {
   if (file.data.length > 0) return file.data;
   if (file.tempFilePath) return readFile(file.tempFilePath);
-  throw new Error('没有收到可上传的图片内容。');
+  throw new Error('没有收到可上传的文件内容。');
 }
 
 function normalizedBaseUrl(value: string) {
   return new URL(value.endsWith('/') ? value : `${value}/`);
 }
 
-export async function uploadImageToImgBed(
+export async function uploadMediaToImgBed(
   file: PayloadFile,
   options: {
     env?: Record<string, string | undefined>;
@@ -33,12 +34,18 @@ export async function uploadImageToImgBed(
     timeoutMs?: number;
   } = {},
 ): Promise<ImgBedUploadResult> {
-  if (!file.mimetype.startsWith('image/')) throw new Error('ImgBed 只接受图片文件。');
+  const isVideo = file.mimetype === 'video/mp4';
+  if (!file.mimetype.startsWith('image/') && !isVideo) throw new Error('只支持图片和 MP4 视频。');
 
   const env = getServerEnv(options.env);
   if (!env.IMGBED_API_TOKEN) throw new Error('图片服务尚未配置，请设置 IMGBED_API_TOKEN。');
 
   const buffer = await fileBuffer(file);
+  if (isVideo) {
+    const error = videoFileError({ name: file.name, type: file.mimetype, size: buffer.length });
+    if (error) throw new Error(error);
+    if (!isMP4(buffer)) throw new Error('文件内容不是有效的 MP4 视频。');
+  }
   const endpoint = new URL('upload', normalizedBaseUrl(env.IMGBED_API_URL));
   endpoint.searchParams.set('returnFormat', 'full');
   endpoint.searchParams.set('uploadFolder', env.IMGBED_UPLOAD_FOLDER);
@@ -47,7 +54,7 @@ export async function uploadImageToImgBed(
 
   const request = options.fetch ?? fetch;
   const retryDelayMs = options.retryDelayMs ?? 350;
-  const timeoutMs = options.timeoutMs ?? 15_000;
+  const timeoutMs = options.timeoutMs ?? (isVideo ? 120_000 : 15_000);
   let response: Response | undefined;
   let lastError: unknown;
   for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -80,12 +87,12 @@ export async function uploadImageToImgBed(
     : typeof first?.src === 'string'
       ? first.src
       : undefined;
-  if (!rawUrl) throw new Error('ImgBed 没有返回图片地址。');
+  if (!rawUrl) throw new Error('ImgBed 没有返回文件地址。');
 
   const publicUrl = new URL(rawUrl, env.IMGBED_PUBLIC_BASE_URL);
   const allowedOrigin = normalizedBaseUrl(env.IMGBED_PUBLIC_BASE_URL).origin;
   if (publicUrl.protocol !== 'https:' || publicUrl.origin !== allowedOrigin) {
-    throw new Error('ImgBed 返回了不受信任的图片地址。');
+    throw new Error('ImgBed 返回了不受信任的文件地址。');
   }
 
   return {
@@ -93,4 +100,9 @@ export async function uploadImageToImgBed(
     sha256: createHash('sha256').update(buffer).digest('hex'),
     storageKey: publicUrl.pathname.replace(/^\/+/, ''),
   };
+}
+
+export function uploadImageToImgBed(file: PayloadFile, options: Parameters<typeof uploadMediaToImgBed>[1] = {}) {
+  if (!file.mimetype.startsWith('image/')) return Promise.reject(new Error('此接口只接受图片文件。'));
+  return uploadMediaToImgBed(file, options);
 }

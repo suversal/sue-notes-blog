@@ -7,6 +7,8 @@ import { createElement, type CSSProperties } from 'react'
 import { linkifyArticleContentUrls, type ArticleContent } from '../../../../lib/article-content-data'
 import styles from '../blog-v1.module.css'
 import { CopyableCodeBlock } from './copyable-code-block'
+import { ArticleVideoPlayer } from '../../../../components/article-video-player'
+import type { SerializedVideoNode } from '../../../../lexical/video-node'
 
 type SerializedTextContainer = SerializedLexicalNode & { children?: SerializedLexicalNode[]; text?: string }
 
@@ -36,6 +38,7 @@ function renderArticleUpload(node: SerializedUploadNode) {
   const filename = typeof upload.filename === 'string' ? upload.filename : '附件'
   const mimeType = typeof upload.mimeType === 'string' ? upload.mimeType : ''
   if (!url) return null
+  if (mimeType === 'video/mp4') return <ArticleVideoPlayer src={url} title={typeof upload.alt === 'string' ? upload.alt : filename} />
   if (!mimeType.startsWith('image/')) return <a href={url} rel="noopener noreferrer">{filename}</a>
 
   const fields = node.fields ?? {}
@@ -81,6 +84,11 @@ export function ArticleRichText({ content }: { content: ArticleContent }) {
             />
           ),
           upload: ({ node }: { node: SerializedUploadNode }) => renderArticleUpload(node),
+          'article-video': ({ node }: { node: SerializedVideoNode }) => {
+            const media = node.fields?.media
+            if (!media || typeof media !== 'object' || media.mimeType !== 'video/mp4' || !media.url) return null
+            return <ArticleVideoPlayer src={media.url} title={media.alt || media.filename || '文章视频'} />
+          },
           heading: ({ node, nodesToJSX }: any) => {
             const id = node.tag === 'h1' || node.tag === 'h2' ? `section-${section++}` : undefined
             return createElement(node.tag, { id }, nodesToJSX({ nodes: node.children }))
