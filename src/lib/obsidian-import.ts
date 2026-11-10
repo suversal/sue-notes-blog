@@ -1,5 +1,6 @@
 import path from 'node:path';
 import yauzl, { type Entry, type ZipFile } from 'yauzl';
+import { MAX_VIDEO_SIZE } from './video-file';
 
 export const MAX_OBSIDIAN_ARCHIVE_SIZE = 50 * 1024 * 1024;
 const MAX_ARCHIVE_ENTRIES = 128;
@@ -40,7 +41,7 @@ function isSymbolicLink(entry: Entry) {
   return (unixMode & 0o170000) === 0o120000;
 }
 
-function readEntry(zip: ZipFile, entry: Entry) {
+function readEntry(zip: ZipFile, entry: Entry, limit: number) {
   return new Promise<Buffer>((resolve, reject) => {
     zip.openReadStream(entry, (error, stream) => {
       if (error || !stream) {
@@ -51,7 +52,7 @@ function readEntry(zip: ZipFile, entry: Entry) {
       let size = 0;
       stream.on('data', (chunk: Buffer) => {
         size += chunk.length;
-        if (size > MAX_ARCHIVE_FILE_SIZE) stream.destroy(archiveError(`文件 ${entry.fileName} 超过 10 MB。`));
+        if (size > limit) stream.destroy(archiveError(`文件 ${entry.fileName} 超过 ${limit / 1024 / 1024} MB。`));
         else chunks.push(Buffer.from(chunk));
       });
       stream.once('error', reject);
@@ -107,15 +108,16 @@ export function readObsidianArchive(buffer: Buffer): Promise<ObsidianArchive> {
           const extension = path.posix.extname(filePath).toLowerCase();
           const isMarkdown = extension === '.md';
           const isImage = imageExtensions.has(extension);
-          if (!isMarkdown && !isImage) {
+          const isVideo = extension === '.mp4';
+          if (!isMarkdown && !isImage && !isVideo) {
             zip.readEntry();
             return;
           }
-          const entryLimit = isMarkdown ? MAX_MARKDOWN_SIZE : MAX_ARCHIVE_FILE_SIZE;
+          const entryLimit = isMarkdown ? MAX_MARKDOWN_SIZE : isVideo ? MAX_VIDEO_SIZE : MAX_ARCHIVE_FILE_SIZE;
           if (entry.uncompressedSize > entryLimit) {
-            throw archiveError(isMarkdown ? 'Markdown 文件不能超过 2 MB。' : `图片 ${filePath} 不能超过 10 MB。`);
+            throw archiveError(isMarkdown ? 'Markdown 文件不能超过 2 MB。' : `${isVideo ? '视频' : '图片'} ${filePath} 不能超过 ${entryLimit / 1024 / 1024} MB。`);
           }
-          files.set(filePath, await readEntry(zip, entry));
+          files.set(filePath, await readEntry(zip, entry, entryLimit));
           zip.readEntry();
         })().catch(fail);
       });
@@ -138,7 +140,7 @@ export function readObsidianArchive(buffer: Buffer): Promise<ObsidianArchive> {
 }
 
 export function readObsidianFiles(markdownFile: ObsidianInputFile, assetFiles: ObsidianInputFile[]): ObsidianArchive {
-  if (assetFiles.length + 1 > MAX_ARCHIVE_ENTRIES) throw archiveError('文件过多，Markdown 和图片合计最多 128 个。');
+  if (assetFiles.length + 1 > MAX_ARCHIVE_ENTRIES) throw archiveError('文件过多，Markdown 和附件合计最多 128 个。');
   const markdownPath = normalizeArchivePath(markdownFile.path);
   if (path.posix.extname(markdownPath).toLowerCase() !== '.md') throw archiveError('请选择 Markdown 文件。');
   if (markdownFile.data.length === 0) throw archiveError('Markdown 文件为空。');
@@ -148,11 +150,14 @@ export function readObsidianFiles(markdownFile: ObsidianInputFile, assetFiles: O
   let totalSize = markdownFile.data.length;
   for (const asset of assetFiles) {
     const assetPath = normalizeArchivePath(asset.path);
-    if (files.has(assetPath)) throw archiveError(`包含重复图片路径：${assetPath}`);
-    if (!imageExtensions.has(path.posix.extname(assetPath).toLowerCase())) continue;
-    if (asset.data.length > MAX_ARCHIVE_FILE_SIZE) throw archiveError(`图片 ${assetPath} 不能超过 10 MB。`);
+    if (files.has(assetPath)) throw archiveError(`包含重复附件路径：${assetPath}`);
+    const extension = path.posix.extname(assetPath).toLowerCase();
+    const isVideo = extension === '.mp4';
+    if (!imageExtensions.has(extension) && !isVideo) continue;
+    const limit = isVideo ? MAX_VIDEO_SIZE : MAX_ARCHIVE_FILE_SIZE;
+    if (asset.data.length > limit) throw archiveError(`${isVideo ? '视频' : '图片'} ${assetPath} 不能超过 ${limit / 1024 / 1024} MB。`);
     totalSize += asset.data.length;
-    if (totalSize > MAX_UNCOMPRESSED_SIZE) throw archiveError('Markdown 和图片合计不能超过 100 MB。');
+    if (totalSize > MAX_UNCOMPRESSED_SIZE) throw archiveError('Markdown 和附件合计不能超过 100 MB。');
     files.set(assetPath, asset.data);
   }
 
@@ -196,26 +201,26 @@ export function extractObsidianDocument(markdown: string, markdownPath: string) 
 export function resolveObsidianAssetPath(markdownPath: string, source: string) {
   const rawPath = source.trim().split(/[?#]/, 1)[0] ?? '';
   if (!rawPath || /^(?:[a-z][a-z\d+.-]*:|\/)/i.test(rawPath)) {
-    throw archiveError(`图片必须使用同级 assets/ 或 asserts/ 相对路径：${source}`);
+    throw archiveError(`附件必须使用同级 assets/ 或 asserts/ 相对路径：${source}`);
   }
 
   let decodedPath = '';
   try {
     decodedPath = decodeURIComponent(rawPath);
   } catch {
-    throw archiveError(`图片路径编码无效：${source}`);
+    throw archiveError(`附件路径编码无效：${source}`);
   }
-  if (decodedPath.includes('\\')) throw archiveError(`图片路径不能使用反斜杠：${source}`);
+  if (decodedPath.includes('\\')) throw archiveError(`附件路径不能使用反斜杠：${source}`);
 
   const markdownDirectory = path.posix.dirname(normalizeArchivePath(markdownPath));
   const attachmentDirectory = decodedPath.split('/')[0];
   if (attachmentDirectory !== 'assets' && attachmentDirectory !== 'asserts') {
-    throw archiveError(`图片必须位于 Markdown 同级的 assets/ 或 asserts/：${source}`);
+    throw archiveError(`附件必须位于 Markdown 同级的 assets/ 或 asserts/：${source}`);
   }
   const assetRoot = path.posix.join(markdownDirectory, attachmentDirectory);
   const resolved = normalizeArchivePath(path.posix.join(markdownDirectory, decodedPath));
   if (!resolved.startsWith(`${assetRoot}/`)) {
-    throw archiveError(`图片必须位于 Markdown 同级的 assets/ 或 asserts/：${source}`);
+    throw archiveError(`附件必须位于 Markdown 同级的 assets/ 或 asserts/：${source}`);
   }
   return resolved;
 }

@@ -1,10 +1,11 @@
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import type { Payload, PayloadRequest } from 'payload';
-import { rewriteMarkdownImages } from './article-import';
+import { findMarkdownMediaSources, rewriteMarkdownMedia } from './article-import';
 import { createDraft } from './article-service';
 import { markdownToArticleContentStable } from './markdown-to-article-content';
 import { detectImageMimeType } from './remote-image';
+import { isMP4 } from './video-file';
 import { extractObsidianDocument, readObsidianArchive, resolveObsidianAssetPath, type ObsidianArchive } from './obsidian-import';
 
 function relationId(value: unknown) {
@@ -32,13 +33,21 @@ export async function importObsidianArticle({
   let uploadedCount = 0;
   let reusedCount = 0;
 
-  const rewritten = await rewriteMarkdownImages(document.bodyMarkdown, async ({ alt, source }) => {
+  const attachments = new Map<string, { assetPath: string; data: Buffer; kind: 'image' | 'video'; mimeType: string; sha256: string }>();
+  // Validate every referenced attachment before writing media or creating a draft.
+  for (const source of findMarkdownMediaSources(document.bodyMarkdown)) {
     const assetPath = resolveObsidianAssetPath(unpacked.markdownPath, source);
     const data = unpacked.files.get(assetPath);
-    if (!data) throw new Error(`找不到正文引用的图片：${assetPath}`);
-    const mimeType = detectImageMimeType(data);
-    if (!mimeType) throw new Error(`图片格式不受支持或内容已损坏：${assetPath}`);
+    if (!data) throw new Error(`找不到正文引用的附件：${assetPath}`);
+    const kind = path.posix.extname(assetPath).toLowerCase() === '.mp4' ? 'video' : 'image';
+    const mimeType = kind === 'video' ? isMP4(data) ? 'video/mp4' : null : detectImageMimeType(data);
+    if (!mimeType) throw new Error(`${kind === 'video' ? 'MP4 视频' : '图片'}格式不受支持或内容已损坏：${assetPath}`);
     const sha256 = createHash('sha256').update(data).digest('hex');
+    attachments.set(source, { assetPath, data, kind, mimeType, sha256 });
+  }
+
+  const rewritten = await rewriteMarkdownMedia(document.bodyMarkdown, async ({ alt, source }) => {
+    const { assetPath, data, kind, mimeType, sha256 } = attachments.get(source)!;
     const existing = await payload.find({
       collection: 'media',
       overrideAccess: true,
@@ -46,10 +55,10 @@ export async function importObsidianArticle({
       limit: 1,
       where: { and: [{ owner: { equals: owner } }, { sha256: { equals: sha256 } }] },
     });
-    const reused = existing.docs.find((media) => relationId(media.owner) === owner && media.mimeType?.startsWith('image/'));
+    const reused = existing.docs.find((media) => relationId(media.owner) === owner && media.mimeType === mimeType);
     if (reused) {
       reusedCount += 1;
-      return { id: String(reused.id), alt: reused.alt };
+      return { id: String(reused.id), alt: reused.alt, kind };
     }
 
     const media = await payload.create({
@@ -57,7 +66,7 @@ export async function importObsidianArticle({
       req,
       data: {
         owner,
-        alt: alt.trim().slice(0, 240) || path.posix.basename(assetPath),
+        alt: (kind === 'video' && alt === '导入图片' ? path.posix.basename(assetPath) : alt.trim() || path.posix.basename(assetPath)).slice(0, 240),
         provider: 'imgbed',
         storageKey: 'pending',
         sha256: 'pending',
@@ -71,7 +80,7 @@ export async function importObsidianArticle({
       },
     });
     uploadedCount += 1;
-    return { id: String(media.id), alt: media.alt };
+    return { id: String(media.id), alt: media.alt, kind };
   });
 
   const article = await createDraft(owner, {
@@ -82,6 +91,7 @@ export async function importObsidianArticle({
   return {
     articleId: String(article.id),
     imageCount: rewritten.imageCount,
+    videoCount: rewritten.videoCount,
     reusedCount,
     title: document.title,
     uploadedCount,

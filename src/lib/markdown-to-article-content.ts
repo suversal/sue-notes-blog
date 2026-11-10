@@ -54,6 +54,10 @@ function definitions(root: MarkdownNode) {
 }
 
 function uploadNode(node: MarkdownNode): LexicalNode | undefined {
+  const videoId = /^video:(.+)$/.exec(node.alt?.trim() ?? '')?.[1];
+  if (videoId && !node.url) return {
+    type: 'article-video', fields: { media: videoId }, format: '', id: randomUUID(), version: 1,
+  };
   const mediaId = /^media:(.+)$/.exec(node.alt?.trim() ?? '')?.[1];
   if (!mediaId || node.url) return undefined;
   return {

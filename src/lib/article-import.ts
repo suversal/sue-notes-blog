@@ -14,6 +14,8 @@ type MarkdownNode = {
 
 export type ImportedImage = { alt: string; id: string };
 export type ImportImage = (image: { alt: string; source: string }) => Promise<ImportedImage>;
+export type ImportedMedia = ImportedImage & { kind?: 'image' | 'video' };
+export type ImportMedia = (media: { alt: string; source: string }) => Promise<ImportedMedia>;
 
 function visit(node: MarkdownNode, callback: (node: MarkdownNode, parent?: MarkdownNode, index?: number) => void, parent?: MarkdownNode, index?: number) {
   callback(node, parent, index);
@@ -48,11 +50,14 @@ export function findMarkdownImageSources(markdown: string) {
   return [...new Set(sources)];
 }
 
+// Obsidian uses the same ![]() embed syntax for both images and MP4 files.
+export const findMarkdownMediaSources = findMarkdownImageSources;
+
 /**
- * Payload's upload transformer intentionally imports only ![relation:id]() placeholders.
- * This pass resolves normal CommonMark images, archives each source, and emits that official format.
+ * Archive CommonMark embeds and retain their positions with media ID placeholders.
+ * Images use Payload's media format; the stable importer maps video IDs to player nodes.
  */
-export async function rewriteMarkdownImages(markdown: string, importImage: ImportImage) {
+export async function rewriteMarkdownMedia(markdown: string, importMedia: ImportMedia) {
   const tree = parseMarkdown(markdown);
   const definitions = new Map<string, MarkdownNode>();
   visit(tree, (node) => {
@@ -71,15 +76,19 @@ export async function rewriteMarkdownImages(markdown: string, importImage: Impor
     }
   });
 
-  const bySource = new Map<string, Promise<ImportedImage>>();
+  const bySource = new Map<string, Promise<ImportedMedia>>();
+  let imageCount = 0;
+  let videoCount = 0;
   for (const job of jobs) {
     let imported = bySource.get(job.source);
     if (!imported) {
-      imported = importImage({ alt: job.alt, source: job.source });
+      imported = importMedia({ alt: job.alt, source: job.source });
       bySource.set(job.source, imported);
     }
-    const image = await imported;
-    const placeholder: MarkdownNode = { type: 'image', alt: `media:${image.id}`, title: null, url: '' };
+    const media = await imported;
+    if (media.kind === 'video') videoCount += 1;
+    else imageCount += 1;
+    const placeholder: MarkdownNode = { type: 'image', alt: `${media.kind === 'video' ? 'video' : 'media'}:${media.id}`, title: null, url: '' };
     if (job.parent?.children && job.index !== undefined) job.parent.children[job.index] = placeholder;
   }
 
@@ -93,5 +102,9 @@ export async function rewriteMarkdownImages(markdown: string, importImage: Impor
     tree.children = tree.children.filter((node) => node.type !== 'definition' || referencedDefinitions.has(normalizedIdentifier(node.identifier)));
   }
 
-  return { markdown: toMarkdown(tree as never, { extensions: [gfmToMarkdown()] }), imageCount: jobs.length };
+  return { markdown: toMarkdown(tree as never, { extensions: [gfmToMarkdown()] }), imageCount, videoCount };
+}
+
+export function rewriteMarkdownImages(markdown: string, importImage: ImportImage) {
+  return rewriteMarkdownMedia(markdown, importImage);
 }

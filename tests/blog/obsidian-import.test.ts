@@ -59,13 +59,17 @@ describe('Obsidian article import', () => {
       { name: '文章 B.md', webkitRelativePath: 'ghostty/文章 B.md' },
       { name: '文章 A.md', webkitRelativePath: 'ghostty/文章 A.md' },
       { name: 'Pasted image.png', webkitRelativePath: 'ghostty/asserts/Pasted image.png' },
+      { name: 'Recording_2026_11_9_21_48_07 1.mp4', webkitRelativePath: 'ghostty/assets/Recording_2026_11_9_21_48_07 1.mp4' },
       { name: '嵌套文章.md', webkitRelativePath: 'ghostty/archive/嵌套文章.md' },
     ]);
 
     expect(inspected.rootName).toBe('ghostty');
     expect(inspected.markdownFiles.map((file) => file.name)).toEqual(['文章 A.md', '文章 B.md']);
-    expect(inspected.attachmentDirectories).toEqual(['asserts']);
+    expect(inspected.attachmentDirectories).toEqual(['asserts', 'assets']);
     expect(inspected.imageFiles).toHaveLength(1);
+    expect(inspected.videoFiles).toHaveLength(1);
+    expect(inspected.attachmentFiles).toHaveLength(2);
+    expect(normalizeObsidianAttachmentSource('assets/Recording_2026_11_9_21_48_07%201.mp4')).toBe('assets/Recording_2026_11_9_21_48_07 1.mp4');
     expect(pathInsideSelectedFolder('ghostty/asserts/Pasted image.png')).toBe('asserts/Pasted image.png');
   });
 
@@ -130,6 +134,16 @@ describe('Obsidian article import', () => {
     expect(input.files.has('assets/Pasted image.png')).toBe(true);
   });
 
+  it('keeps MP4 attachments with spaces in both folder and ZIP imports, including videos larger than 10 MB', async () => {
+    const video = Buffer.alloc(11 * 1024 * 1024);
+    const videoPath = 'assets/Recording_2026_11_9_21_48_07 1.mp4';
+    const markdown = '# 录屏\n\n![](assets/Recording_2026_11_9_21_48_07%201.mp4)';
+    const files = readObsidianFiles({ path: 'article.md', data: Buffer.from(markdown) }, [{ path: videoPath, data: video }]);
+    expect(files.files.get(videoPath)?.length).toBe(video.length);
+    const archive = await readObsidianArchive(storedZip([{ name: 'article.md', data: markdown }, { name: videoPath, data: video }]));
+    expect(archive.files.get(videoPath)?.length).toBe(video.length);
+  });
+
   it('rejects remote, file and out-of-scope image paths', () => {
     for (const source of [
       'https://example.com/image.png',
@@ -158,10 +172,16 @@ describe('Obsidian article import', () => {
       '```',
       '',
       '![media:media-id]()',
+      '',
+      '录屏之前',
+      '',
+      '![video:video-id]()',
+      '',
+      '录屏之后',
     ].join('\n')) as unknown as { root: { children: Array<{ type: string }> } };
 
     expect(content.root.children.map((node) => node.type)).toEqual([
-      'heading', 'paragraph', 'list', 'table', 'code', 'upload',
+      'heading', 'paragraph', 'list', 'table', 'code', 'upload', 'paragraph', 'article-video', 'paragraph',
     ]);
   });
 });

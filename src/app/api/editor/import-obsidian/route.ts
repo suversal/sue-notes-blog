@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     const message = error instanceof Error ? error.message : 'Obsidian 文章导入失败。';
     const uploadFailure = message.includes('ImgBed') || message.includes('图床');
     return Response.json({
-      message: uploadFailure ? '文章图片已读取，但上传到图片服务器失败，请稍后重试。' : message,
+      message: uploadFailure ? '文章附件已读取，但上传到媒体服务器失败，请稍后重试。' : message,
     }, { status: uploadFailure ? 502 : 422 });
   }
 }

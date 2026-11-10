@@ -1,4 +1,5 @@
 const imageExtension = /\.(?:avif|gif|jpe?g|png|webp)$/i;
+const videoExtension = /\.mp4$/i;
 const attachmentDirectoryNames = new Set(['assets', 'asserts']);
 
 export type ObsidianFolderFile = {
@@ -29,7 +30,11 @@ export function inspectObsidianFolder<T extends ObsidianFolderFile>(files: T[]) 
     const relativePath = pathInsideSelectedFolder(file.webkitRelativePath);
     return attachmentDirectoryNames.has(relativePath.split('/')[0] ?? '') && imageExtension.test(file.name);
   });
-  return { attachmentDirectories, imageFiles, markdownFiles, rootName };
+  const videoFiles = files.filter((file) => {
+    const relativePath = pathInsideSelectedFolder(file.webkitRelativePath);
+    return attachmentDirectoryNames.has(relativePath.split('/')[0] ?? '') && videoExtension.test(file.name);
+  });
+  return { attachmentDirectories, attachmentFiles: [...imageFiles, ...videoFiles], imageFiles, videoFiles, markdownFiles, rootName };
 }
 
 export function normalizeObsidianAttachmentSource(source: string) {

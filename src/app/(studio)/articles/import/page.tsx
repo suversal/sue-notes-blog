@@ -13,7 +13,7 @@ export default function ImportObsidianPage() {
       <div>
         <p>IMPORT</p>
         <h1>从 Obsidian 导入</h1>
-        <span>把 Markdown 和本地图片收进网站，先生成草稿，再决定是否发布。</span>
+        <span>把 Markdown 与本地图片、视频收进网站，先生成草稿，再决定是否发布。</span>
       </div>
     </header>
     <ObsidianImportForm />

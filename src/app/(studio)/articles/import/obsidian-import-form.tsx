@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { findMarkdownImageSources } from '../../../../lib/article-import';
+import { findMarkdownMediaSources } from '../../../../lib/article-import';
+import { MAX_VIDEO_SIZE } from '../../../../lib/video-file';
 import { inspectObsidianFolder, normalizeObsidianAttachmentSource, pathInsideSelectedFolder } from '../../../../lib/obsidian-folder';
 import { Icon } from '../../../(site)/blog/components/ui-icon';
 import styles from './import.module.css';
@@ -16,6 +17,8 @@ type ImportProgress = { current: number; fileName: string; phase: 'checking' | '
 type FolderSelection = {
   attachmentDirectories: string[];
   imageFiles: File[];
+  videoFiles: File[];
+  attachmentFiles: File[];
   markdownFiles: File[];
   rootName: string;
 };
@@ -103,24 +106,28 @@ export function ObsidianImportForm() {
     setMessageTitle('无法导入');
     try {
       if (mode === 'folder' && folder) {
-        const availableImages = new Map(folder.imageFiles.map((file) => [pathInsideSelectedFolder(file.webkitRelativePath), file]));
+        const availableAttachments = new Map(folder.attachmentFiles.map((file) => [pathInsideSelectedFolder(file.webkitRelativePath), file]));
         const plans: { data: FormData; file: File }[] = [];
 
         for (const [index, markdown] of selectedMarkdownFiles.entries()) {
           setProgress({ current: index + 1, fileName: markdown.name, phase: 'checking', total: selectedMarkdownFiles.length });
           if (markdown.size > MAX_MARKDOWN_SIZE) throw new Error(`“${markdown.name}”超过 2 MB。`);
-          const referencedPaths = new Set(findMarkdownImageSources(await markdown.text())
+          const referencedPaths = new Set(findMarkdownMediaSources(await markdown.text())
             .map(normalizeObsidianAttachmentSource)
             .filter((source): source is string => Boolean(source)));
-          const missingImages = [...referencedPaths].filter((source) => !availableImages.has(source));
-          if (missingImages.length) throw new Error(`“${markdown.name}”引用的图片未在所选目录中找到：${missingImages[0]}`);
+          const missingAttachments = [...referencedPaths].filter((source) => !availableAttachments.has(source));
+          if (missingAttachments.length) throw new Error(`“${markdown.name}”引用的附件未在所选目录中找到：${missingAttachments[0]}`);
 
           const data = new FormData();
           data.set('source', 'files');
           data.set('markdown', markdown);
           data.set('markdownPath', pathInsideSelectedFolder(markdown.webkitRelativePath));
           for (const source of referencedPaths) {
-            data.append('asset', availableImages.get(source)!);
+            const file = availableAttachments.get(source)!;
+            const isVideo = /\.mp4$/i.test(file.name);
+            const limit = isVideo ? MAX_VIDEO_SIZE : 10 * 1024 * 1024;
+            if (file.size > limit) throw new Error(`${isVideo ? '视频' : '图片'} ${source} 不能超过 ${limit / 1024 / 1024} MB。`);
+            data.append('asset', file);
             data.append('assetPath', source);
           }
           plans.push({ data, file: markdown });
@@ -199,7 +206,7 @@ export function ObsidianImportForm() {
           <small>
             发现 {folder.markdownFiles.length} 篇文章
             {folder.attachmentDirectories.length
-              ? ` · 附件目录 ${folder.attachmentDirectories.join('、')} · ${folder.imageFiles.length} 张图片`
+              ? ` · 附件目录 ${folder.attachmentDirectories.join('、')} · ${folder.imageFiles.length} 张图片 · ${folder.videoFiles.length} 段视频`
               : ' · 未发现 assets 或 asserts'}
           </small>
         </span>
@@ -246,7 +253,8 @@ export function ObsidianImportForm() {
       <ul>
         <li>可以一次选择多篇文章，每篇都会分别保存为私密草稿。</li>
         <li>支持 <code>assets/</code>，并兼容已有的 <code>asserts/</code> 附件路径。</li>
-        <li>只上传正文引用的图片，导入结果只会保存为私密草稿。</li>
+        <li>只上传正文引用的图片和 MP4 视频，单图最大 10 MB，单个视频最大 50 MB。</li>
+        <li>导入结果只会保存为私密草稿。</li>
       </ul>
     </section>
 
